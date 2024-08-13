@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import HeaderSearchComponent from './HeaderSearchComponent';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const HeaderTopComponent = () => {
   const [isToggled, setIsToggled] = useState(false);
@@ -44,6 +45,16 @@ const HeaderTopComponent = () => {
     setIsToggled(!isToggled);
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8787/logout', {}, { withCredentials: false });
+      // 세션 스토리지 초기화
+      window.sessionStorage.removeItem("user");
+      alert('로그아웃 완료');
+    } catch (error) {
+      console.error('로그아웃 에러:', error);
+    }
+  };
 
     return (
         <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -66,8 +77,8 @@ const HeaderTopComponent = () => {
               <Link to='/myPage' style={{color:'white', textDecorationLine:'none', marginRight:20}}>
                 <i className="bi bi-person-circle"></i> 마이페이지
                 </Link>
-              <Link to='/login' style={{color:'white', textDecorationLine:'none', marginRight:20}}>
-                 <i className="bi bi-person-fill-slash"></i> 로그아웃
+              <Link to='/' onClick={handleLogout} style={{color:'white', textDecorationLine:'none', marginRight:20}}>
+                <i className="bi bi-person-fill-slash"></i> 로그아웃
             </Link>
         </nav>
     );

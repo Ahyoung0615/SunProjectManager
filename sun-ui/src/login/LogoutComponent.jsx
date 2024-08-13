@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const LogoutComponent = () => {
     const location = useLocation();
-     const { empcode, authorities } = location.state.userData;
+    const { empcode, authorities } = location.state.userData;
     const handleLogout = async () => {
         try {
           await axios.post('http://localhost:8787/logout', {}, { withCredentials: false });

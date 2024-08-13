@@ -40,7 +40,6 @@ const LoginComponent = () => {
             const userData = {
                 empcode: response.data.empcode,
                 authorities: response.data.authorities,
-                
             };
     
             window.sessionStorage.setItem("user", JSON.stringify(userData));
