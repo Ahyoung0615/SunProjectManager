@@ -5,7 +5,7 @@
 <mapper namespace="TestMapper">
 	<insert id="testInsert">
 		INSERT INTO JOB (JOB_CODE, JOB_NAME)
-		VALUES(2, 'test')
+		VALUES(2, 'test2')
 	</insert>
 	
 	<select id="testSelect" resultType="JobVo">

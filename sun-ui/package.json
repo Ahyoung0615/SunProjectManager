@@ -1,0 +1,53 @@
+{
+  "name": "sun-ui",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.3",
+    "bootstrap": "^4.6.2",
+    "bootstrap-icons": "^1.11.3",
+    "chart.js": "^4.4.3",
+    "date-fns": "^3.6.0",
+    "font-awesome": "^4.7.0",
+    "ion-datetime-picker": "^0.5.2",
+    "jquery": "^3.7.1",
+    "jstree": "^3.3.16",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-datepicker": "^7.3.0",
+    "react-dom": "^18.3.1",
+    "react-jstree-table": "^0.0.24",
+    "react-router-dom": "^6.26.0",
+    "react-scripts": "5.0.1",
+    "react-simple-jstree": "^0.2.2",
+    "simple-datatables": "^9.0.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
