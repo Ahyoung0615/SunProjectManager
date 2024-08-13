@@ -7,13 +7,13 @@
 	<select id="login" resultType="EmployeeVo">
 		SELECT * 
 		FROM EMPLOYEE
-		WHERE EMP_CODE = #{emp_code} AND EMP_PW = #{emp_pw}
+		WHERE EMP_CODE = #{empCode} AND EMP_PW = #{empPw}
 	</select>
 	
 	<select id="Info" parameterType="String" resultType="EmployeeVo">
 		SELECT * 
 		FROM EMPLOYEE 
-		WHERE EMP_CODE = #{emp_code} 
+		WHERE EMP_CODE = #{empCode} 
 	</select>
 	
 </mapper>

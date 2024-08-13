@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -42,7 +43,8 @@ public class SecurityConfig{
                     .formLogin(formLogin -> formLogin
                         .loginPage("/login")                            // 사용자 정의 로그인 페이지 설정
                         .loginProcessingUrl("/loginProc")               // 로그인 처리를 담당할 엔드포인트 설정
-                        .usernameParameter("email")                     // 이메일을 로그인 ID로 사용
+                        .usernameParameter("empcode")     // empcode을 로그인 ID로 사용
+                        .passwordParameter("emppw")       //emppw를 로그인 PW로 사용 (설정안할시 password고정)
                         .defaultSuccessUrl("/loginOk", true)            // 로그인 성공 시 리디렉션할 URL 설정
                     )
                     .logout(logout -> logout
@@ -50,7 +52,13 @@ public class SecurityConfig{
                         .logoutSuccessUrl("/logoutOk")                  // 로그아웃 성공 시 리디렉션할 URL 설정
                         .invalidateHttpSession(true)                    // 로그아웃 시 세션 무효화
                         .deleteCookies("JSESSIONID")                    // 세션 쿠키 삭제
-                    );
+                    )
+                    .sessionManagement(session -> session
+                            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                            .maximumSessions(1) // 사용자당 최대 세션 수를 1로 설정
+                            .maxSessionsPreventsLogin(false) // 최대 세션 수 초과 시 새로운 로그인 허용 여부
+                        );
+                    
 
                 // CORS 필터를 추가
                 http.addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class);

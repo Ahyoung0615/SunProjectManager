@@ -9,10 +9,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.brs.sun.model.service.EmployeeService;
-
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,17 +25,15 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "http://localhost:3000/")
 public class LoginController {
 
-	private final EmployeeService employeeService;
 	
+	//로그인
 	@GetMapping(value="/loginOk")
 	public ResponseEntity<Map<String, String>> loginOk(){
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null || !authentication.isAuthenticated()) {
-	        log.info("Authentication 객체가 null이거나 인증되지 않았습니다.");
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-	    }
+		
 		String empcode = authentication.getName();
 		String authorities = authentication.getAuthorities().toString();
+		
 		log.info("로그인한 유저 아이디:" + empcode);
         log.info("유저 권한:" + authentication.getAuthorities());
 
@@ -41,7 +42,27 @@ public class LoginController {
 		
         return ResponseEntity.ok(login);
 	}
+	//로그아웃
+	@GetMapping("/logoutOk")
+    public String logoutOk() {
+        log.info("로그아웃 성공: {}");
+        return "멍청아 성공하라고";
+    }
+	@PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession(false);
 
+        if (session != null) {
+            session.invalidate();
+        }
+
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath(request.getContextPath());
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
+    }
 	private Map<String, String> createUserInfo(String empcode, String authorities) {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("empcode", empcode);
