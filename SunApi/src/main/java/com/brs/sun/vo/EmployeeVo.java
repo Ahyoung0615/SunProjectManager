@@ -18,7 +18,7 @@ public class EmployeeVo {
 	// 사원
 
 	// 사번, PK
-	private int empCode;
+	private String empCode;
 	// 이름
 	private String empName;
 	// 비밀번호
@@ -40,5 +40,5 @@ public class EmployeeVo {
 	// 사원 사진(경로)
 	private String empImg;
 	// 권한 (관리자 A 11, 유저 U 12)
-	private int commCode;
+	private String commCode;
 }
