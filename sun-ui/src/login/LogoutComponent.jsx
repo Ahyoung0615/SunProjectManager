@@ -7,7 +7,7 @@ const LogoutComponent = () => {
      const { empcode, authorities } = location.state.userData;
     const handleLogout = async () => {
         try {
-          await axios.post('http://localhost:8081/logout', {}, { withCredentials: false });
+          await axios.post('http://localhost:8787/logout', {}, { withCredentials: false });
           // 세션 스토리지 초기화
           window.sessionStorage.removeItem("user");
           alert('로그아웃 완료');

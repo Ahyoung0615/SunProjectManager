@@ -45,8 +45,8 @@ public class LoginController {
 	//로그아웃
 	@GetMapping("/logoutOk")
     public String logoutOk() {
-        log.info("로그아웃 성공: {}");
-        return "멍청아 성공하라고";
+        log.info("로그아웃 성공");
+        return "succes";
     }
 	@PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
