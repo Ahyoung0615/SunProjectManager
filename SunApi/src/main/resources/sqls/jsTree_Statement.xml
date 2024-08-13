@@ -5,4 +5,14 @@
 
 <mapper namespace="com.brs.sun.model.dao.JsTreeDao">
 	
+	<select id="selectDept" resultType="DepartmentVo">
+		SELECT *
+		FROM DEPARTMENT
+	</select>
+	
+	<select id="selectEmp" resultType="EmployeeVo">
+		SELECT *
+		FROM EMPLOYEE
+	</select>
+	
 </mapper>
