@@ -7,7 +7,7 @@ const LoginComponent = () => {
 
     const storedUserData = window.sessionStorage.getItem("user");
     const initialUser = storedUserData ? JSON.parse(storedUserData) : { empcode: '', emppw: '' };
-
+    const [userData, setUserData] = useState();
     const [user, setUser] = useState(initialUser);
 
     const handleChange = (e) => {
@@ -42,9 +42,9 @@ const LoginComponent = () => {
                 authorities: response.data.authorities,
                 
             };
-    
+            
             window.sessionStorage.setItem("user", JSON.stringify(userData));
-    
+            
             navigate('/logout', { state: { userData: response.data } });
           }
         } catch (error) {
