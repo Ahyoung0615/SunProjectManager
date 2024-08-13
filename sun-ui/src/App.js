@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './login/LoginComponent';
+import LogoutComponent from './login/LogoutComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import './App.css';
+
 import MainContentComponent from './maincontent/MainContentComponent';
 import MyPageComponent from './mypage/MyPageComponent';
 import AttendenceComponent from './attendence/AttendenceComponent';
@@ -40,7 +42,6 @@ import VehicleRentDetailComponent from './vehicle/VehicleRentDetailComponent';
 import VehicleRentListComponent from './vehicle/VehicleRentListComponent';
 import FVehicleDetailComponent from './fvehicle/FVehicleDetailComponent';
 import Error404Component from './error/Error404Component';
-import LoginComponent from './login/LoginComponent';
 
 function App() {
   const [sessionAccess, setSessionAccess] = useState(false);
@@ -67,8 +68,9 @@ function App() {
           <div id="layoutSidenav_content">
             <main>
               <Routes>
-                <Route path="/" element={<MainContentComponent />} />
-                <Route path="/login" element={<LoginComponent />} />
+                <Route path="/" element={<Login />} />
+                <Route path="/logout" element={<LogoutComponent />} />
+                <Route path="/home" element={<MainContentComponent />} />
                 <Route path="/myPage" element={renderComponent(MyPageComponent)} />
 
                 <Route path="/attendence" element={renderComponent(AttendenceComponent)} />
