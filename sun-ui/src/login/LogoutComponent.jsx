@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import MainContentComponent from './../maincontent/MainContentComponent';
 
 const LogoutComponent = () => {
     const location = useLocation();
@@ -18,11 +19,7 @@ const LogoutComponent = () => {
       };
     return (
         <div>
-            로그인완료
-            <h1>사용자 정보</h1>
-            <p>이메일: {empcode}</p>
-            <p>권한: {authorities}</p>
-            <button onClick={handleLogout}>로그아웃</button>
+            <MainContentComponent/>
         </div>
     );
 };

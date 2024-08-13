@@ -20,6 +20,6 @@ server:
   
 mybatis:
   type-aliases-package: com.brs.sun.vo
-  mapper-locations: classpath:sqls/*.xml
+  mapper-locations: sqls/*.xml
   configuration:
     map-underscore-to-camel-case: true
