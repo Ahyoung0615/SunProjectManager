@@ -1,11 +1,12 @@
 import React from 'react';
-import OrgChartComponent from '../commodule/OrgChartComponent';
+
 
 const DocumentListComponent = () => {
     return (
         <div>
             DocumentListComponent
-            <OrgChartComponent/>
+            
+            <a href='/fileTest'>파일 테스트</a>
         </div>
     );
 };

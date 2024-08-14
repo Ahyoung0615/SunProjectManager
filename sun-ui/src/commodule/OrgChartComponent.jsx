@@ -13,6 +13,8 @@ const OrgChartComponent = () => {
     const [show, setShow] = useState(false);
     const treeRef = useRef(null);
 
+    const serverUrl = "http://localhost:8787/api/";
+
     useEffect(() => {
         const jsTreeData = async () => {
           try {
@@ -39,7 +41,6 @@ const OrgChartComponent = () => {
     
           $(treeRef.current).on("select_node.jstree", function (e, data) {
             console.log("tree text: ", data.node.original.text);
-            console.log(data.node);
             if(data.node.original.parent !== "#"){
                 const selectedText = data.node.original.text;
                 setChoiceArr((prevChoices) => {
@@ -70,7 +71,7 @@ const OrgChartComponent = () => {
       const sendDataToServer = useCallback(async () => {
         if (choiceArr.length > 0) {
             try {
-                const res = await axios.post("http://localhost:8787/", choiceArr, {
+                const res = await axios.post(serverUrl + "empList", choiceArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });
                 console.log("server ok: ", res.data);

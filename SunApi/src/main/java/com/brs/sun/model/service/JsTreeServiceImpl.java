@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class JsTreeServiceImpl implements JsTreeService {
 
 	private final JsTreeDao dao;
-	
+
 	@Override
 	public List<DepartmentVo> getDept() {
 		return dao.getDept();
