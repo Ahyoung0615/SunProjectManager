@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.brs.sun.dao.EmployeeDao;
+import com.brs.sun.model.dao.EmployeeDao;
 import com.brs.sun.vo.EmployeeVo;
 
 

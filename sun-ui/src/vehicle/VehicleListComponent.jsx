@@ -28,7 +28,6 @@ const VehicleListComponent = () => {
       {/* 차량 관리 테이블 */}
       <table className="table table-bordered">
         <thead>
-            
           <tr>
             <th>차량등록번호</th>
             <th>차량번호</th>
