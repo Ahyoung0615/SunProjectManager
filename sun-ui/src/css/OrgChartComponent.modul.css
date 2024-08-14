@@ -1,5 +1,5 @@
 /* Flexbox 컨테이너 */
-.container {
+.treeBox {
     display: flex; /* Flexbox 사용 */
     justify-content: space-between; /* 두 div를 양옆으로 배치 */
     overflow-x: hidden;

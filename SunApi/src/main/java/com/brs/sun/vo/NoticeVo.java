@@ -29,6 +29,6 @@ public class NoticeVo {
 	private LocalDateTime notiDate;
 	// 삭제 여부 (삭제 Y, 유지 N)
 	private String notiDelflag;
-	// 중요 게시글 여부
-	private int commode;
+	// 중요 게시판 여부 (중요 I, 일반 N)
+	private String notiStatus;
 }

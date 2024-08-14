@@ -27,6 +27,6 @@ public class EDocVo {
 	private int empCode;
 	// 기안 일자
 	private LocalDateTime edocDate;
-	// 결재 상태
-	private String commCode;
+	// 결재 상태 (결재 대기중 A, 결재 완료 S, 반려 R, 회수 C)
+	private String edocStatus;
 }
