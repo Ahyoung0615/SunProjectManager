@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-
+import { Link } from 'react-router-dom';
 
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
@@ -95,7 +95,7 @@ const MemberListComponent = () => {
                 <tbody>
                     {emp.map((item, index) =>(
                         <tr key={index}>
-                            <td>{item.empCode}</td>
+                            <td><Link to={`/memberList/${item.empCode}`}>{item.empCode}</Link></td>
                             <td>{item.empName}</td>
                             <td>{getDeptTitle(item.deptCode)}</td>
                             <td>{getJobTitle(item.jobCode)}</td>

@@ -43,7 +43,7 @@ public class SecurityConfig{
         		.csrf(csrf -> csrf.disable())
         		.authorizeHttpRequests(authorize -> authorize
                 //.antMatchers("/주소입력").hasRole("")<< 만약 입력 1을 넣으면 prefix로 ROLE_가 붙으면서 새로운 권한이 생김
-        				.requestMatchers("/admin/**").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
+        				.requestMatchers("/memberList").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
                         .anyRequest().permitAll()                      // 그 외의 모든 요청은 누구나 접근 가능
                     )
