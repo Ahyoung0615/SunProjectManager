@@ -36,7 +36,11 @@ public class JsTreeController {
 		
 		List<DepartmentVo> deptList = service.getDept();
 		for (DepartmentVo departmentVo : deptList) {
-			jsList.add(new JsTreeResponse(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/deptImg.png"));
+			if(departmentVo.getDeptCode() == 1) {
+				jsList.add(new JsTreeResponse(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/masterBall.png"));
+			} else {
+				jsList.add(new JsTreeResponse(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/deptImg.png"));
+			}
 		}
 		
 		List<EmployeeVo> empList = service.getEmp();
@@ -51,6 +55,11 @@ public class JsTreeController {
 		return jsList;
 	}
 	
+	/**
+	 * jsTree 에서 서버로 전송된 Array 사용 Api
+	 * @param choiceList
+	 * @return ok 문자열 반환
+	 */
 	@PostMapping("/empList")
 	public String getChoiceEmp(@RequestBody List<String> choiceList) {
 		log.info("choiceArr: {}", choiceList);
