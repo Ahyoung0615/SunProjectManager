@@ -19,8 +19,8 @@
 	<select id="MemberList" resultType="EmployeeVo">
 		SELECT *
 		FROM EMPLOYEE
-		WHERE EMP_STATUS = "Y"
-		ORDER BY EMP_CODE DESC
+		WHERE EMP_STATUS = 'Y'
+		ORDER BY EMP_CODE ASC
 	</select>
 	
 </mapper>

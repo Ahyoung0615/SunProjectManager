@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 사용자 조회, 없으면 예외 발생
         EmployeeVo emp = employeeDao.Info(empcode);
         String empCodet = String.valueOf(emp.getEmpCode());
-        String commCode = String.valueOf(emp.getEmpAuth());
+
         if (empCodet == null) {
             throw new UsernameNotFoundException("User not found with ID: " + empcode);
         }
@@ -37,7 +37,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
         		empCodet,
                 emp.getEmpPw(),
-                Collections.singleton(new SimpleGrantedAuthority(commCode)));
+                Collections.singleton(new SimpleGrantedAuthority(emp.getEmpAuth())));
         
     }
 

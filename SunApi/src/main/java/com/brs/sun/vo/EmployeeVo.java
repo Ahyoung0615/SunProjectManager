@@ -43,5 +43,5 @@ public class EmployeeVo {
 	private String empImg;
 	// 사용자 권한 (유저 U, 관리자 A)
 	private String empAuth;
-	
+
 }
