@@ -1,10 +1,11 @@
 /* Flexbox 컨테이너 */
+/*
 .container {
-    display: flex; /* Flexbox 사용 */
-    justify-content: space-between; /* 두 div를 양옆으로 배치 */
+    display: flex; 
+    justify-content: space-between; 
     overflow-x: hidden;
   }
-  
+  */
   /* tree-container의 높이 및 스크롤 */
   .tree-container {
     height: 300px; /* 원하는 높이 설정 */

@@ -11,7 +11,7 @@ import com.brs.sun.vo.EmployeeVo;
 @Mapper
 public interface EmployeeDao {
 
-	List<EmployeeVo> MemberDetail();
+	List<EmployeeVo> MemberList();
 	
 	EmployeeVo login(String empcode, String emppw);
 	
