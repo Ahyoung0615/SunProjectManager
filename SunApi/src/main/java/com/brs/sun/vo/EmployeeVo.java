@@ -29,6 +29,8 @@ public class EmployeeVo {
 	private int jobCode;
 	// 이메일
 	private String empEmail;
+	// 전화번호
+	private String empTel;
 	// 주소
 	private String empAddress;
 	// 성별
@@ -39,6 +41,7 @@ public class EmployeeVo {
 	private String empStatus;
 	// 사원 사진(경로)
 	private String empImg;
-	// 권한 (관리자 A 11, 유저 U 12)
+	// 사용자 권한 (유저 U, 관리자 A)
 	private String empAuth;
+
 }

@@ -35,6 +35,6 @@ public class DeliveryVo {
 	private int empCode;
 	// 배송 용량 (무게)
 	private int deliveryWeight;
-	// 운송 상태
-	private int commCode;
+	// 운송 상태 (예약 R, 출발 D, 도착 A, 취소 C)
+	private String deliveryStatus;
 }

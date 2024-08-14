@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.brs.sun.dto.response.JsTreeResponse;
 import com.brs.sun.model.service.JsTreeService;
 import com.brs.sun.vo.DepartmentVo;

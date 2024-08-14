@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 사용자 조회, 없으면 예외 발생
         EmployeeVo emp = employeeDao.Info(empcode);
         String empCodet = String.valueOf(emp.getEmpCode());
-        
+
         if (empCodet == null) {
             throw new UsernameNotFoundException("User not found with ID: " + empcode);
         }
