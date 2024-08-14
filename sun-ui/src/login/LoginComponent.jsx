@@ -43,8 +43,8 @@ const LoginComponent = () => {
             };
             
             window.sessionStorage.setItem("user", JSON.stringify(userData));
-            
-            navigate('/logout', { state: { userData: response.data } });
+
+            navigate('/access', { state: { userData: response.data } });
           }
         } catch (error) {
           alert('로그인 실패');

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './login/LoginComponent';
-import LogoutComponent from './login/LogoutComponent';
+import AccessComponent from './login/AccessComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -52,25 +52,30 @@ function App() {
   }, []);
 
   const renderComponent = (Component) => {
-    //return sessionAccess ? <Component /> : <Error404Component />;
-    return  <Component />;
+    return sessionAccess ? <Component /> : <Error404Component />;
+    
   };
+
+  const sessionComponent = (Component) => {
+    return sessionAccess ? <Component /> : <Login />;
+  }
 
   return (
     <Router>
       <RenderingScrollTopComponent />
       <div className="sb-nav-fixed">
-        <HeaderTopComponent />
+      <HeaderTopComponent />
         <div id="layoutSidenav">
           <div id="layoutSidenav_nav">
-            <HeaderSideComponent />
+          <HeaderSideComponent />
+            
           </div>
           <div id="layoutSidenav_content">
             <main>
               <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/logout" element={<LogoutComponent />} />
-                <Route path="/home" element={<MainContentComponent />} />
+                <Route path="/access" element={<AccessComponent />} />
+                <Route path="/home" element={sessionComponent(MainContentComponent)}/> 
                 <Route path="/myPage" element={renderComponent(MyPageComponent)} />
 
                 <Route path="/attendence" element={renderComponent(AttendenceComponent)} />
