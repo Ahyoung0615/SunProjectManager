@@ -99,8 +99,7 @@ const OrgChartComponent = (props) => {
     
       return (
         <div>
-          <button onClick={arrChk}>chk</button>
-          <button onClick={openModal}>모달팝업</button>
+          <button onClick={openModal}>{props.buttonName}</button>
           <ModalComponent 
             open={show} 
             close={closeModal} 
