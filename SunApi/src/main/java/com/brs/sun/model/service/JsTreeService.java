@@ -7,7 +7,15 @@ import com.brs.sun.vo.EmployeeVo;
 
 public interface JsTreeService {
 
-public List<DepartmentVo> getDept();
+	/**
+	 * 전체 부서 리스트 반환
+	 * @return List<DepartmentVo>
+	 */
+	public List<DepartmentVo> getDept();
 	
+	/**
+	 * 전체 사원 리스트 반환
+	 * @return List<EmployeeVo>
+	 */
 	public List<EmployeeVo> getEmp();
 }

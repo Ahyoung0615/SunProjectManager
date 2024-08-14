@@ -43,6 +43,9 @@ import VehicleRentListComponent from './vehicle/VehicleRentListComponent';
 import FVehicleDetailComponent from './fvehicle/FVehicleDetailComponent';
 import Error404Component from './error/Error404Component';
 
+
+import FileUploadTest from './document/FileUploadTest';
+
 function App() {
   const [sessionAccess, setSessionAccess] = useState(false);
 
@@ -111,6 +114,9 @@ function App() {
                 <Route path="/boardList" element={renderComponent(BoardListComponent)} />
                 <Route path="/chatSun" element={renderComponent(ChatSunComponent)} />
                 
+                {/* fileUpload Test */}
+                <Route path='/fileTest' element={FileUploadTest}/>
+
                 <Route path="/*" element={<Error404Component />} />
               </Routes>
             </main>
