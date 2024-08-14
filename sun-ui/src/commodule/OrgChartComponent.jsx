@@ -6,7 +6,7 @@ import ModalComponent from './ModalComponent';
 import 'jstree/dist/themes/default/style.min.css';
 import styles from '../css/OrgChartComponent.modul.css';
 
-const OrgChartComponent = () => {
+const OrgChartComponent = (props) => {
 
     const [jsonData, setJsonData] = useState([]);
     const [choiceArr, setChoiceArr] = useState([]);
@@ -71,7 +71,7 @@ const OrgChartComponent = () => {
       const sendDataToServer = useCallback(async () => {
         if (choiceArr.length > 0) {
             try {
-                const res = await axios.post(serverUrl + "empList", choiceArr, {
+                const res = await axios.post(`${serverUrl}${props.mappingUrl}`, choiceArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });
                 console.log("server ok: ", res.data);
@@ -109,7 +109,7 @@ const OrgChartComponent = () => {
               <>
                 <input type="text" id="schName" placeholder="검색" />
                 <button onClick={handleSearch}>검색</button>
-                <div className={styles.container}>
+                <div className={styles.treeBox}>
                   <div className={styles['tree-container']} ref={treeRef}></div>
                   <div className={styles.child}>
                     <ul style={{ display: 'flex', listStyleType: 'none', padding: 0 }}>

@@ -35,6 +35,6 @@ public class VehicleVo {
 	private String vehicleDelflag;
 	// 차량 이미지
 	private String vehicleImg;
-	// 상태 (출차 O, 보관 I, 수리 R)
-	private int commCode;
+	// 차량 수리 여부 (출차 O, 보관 I, 수리 R)
+	private String vehicleStatus;
 }

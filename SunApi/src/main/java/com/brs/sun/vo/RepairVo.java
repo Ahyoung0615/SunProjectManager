@@ -27,6 +27,6 @@ public class RepairVo {
 	private LocalDateTime repairDate;
 	// 수리 내역
 	private String repairReason;
-	// 수리 현황
-	private int commode;
+	// 수리 완료 여부 (수리 완료 O, 수리중 I)
+	private String repairStatus;
 }
