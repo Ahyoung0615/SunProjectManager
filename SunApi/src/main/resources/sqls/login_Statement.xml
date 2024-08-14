@@ -16,4 +16,11 @@
 		WHERE EMP_CODE = #{empCode} 
 	</select>
 	
+	<select id="MemberList" resultType="EmployeeVo">
+		SELECT *
+		FROM EMPLOYEE
+		WHERE EMP_STATUS = "Y"
+		ORDER BY EMP_CODE DESC
+	</select>
+	
 </mapper>

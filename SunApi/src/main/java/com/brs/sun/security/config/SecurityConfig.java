@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -33,7 +37,10 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        		.cors().and().csrf().disable()
+        		.cors(cors -> cors
+        				.configurationSource(corsConfigurationSource())
+        		)
+        		.csrf(csrf -> csrf.disable())
         		.authorizeHttpRequests(authorize -> authorize
                 //.antMatchers("/주소입력").hasRole("")<< 만약 입력 1을 넣으면 prefix로 ROLE_가 붙으면서 새로운 권한이 생김
         				.requestMatchers("/admin/**").hasRole("11")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
@@ -57,6 +64,7 @@ public class SecurityConfig{
                             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                             .maximumSessions(1) // 사용자당 최대 세션 수를 1로 설정
                             .maxSessionsPreventsLogin(false) // 최대 세션 수 초과 시 새로운 로그인 허용 여부
+                            .sessionRegistry(sessionRegistry())
                         );
                     
 
@@ -66,17 +74,32 @@ public class SecurityConfig{
                 return http.build();
             }
 
-            @Bean
-            public CorsFilter corsFilter() {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-                config.setAllowCredentials(true);
+    
+		    @Bean
+		    public SessionRegistry sessionRegistry() {
+		        return new SessionRegistryImpl();
+		    }
+		
+		    @Bean
+		    public HttpSessionEventPublisher httpSessionEventPublisher() {
+		        return new HttpSessionEventPublisher();
+		    }
+		    @Bean
+		    public CorsConfigurationSource corsConfigurationSource() {
+		        CorsConfiguration config = new CorsConfiguration();
+		        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+		        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+		        config.setAllowCredentials(true);
 
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", config);
+		        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		        source.registerCorsConfiguration("/**", config);
 
-                return new CorsFilter(source);
-            }
+		        return source;
+		    }
+
+		    @Bean
+		    public CorsFilter corsFilter() {
+		        return new CorsFilter(corsConfigurationSource());
+		    }
 }

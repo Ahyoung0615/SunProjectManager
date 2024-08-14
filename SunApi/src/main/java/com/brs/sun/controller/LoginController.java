@@ -60,7 +60,7 @@ public class LoginController {
         cookie.setPath(request.getContextPath());
         cookie.setMaxAge(0);
         response.addCookie(cookie);
-
+        log.info("로그아웃 완료 {}", cookie);
         return ResponseEntity.ok().build();
     }
 	private Map<String, String> createUserInfo(String empcode, String authorities) {
