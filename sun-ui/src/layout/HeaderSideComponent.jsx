@@ -69,8 +69,8 @@ const HeaderSideComponent = () => {
                     </a>
                     <div className="collapse" id="collapseDutyManagement4" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
                         <nav className="sb-sidenav-menu-nested nav">
-                            <Link className='nav-link' to='/documentList'>수신함</Link>
-                            <Link className='nav-link' to='/documentAppList'>송신함</Link>
+                            <Link className='nav-link' to='/documentList'>발신함</Link>
+                            <Link className='nav-link' to='/documentAppList'>수신함</Link>
                         </nav>
                     </div>
                     <Link className='nav-link' to='/documentInsertForm'>

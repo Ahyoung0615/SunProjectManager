@@ -40,6 +40,7 @@ import VehicleDetailComponent from './vehicle/VehicleDetailComponent';
 import BTripDetailComponent from './btrip/BTripDetailComponent';
 import VehicleRentDetailComponent from './vehicle/VehicleRentDetailComponent';
 import VehicleRentListComponent from './vehicle/VehicleRentListComponent';
+import VehicleFormComponent from './vehicle/VehicleFormComponent';
 import FVehicleDetailComponent from './fvehicle/FVehicleDetailComponent';
 import Error404Component from './error/Error404Component';
 
@@ -56,7 +57,7 @@ function App() {
 
   const renderComponent = (Component) => {
     return sessionAccess ? <Component /> : <Error404Component />;
-    
+
   };
 
   const sessionComponent = (Component) => {
@@ -67,18 +68,18 @@ function App() {
     <Router>
       <RenderingScrollTopComponent />
       <div className="sb-nav-fixed">
-      <HeaderTopComponent />
+        <HeaderTopComponent />
         <div id="layoutSidenav">
           <div id="layoutSidenav_nav">
-          <HeaderSideComponent />
-            
+            <HeaderSideComponent />
+
           </div>
           <div id="layoutSidenav_content">
             <main>
               <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/access" element={<AccessComponent />} />
-                <Route path="/home" element={sessionComponent(MainContentComponent)}/> 
+                <Route path="/home" element={sessionComponent(MainContentComponent)} />
                 <Route path="/myPage" element={renderComponent(MyPageComponent)} />
 
                 <Route path="/attendence" element={renderComponent(AttendenceComponent)} />
@@ -97,7 +98,7 @@ function App() {
                 <Route path="/fDeliveryRsvForm" element={renderComponent(FDeliveryRsvFormComponent)} />
 
                 <Route path="/documentList" element={renderComponent(DocumentListComponent)} />
-                <Route path="/documentDetail" element={renderComponent(DocumentDetailComponent)} />
+                <Route path="/documentDetail/:edocCode" element={renderComponent(DocumentDetailComponent)} />
                 <Route path="/documentAppList" element={renderComponent(DocumentAppComponent)} />
                 <Route path="/documentAppDetail" element={renderComponent(DocumentAppDetailComponent)} />
                 <Route path="/documentInsertForm" element={renderComponent(DocumentInsertComponent)} />
@@ -108,9 +109,10 @@ function App() {
                 <Route path="/memberTree" element={renderComponent(MemberTreeComponent)} />
 
                 <Route path="/vehicleList" element={renderComponent(VehicleListComponent)} />
-                <Route path="/vehicleDetail/:vehiclecode" element={renderComponent(VehicleDetailComponent)} />
+                <Route path="/vehicleDetail/:vehicleCode" element={renderComponent(VehicleDetailComponent)} />
                 <Route path="/vehicleRentList" element={renderComponent(VehicleRentListComponent)} />
-                <Route path="/vehicleRentDetail/:vrentcode" element={renderComponent(VehicleRentDetailComponent)} />
+                <Route path="/vehicleRentDetail/:vrentCode" element={renderComponent(VehicleRentDetailComponent)} />
+                <Route path="/vehicleForm" element={renderComponent(VehicleFormComponent)} />
 
                 <Route path="/fVehicleList" element={renderComponent(FVehicleListComponent)} />
                 <Route path="/fVehicleForm" element={renderComponent(FVehicleFormComponent)} />
@@ -118,9 +120,9 @@ function App() {
 
                 <Route path="/boardList" element={renderComponent(BoardListComponent)} />
                 <Route path="/chatSun" element={renderComponent(ChatSunComponent)} />
-                
+
                 {/* fileUpload Test */}
-                <Route path='/fileTest' element={FileUploadTest}/>
+                <Route path='/fileTest' element={FileUploadTest} />
 
                 <Route path="/*" element={<Error404Component />} />
               </Routes>
