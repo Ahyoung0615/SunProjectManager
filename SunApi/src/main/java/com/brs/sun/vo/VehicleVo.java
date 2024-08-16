@@ -25,8 +25,6 @@ public class VehicleVo {
 	private String vehicleModel;
 	// 등록 일자
 	private LocalDateTime vehicleRegdate;
-	// 수리 번호
-	private int repairCode;
 	// 구분 (영엽용 C, 화물용 F)
 	private String vehicleType;
 	// 인승
