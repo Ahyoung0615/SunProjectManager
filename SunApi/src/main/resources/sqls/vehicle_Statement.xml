@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.brs.sun.model.dao.VehicleDao">
+
+	<!-- 차량 관련 -->
+
+	<!-- 차량 전체 조회 getAllVehicle() 파라미터 C(영업),F(화물),NULL(전체) -->
+	<select id="getAllVehicle" resultType="VehicleVo">
+		SELECT VEHICLE_CODE, VEHICLE_NO, VEHICLE_MODEL,
+		VEHICLE_REGDATE,
+		VEHICLE_TYPE, VEHICLE_SIZE,
+		VEHICLE_STATUS
+		FROM VEHICLE
+		WHERE
+		VEHICLE_DELFLAG = 'N'
+		<if test="vehicleType != null and vehicleType != ''">
+			AND VEHICLE_TYPE = #{vehicleType}
+		</if>
+		ORDER BY VEHICLE_CODE ASC
+	</select>
+
+
+	<!-- 차량 상세 조회 getOneVehicle -->
+	<select id="getOneVehicle" resultType="VehicleVo">
+		SELECT VEHICLE_CODE,
+		VEHICLE_NO,
+		VEHICLE_MODEL,
+		VEHICLE_REGDATE,
+		VEHICLE_TYPE,
+		VEHICLE_SIZE,
+		VEHICLE_IMG,
+		VEHICLE_STATUS
+		FROM VEHICLE
+		WHERE VEHICLE_DELFLAG = 'N'
+		AND
+		TO_CHAR(VEHICLE_CODE) = #{vehicleCode}
+	</select>
+
+	<!-- 차량 신규 등록 insertVehicle -->
+	<insert id="insertVehicle">
+		INSERT INTO VEHICLE (VEHICLE_CODE, VEHICLE_NO,
+		VEHICLE_MODEL,
+		VEHICLE_REGDATE, VEHICLE_TYPE, VEHICLE_SIZE,
+		VEHICLE_DELFLAG, VEHICLE_IMG, VEHICLE_STATUS)
+		VALUES((SELECT
+		MAX(NVL(VEHICLE_CODE, 0))+1 FROM VEHICLE v),
+		#{vehicleNo},
+		#{vehicleModel}, #{vehicleRegdate}, #{vehicleType} ,
+		#{vehicleSize},
+		'N' , '', 'I')
+	</insert>
+
+	<!-- 차량 이미지 수정 updateVehicleImage -->
+	<update id="updateVehicleImage">
+		UPDATE VEHICLE SET VEHICLE_IMG
+		WHERE VEHICLE_CODE =
+		#{vehicleCode}
+	</update>
+
+	<!-- 차량 출차/보관/수리 상태 수정 updateVehicleStatus -->
+	<update id="updateVehicleStatus">
+		UPDATE VEHICLE SET VEHICLE_STATUS = #{vehicleStatus}
+		WHERE VEHICLE_CODE = #{vehicleCode}
+	</update>
+
+	<!-- 차량 소프트 삭제 deleteVehicle -->
+	<update id="deleteVehicle">
+		UPDATE VEHICLE SET VEHICLE_DELFLAG = 'Y'
+		WHERE
+		VEHICLE_CODE = #{vehicleCode}
+	</update>
+
+
+
+
+	<!-- 차량 수리 관련 -->
+
+	<!-- 차량 상세조회시 수리 내역 조회 getOneRepair -->
+	<select id="getAllRepair" resultType="RepairVo">
+		SELECT r.REPAIR_CODE,
+		v.VEHICLE_CODE, r.REPAIR_DETAIL, r.REPAIR_DATE,
+		r.REPAIR_REASON,
+		r.REPAIR_STATUS
+		FROM REPAIR r JOIN VEHICLE v
+		ON r.VEHICLE_CODE =
+		v.VEHICLE_CODE
+		WHERE TO_CHAR(v.VEHICLE_CODE) = #{vehicleCode}
+		ORDER BY
+		r.REPAIR_DATE DESC
+	</select>
+
+	<!-- 차량 수리 등록 insertRepair -->
+	<insert id="insertRepair">
+		INSERT INTO REPAIR (REPAIR_CODE, VEHICLE_CODE,
+		REPAIR_DETAIL,
+		REPAIR_DATE, REPAIR_REASON, REPAIR_STATUS)
+		VALUES((SELECT MAX(NVL(REPAIR_CODE, 0))+1 FROM REPAIR),
+		#{vehicleCode}, #{repairDetail}, #{repairDate},
+		#{repairReason},
+		#{repairStatus})
+	</insert>
+
+	<!-- 차량 수리 완료 updateRepairStatus -->
+	<update id="updateRepairStatusO">
+		UPDATE REPAIR SET REPAIR_STATUS = 'O' WHERE
+		REPAIR_CODE = #{repairCode}
+	</update>
+
+	<!-- 차량 수리중 상태 수정 updateVehicleStatusR -->
+	<update id="updateVehicleStatusR">
+		UPDATE VEHICLE
+		SET VEHICLE_STATUS = 'R'
+		WHERE
+		VEHICLE_CODE IN (
+		SELECT v.VEHICLE_CODE
+		FROM VEHICLE v
+		JOIN REPAIR r ON
+		v.VEHICLE_CODE = r.VEHICLE_CODE
+		WHERE r.REPAIR_STATUS = 'I'
+		)
+	</update>
+
+
+	<!-- 차량 수리 완료 상태 수정 updateVehicleStatusI -->
+	<update id="updateVehicleStatusI">
+		UPDATE VEHICLE SET VEHICLE_STATUS = 'I'
+		WHERE VEHICLE_CODE = (SELECT VEHICLE_CODE
+		FROM REPAIR r
+		WHERE REPAIR_CODE = #{repairCode})
+	</update>
+
+</mapper>
+
