@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.brs.sun.jpa.entity.EDocEntity;
 import com.brs.sun.jpa.entity.EDocTempEntity;
+import com.brs.sun.jpa.entity.EmployeeEntity;
 
 @Repository
 public interface EDocRepository extends JpaRepository<EDocEntity, Long>{
@@ -29,4 +30,12 @@ public interface EDocRepository extends JpaRepository<EDocEntity, Long>{
 	 */
 	@Query("select t from EDocTempEntity t where t.empCode = :empCode")
 	Page<EDocTempEntity> eDocTempSelect(Integer empCode, Pageable pageable);
+	
+	/**
+	 * session storage id 값으로 사원 정보 조회
+	 * @param empCode
+	 * @return Employee 정보
+	 */
+	@Query("select e from EmployeeEntity e where e.empCode = :empCode")
+	EmployeeEntity employeeInfo(Integer empCode);
 }

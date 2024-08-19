@@ -1,5 +1,6 @@
 package com.brs.sun.security.config;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,17 +29,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 사용자 조회, 없으면 예외 발생
         EmployeeVo emp = employeeDao.Info(empcode);
         String empCodet = String.valueOf(emp.getEmpCode());
-
+        
         if (empCodet == null) {
             throw new UsernameNotFoundException("User not found with ID: " + empcode);
         }
 
         // 사용자가 있다면 UserDetails 객체 생성
-        return new org.springframework.security.core.userdetails.User(
-        		empCodet,
-                emp.getEmpPw(),
-                Collections.singleton(new SimpleGrantedAuthority(emp.getEmpAuth())));
-        
+        return User.builder()
+        		.username(empCodet)
+                .password(emp.getEmpPw())
+                .roles(emp.getEmpAuth()).build();
     }
 
 }

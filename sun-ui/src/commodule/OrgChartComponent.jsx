@@ -8,7 +8,8 @@ import styles from '../css/OrgChartComponent.module.css';
 
 const OrgChartComponent = (props) => {
     const [jsonData, setJsonData] = useState([]);
-    const [choiceArr, setChoiceArr] = useState([]);
+    const [choiceArr, setChoiceArr] = useState([]);  // 선택된 노드 텍스트
+    const [serverDataArr, setServerDataArr] = useState([]);  // 선택된 노드 ID
     const [show, setShow] = useState(false);
     const treeRef = useRef(null);
 
@@ -17,7 +18,7 @@ const OrgChartComponent = (props) => {
     useEffect(() => {
         const jsTreeData = async () => {
             try {
-                const jsonData = await axios.get("http://localhost:8787/api/jsTree");
+                const jsonData = await axios.get(`${serverUrl}jsTree`);
                 setJsonData(jsonData.data);
                 console.log("json data: ", jsonData);
             } catch (error) {
@@ -42,6 +43,7 @@ const OrgChartComponent = (props) => {
                 console.log("tree text: ", data.node.original.text);
                 if (data.node.original.parent !== "#") {
                     const selectedText = data.node.original.text;
+                    const selectedId = data.node.original.id;
                     setChoiceArr((prevChoices) => {
                         if (props.maxSelection && prevChoices.length >= props.maxSelection) {
                             alert(`최대 ${props.maxSelection}명까지 선택할 수 있습니다.`);
@@ -51,6 +53,15 @@ const OrgChartComponent = (props) => {
                             return [...prevChoices, selectedText];
                         }
                         return prevChoices;
+                    });
+                    setServerDataArr((prevServerData) => {
+                        if (props.maxSelection && prevServerData.length >= props.maxSelection) {
+                            return prevServerData;
+                        }
+                        if (!prevServerData.includes(selectedId)) {
+                            return [...prevServerData, selectedId];
+                        }
+                        return prevServerData;
                     });
                 }
             });
@@ -68,17 +79,24 @@ const OrgChartComponent = (props) => {
     };
 
     const deleteChoice = (index) => {
+        const deletedItem = choiceArr[index];
         setChoiceArr((prevChoices) => prevChoices.filter((_, i) => i !== index));
+        setServerDataArr((prevServerData) => {
+            const deletedId = jsonData.find(node => node.text === deletedItem)?.id;
+            return prevServerData.filter(id => id !== deletedId);
+        });
     };
 
     const sendDataToServer = useCallback(async () => {
-        if (choiceArr.length > 0) {
+        console.log(serverDataArr);
+        if (serverDataArr.length > 0) {
             try {
-                const res = await axios.post(`${serverUrl}${props.mappingUrl}`, choiceArr, {
+                const res = await axios.post(`${serverUrl}${props.mappingUrl}`, serverDataArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });
                 console.log("server ok: ", res.data);
                 setChoiceArr([]);
+                setServerDataArr([]);
                 closeModal();
             } catch (error) {
                 console.log("error", error.message);
@@ -87,7 +105,7 @@ const OrgChartComponent = (props) => {
             console.log("빈 요소");
             alert("최소 한 명 이상 선택해 주세요");
         }
-    }, [choiceArr]);
+    }, [serverDataArr]);
 
     const openModal = () => {
         setShow(true);
@@ -100,9 +118,9 @@ const OrgChartComponent = (props) => {
     return (
         <div>
             <button onClick={openModal}>{props.buttonName}</button>
-            <ModalComponent 
-                open={show} 
-                close={closeModal} 
+            <ModalComponent
+                open={show}
+                close={closeModal}
                 title="조직도"
                 body={
                     <>

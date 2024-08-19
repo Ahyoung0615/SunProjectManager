@@ -5,6 +5,8 @@ const MemberDetailComponent = () => {
     const { empCode } = useParams();
     const [employee, setEmployee] = useState([]);
     const [file, setFile] = useState(null);
+    const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${employee.empImg}`);
+
     useEffect(() => {
       // API 호출
       fetch(`http://localhost:8787/memberDetail/${empCode}`)
@@ -43,6 +45,7 @@ const MemberDetailComponent = () => {
             const data = text ? JSON.parse(text) : {};
             console.log(data);
             alert(data.message || '파일 업로드 성공');
+            setEmpImg(`http://localhost:8787/memberImage/${employee.empImg}`);
         } catch (error) {
             throw new Error('Invalid JSON format');
         }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.brs.sun.jpa.entity.EDocEntity;
 import com.brs.sun.jpa.entity.EDocTempEntity;
+import com.brs.sun.jpa.entity.EmployeeEntity;
 import com.brs.sun.jpa.repository.EDocRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,10 @@ public class EDocJpaServiceImpl implements EDocJpaService {
 	public Page<EDocTempEntity> docTempSelect(Integer empCode, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return repository.eDocTempSelect(empCode, pageable);
+	}
+	
+	@Override
+	public EmployeeEntity employeeInfo(Integer empCode) {
+		return repository.employeeInfo(empCode);
 	}
 }
