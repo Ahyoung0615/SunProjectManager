@@ -4,24 +4,44 @@ import { Link } from 'react-router-dom';
 
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
-
-    const handleSelect = (eventKey) => {
-        alert(`Selected option: ${eventKey}`);
-    };
+    const [selectedStatus, setSelectedStatus] = useState('1');
+    
 
     useEffect(() => {
-        // Make an HTTP GET request to the Spring Boot API
-        fetch('http://localhost:8787/memberDetail')
-            .then(response => {
+        // 선택된 상태에 따라 API 호출
+        const fetchData = async () => {
+            let url = 'http://localhost:8787/memberDetail'; // 기본 URL
+            if (selectedStatus === '2') {
+                url = 'http://localhost:8787/memberDetail1'; // 퇴사
+            } else if (selectedStatus === '3') {
+                url = 'http://localhost:8787/memberDetail2'; // 휴가
+            }
+
+            try {
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
-            })
-            .then(data => setEmployee(data))
-            .catch(error => console.error('Error fetching employee list:', error));
-    }, []);
+                const data = await response.json();
+                setEmployee(data);
+            } catch (error) {
+                console.error('Error fetching employee list:', error);
+            }
+        };
 
+        fetchData();
+    }, [selectedStatus]);
+
+    const handleSelect = (eventKey) => {
+        setSelectedStatus(eventKey);;
+    };
+    const handleNewEmp = () => {
+        window.open(
+            '/NewEmp', // 실제로 팝업 창에서 열고자 하는 경로를 지정합니다.
+            '신규사원등록',
+            'width=500,height=600' // 팝업 창의 크기 설정
+          );
+    };
     const getJobTitle = (jobCode) => {
         switch (jobCode) {
             case 1:
@@ -66,6 +86,16 @@ const MemberListComponent = () => {
         }
     };
 
+    const getStatus = (empStatus) =>{
+        switch(empStatus){
+          case 'Y':
+            return '재직';
+          case 'N':
+            return '퇴사';
+          case 'V':
+            return '휴가';
+        }
+      }
     return (
         <div className="container" style={{ marginTop: 30 }}>
           <br></br>
@@ -77,7 +107,7 @@ const MemberListComponent = () => {
                     onSelect={handleSelect}
                 >
                     <Dropdown.Item eventKey="1">재직</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">지각</Dropdown.Item>
+                    <Dropdown.Item eventKey="2">퇴사</Dropdown.Item>
                     <Dropdown.Item eventKey="3">휴가</Dropdown.Item>
             </DropdownButton>
             </div>
@@ -95,15 +125,18 @@ const MemberListComponent = () => {
                 <tbody>
                     {emp.map((item, index) =>(
                         <tr key={index}>
-                            <td><Link to={`/memberList/${item.empCode}`}>{item.empCode}</Link></td>
+                            <td><Link to={`/memberDetail/${item.empCode}`}>{item.empCode}</Link></td>
                             <td>{item.empName}</td>
                             <td>{getDeptTitle(item.deptCode)}</td>
                             <td>{getJobTitle(item.jobCode)}</td>
                             <td>{item.empEmail}</td>
-                            <td>{item.empStatus}</td>
+                            <td>{getStatus(item.empStatus)}</td>
                         </tr>
                     ))}
                 </tbody>
+                <button className="btn btn-primary" onClick={handleNewEmp} style={{position: 'absolute', right: '190px'}}>
+                        신규사원 등록
+                </button>
             </table>
         </div>
     );

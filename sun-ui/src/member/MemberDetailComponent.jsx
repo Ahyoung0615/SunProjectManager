@@ -1,16 +1,120 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const MemberDetailComponent = () => {
+    const { empCode } = useParams();
+    const [employee, setEmployee] = useState([]);
+
+    useEffect(() => {
+      // API 호출
+      fetch(`http://localhost:8787/memberDetail/${empCode}`)
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+          })
+          .then(data => {
+              setEmployee(data);
+          })
+          .catch(error => {
+          });
+  }, [empCode]);
+
+      const getJobTitle = (jobCode) => {
+        switch (jobCode) {
+            case 1:
+                return '대표';
+            case 11:
+                return '이사';
+            case 21:
+                return '부장';
+            case 31:
+                return '차장';
+            case 41:
+                return '과장';
+            case 51:
+                return '대리';
+            case 61:
+                return '주임';
+            case 71:
+                return '사원';
+            default:
+                return '직급 미정';
+        }
+    };
+
+    const getGender = (gender) =>{
+      switch(gender){
+        case 'F': 
+            return '여성';
+        case 'M': 
+            return '남성';
+      }
+    }
+
+    const getStatus = (empStatus) =>{
+      switch(empStatus){
+        case 'Y':
+          return '재직';
+        case 'N':
+          return '퇴사';
+        case 'V':
+          return '휴가';
+      }
+    }
+    const getDeptTitle = (deptCode) => {
+        switch (deptCode){
+            case 1:
+                return '경영총괄';
+            case 11:
+                return '경영지원';
+            case 21:
+                return '연구개발';
+            case 31:
+                return '고객지원';
+            case 41:
+                return '운송관리';
+            case 51:
+                return '품질관리';
+            case 61:
+                return '자재관리';
+            case 71:
+                return '생산제조';
+        }
+    };
+    const handleUpdate = () => {
+      window.open(
+        `/memberUpdate/${empCode}`,
+        '사원정보수정',
+        'width=500,height=600'
+      )
+  };
+    const handlePasswordReset = () => {
+      fetch(`http://localhost:8787/resetPassword/${empCode}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();  // 비밀번호 초기화 API는 응답으로 텍스트를 보낼 것으로 예상됩니다.
+    })
+    .then(message => {
+        alert(message);  // 성공 메시지 표시
+    })
+    .catch(error => {
+        alert('비밀번호 초기화 중 오류가 발생했습니다.');
+    });
+  };
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
-      <h1>차량 상세</h1>
+      <h1>사원 상세</h1>
       
-      {/* 상태 표시 버튼들 */}
-      <div style={{ display: "flex", marginBottom: 20 }}>
-      <span class="badge badge-success">출차</span>
-      <span class="badge badge-warning">수리</span>
-      <span class="badge badge-primary">보관</span>
-      </div>
 
       {/* 이미지와 차량 정보 테이블을 가로로 배치 */}
       <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
@@ -24,80 +128,55 @@ const MemberDetailComponent = () => {
           <table className="table table-bordered">
             <tbody>
               <tr>
-                <td>차량등록번호</td>
-                <td>1</td>
+                <td>사번</td>
+                <td>{employee.empCode}</td>
               </tr>
               <tr>
-                <td>차량번호</td>
-                <td>1가1234</td>
+                <td>이름</td>
+                <td>{employee.empName}</td>
               </tr>
               <tr>
-                <td>차종</td>
-                <td>아반떼</td>
+                <td>직급</td>
+                <td>{getJobTitle(employee.jobCode)}</td>
               </tr>
               <tr>
-                <td>색상</td>
-                <td>W</td>
+                <td>부서</td>
+                <td>{getDeptTitle(employee.deptCode)}</td>
               </tr>
               <tr>
-                <td>등록일</td>
-                <td>2018.07.14</td>
+                <td>성별</td>
+                <td>{getGender(employee.gender)}</td>
               </tr>
               <tr>
-                <td>구분</td>
-                <td>영업</td>
+                <td>전화번호</td>
+                <td>{employee.empTel}</td>
               </tr>
               <tr>
-                <td>용량</td>
-                <td>4인승</td>
+                <td>이메일</td>
+                <td>{employee.empEmail}</td>
+              </tr>
+              <tr>
+                <td>주소</td>
+                <td>{employee.empAddress}</td>
+              </tr>
+              <tr>
+                <td>입사일</td>
+                <td>{employee.joindate}</td>
+              </tr>
+              <tr>
+                <td>근무현황</td>
+                <td>{getStatus(employee.empStatus)}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* 수리 내역 테이블을 아래로 배치 */}
-      <div style={{ marginTop: 20 }}>
-        <h5>수리 내역</h5>
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th>수리내역번호</th>
-              <th>수리내역</th>
-              <th>수리일자</th>
-              <th>사유</th>
-              <th>수리완료여부</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>범퍼 교체</td>
-              <td>2019.01.05</td>
-              <td>추돌사고로 인한 범퍼 파손</td>
-              <td>완료</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>엔진 교체</td>
-              <td>2020.05.04</td>
-              <td>엔진 정기 점검</td>
-              <td>완료</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>사이드 미러 교체</td>
-              <td>2022.09.08</td>
-              <td>물건 낙하 사고로 인한 사이드 미러 파손</td>
-              <td>완료</td>
-            </tr>
-          </tbody>
-        </table>
-
-        
-        <br></br><br></br><br></br>
-      </div>
-
+      <button className="btn btn-primary" onClick={handleUpdate} style={{position: 'absolute', right: '350px'}}>
+            수정
+      </button>
+      <button className="btn btn-primary" onClick={handlePasswordReset} style={{position: 'absolute', right: '190px'}}>
+            비밀번호 초기화
+      </button>
       
     </div>
     );
