@@ -7,39 +7,56 @@ const CoWorkComponent = () => {
     const [searchType, setSearchType] = useState("cowName");
     const [searchKeyword, setSearchKeyword] = useState("");
     const [selectedAddress, setSelectedAddress] = useState("");
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const searchCoWork = async () => {
-        console.log("Search function called");
-        console.log("searchKeyword", searchKeyword);
-        console.log("searchType", searchType);
+    const fetchCoWorkList = async (page = 0) => {
+        if (page < 0) {
+            console.error("Page index must not be less than zero");
+            page = 0;
+        }
+
         try {
             const response = await axios.get("http://localhost:8787/api/cowork", {
                 params: {
-                    first: 1,
-                    last: 5,
+                    page: page + 1,  // 페이지는 1부터 시작하므로 +1
+                    size: 5,        // 페이지당 10개의 항목
                     [searchType]: searchKeyword
                 }
             });
-            setCoworkList(response.data);
+
+            const data = response.data;
+            setCoworkList(data.content || []);
+            setTotalPages(data.totalPage || 1);
+            setCurrentPage(page);
         } catch (error) {
-            console.error("검색 중 오류 발생:", error);
+            console.error("Error fetching cowork list:", error);
+            setCoworkList([]);
+        }
+    };
+
+    const handleSearch = () => {
+        setCurrentPage(0);  // 검색 시 첫 페이지로 이동
+        fetchCoWorkList(0); // 검색 버튼 클릭 시 조회
+    };
+
+    const getcowOneAddress = (cowAddress) => {
+        console.log("Selected Address:", cowAddress);
+        setSelectedAddress(cowAddress);
+    };
+
+    const handlePageChange = (page) => {
+        if (page >= 0 && page < totalPages) {
+            fetchCoWorkList(page);
         }
     };
 
     useEffect(() => {
-        searchCoWork();
+        fetchCoWorkList(0, true);
     }, []);
 
-
-    const getcowOneAddress = (cowAddress) => {
-        console.log("Selected Address:", cowAddress); // 주소가 제대로 전달되는지 확인
-        setSelectedAddress(cowAddress);
-    };
-
-    useEffect(() => {
-        console.log("선택주소:", selectedAddress);
-    }, [selectedAddress]);
-
+    const isEmpty = coworkList.length === 0;
+    const displayTotalPages = totalPages > 0 ? totalPages : 1;
 
     return (
         <div>
@@ -66,10 +83,7 @@ const CoWorkComponent = () => {
                             style={{ height: 40, width: '60%', padding: '10px', border: '1px solid #ddd' }}
                         />
                         <button
-                            onClick={() => {
-                                console.log("Button clicked");
-                                searchCoWork();
-                            }}
+                            onClick={handleSearch}  // 검색 버튼 클릭 시 조회
                             style={{
                                 height: 40,
                                 padding: 10,
@@ -78,7 +92,7 @@ const CoWorkComponent = () => {
                                 backgroundColor: '#f2f2f2'
                             }}
                         >
-                             <i className="fas fa-search"></i>
+                            <i className="fas fa-search"></i>
                         </button>
                     </div>
                     <table className="table table-bordered">
@@ -91,7 +105,7 @@ const CoWorkComponent = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {coworkList.length === 0 ? (
+                            {isEmpty ? (
                                 <tr>
                                     <td colSpan="4">검색 결과가 없습니다</td>
                                 </tr>
@@ -101,7 +115,7 @@ const CoWorkComponent = () => {
                                         <td>{item.cowCode}</td>
                                         <td>{item.cowName}</td>
                                         <td>
-                                            <button type="button" className="btn btn-link" style={{margin:-7}} onClick={() => getcowOneAddress(item.cowAddress)}>
+                                            <button type="button" className="btn btn-link" style={{ margin: -7 }} onClick={() => getcowOneAddress(item.cowAddress)}>
                                                 {item.cowAddress}
                                             </button>
                                         </td>
@@ -110,8 +124,68 @@ const CoWorkComponent = () => {
                                 ))
                             )}
                         </tbody>
-
                     </table>
+
+                    {/* 페이지네이션 버튼 */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+                        <button
+                            onClick={() => handlePageChange(0)}
+                            disabled={currentPage === 0 || isEmpty}
+                            style={{
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                border: '1px solid #ddd',
+                                backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
+                                color: currentPage === 0 ? '#000' : '#fff'
+                            }}
+                        >
+                            처음
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 0 || isEmpty}
+                            style={{
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                border: '1px solid #ddd',
+                                backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
+                                color: currentPage === 0 ? '#000' : '#fff'
+                            }}
+                        >
+                            이전
+                        </button>
+                        <span>페이지 {currentPage + 1} / {displayTotalPages}</span>
+                        <button
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage + 1 >= totalPages || isEmpty}
+                            style={{
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                border: '1px solid #ddd',
+                                backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
+                                color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+                            }}
+                        >
+                            다음
+                        </button>
+                        <button
+                            onClick={() => handlePageChange(totalPages - 1)}
+                            disabled={currentPage + 1 >= totalPages || isEmpty}
+                            style={{
+                                margin: '0 5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                                border: '1px solid #ddd',
+                                backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
+                                color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+                            }}
+                        >
+                            마지막
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
