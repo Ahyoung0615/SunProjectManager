@@ -6,6 +6,7 @@ import axios from 'axios';
 const BTripListComponent = () => {
     const [bTripList, setBTripList] = useState([]);
     const [sessionEmp, setSessionEmp] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const sessionUser = sessionStorage.getItem("user");
@@ -33,6 +34,7 @@ const BTripListComponent = () => {
             }
         };
         getBTrip(sessionEmp);
+        
     }, [sessionEmp]);
 
     return (

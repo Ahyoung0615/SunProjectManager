@@ -3,6 +3,7 @@ import MainChartComponent from './MainChartComponent';
 import MainStickChartComponent from './MainStickChartComponent';
 import MainTableComponent from './MainTableComponent';
 import MainAlertComponent from './MainAlertComponent';
+import HeaderTopComponent from '../layout/HeaderTopComponent';
 
 const MainContentComponent = () => {
 
