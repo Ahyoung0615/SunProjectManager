@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../css/VacationDocComponent.module.css';
 import axios from 'axios';
 import ModalComponent from '../commodule/ModalComponent';
+import OrgChartComponent from '../commodule/OrgChartComponent';
 
 const VacationDocComponent = () => {
     const [selectedValue, setSelectedValue] = useState('apple');
@@ -9,6 +10,8 @@ const VacationDocComponent = () => {
     const [f, setF] = useState('');
     const [g, setG] = useState('');
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
+    const [empInfo, setEmpInfo] = useState([]);
+    const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
 
     const [currentDate, setCurrentData] = useState('');
 
@@ -37,6 +40,27 @@ const VacationDocComponent = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const serverEmpInfo = async () => {
+            if (sessionEmpCode) {
+                try {
+                    const response = await axios.get("http://localhost:8787/api/edoc/employeeInfo", {
+                        params: {
+                            empCode: sessionEmpCode
+                        }
+                    });
+                    const empData = response.data;
+                    setEmpInfo(empData);
+                    setEmpDeptCodeToText(deptCodeToText(empData.deptCode)); // 부서 코드를 부서명으로 변환하여 설정
+                } catch (error) {
+                    console.error("Error fetching employee info:", error);
+                }
+            }
+        };
+
+        serverEmpInfo();
+    }, [sessionEmpCode]); // sessionEmpCode가 변경될 때마다 호출
+
     const handleChange = (event) => setSelectedValue(event.target.value);
     const eChange = (event) => setE(event.target.value);
     const fChange = (event) => setF(event.target.value);
@@ -49,15 +73,29 @@ const VacationDocComponent = () => {
     };
 
     const serverSend = () => {
-        axios.post("http://localhost:8090/api/docTest", data)
+        axios.post("http://localhost:8787/api/edoc/insertVacation", data)
             .then((res) => console.log(res.data))
             .catch((error) => console.log(error));
     };
 
+    const deptCodeToText = (deptCode) => {
+        switch(deptCode) {
+            case 1: return '경영총괄';
+            case 11: return '경영지원';
+            case 21: return '연구개발';
+            case 31: return '고객지원';
+            case 41: return '운송관리';
+            case 51: return '품질관리';
+            case 61: return '자재관리';
+            case 71: return '생산제조';
+            default: return '부서 없음';
+        }
+    };
+
     return (
         <div className={styles.vacationDocContainer}>
+            <OrgChartComponent mappingUrl="empList" buttonName="결재자" maxSelection="3" />
             <h1 className={styles.vacationDocHeader}>휴 가 신 청 서</h1>
-            <ModalComponent/>
             <form>
                 <table className={styles.vacationDocTable}>
                     <thead>
@@ -104,8 +142,8 @@ const VacationDocComponent = () => {
                     <p className={styles.signature}>{currentDate}</p>
                 </div>
 
-                <p className={styles.vacationDocSignature}>소속: </p>
-                <p className={styles.vacationDocSignature}>성명: </p>
+                <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
+                <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
                 <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
             </div>
 

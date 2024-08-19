@@ -46,5 +46,11 @@ public class EmployeeVo {
 	// 사용자 권한 (유저 U, 관리자 A)
 	private String empAuth;
 	
+	
+	// myBatis JOIN Mapper
+	// DEPARTMENT : DEPT_NAME 부서 이름
+	private String deptName;
+	// JOB : JOB_CODE 직급 이름
+	private String jobName;
 
 }

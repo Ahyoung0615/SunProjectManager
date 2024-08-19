@@ -61,9 +61,9 @@ public class JsTreeController {
 	 * @return ok 문자열 반환
 	 */
 	@PostMapping("/empList")
-	public String getChoiceEmp(@RequestBody List<String> choiceList) {
+	public List<EmployeeVo> getChoiceEmp(@RequestBody List<String> choiceList) {
 		log.info("choiceArr: {}", choiceList);
 		
-		return "ok";
+		return null;
 	}
 }
