@@ -2,6 +2,7 @@ package com.brs.sun.security.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,9 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 public class SecurityConfig{
 
+	@Autowired
+	private UserDetailsServiceImpl userDetailsService; 
+	
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
@@ -45,21 +49,21 @@ public class SecurityConfig{
                 //.antMatchers("/주소입력").hasRole("")<< 만약 입력 1을 넣으면 prefix로 ROLE_가 붙으면서 새로운 권한이 생김
         				.requestMatchers("/memberList").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
-                        .requestMatchers("/memberImage/**").permitAll()     // 이미지 미리보기 허용
+                        .requestMatchers("/member").permitAll()     // 이미지 미리보기 허용
                         .anyRequest().permitAll()                      // 그 외의 모든 요청은 누구나 접근 가능
-                    )
-                    .formLogin(formLogin -> formLogin
+                )
+                .formLogin(formLogin -> formLogin
                         .loginPage("/login")                            // 사용자 정의 로그인 페이지 설정
                         .loginProcessingUrl("/loginProc")               // 로그인 처리를 담당할 엔드포인트 설정
                         .usernameParameter("empcode")     // empcode을 로그인 ID로 사용
                         .passwordParameter("emppw")       //emppw를 로그인 PW로 사용 (설정안할시 password고정)
                         .defaultSuccessUrl("/loginOk", true)            // 로그인 성공 시 리디렉션할 URL 설정
-                    )
+                )
                     .logout(logout -> logout
                         .logoutUrl("/logout")                           // 로그아웃 요청 엔드포인트 설정
-                        .logoutSuccessUrl("/logoutOk")                  // 로그아웃 성공 시 리디렉션할 URL 설정
+                        .deleteCookies("JSESSIONID" ,"remember-me-cookie")	// 세션 쿠키 삭제
                         .invalidateHttpSession(true)                    // 로그아웃 시 세션 무효화
-                        .deleteCookies("JSESSIONID")                    // 세션 쿠키 삭제
+                        .logoutSuccessUrl("/logoutOk")                  // 로그아웃 성공 시 리디렉션할 URL 설정
                     )
                     .sessionManagement(sessionManagement -> sessionManagement
                             .maximumSessions(1) // 사용자당 최대 세션 수를 1로 설정
@@ -68,6 +72,13 @@ public class SecurityConfig{
                         )
                     .sessionManagement(session -> session
                     		.invalidSessionUrl("/")
+                    )
+                    .rememberMe(rememberMe -> rememberMe
+                    		.key("rememberMe")
+                    		.tokenValiditySeconds(3600)
+                    		.userDetailsService(userDetailsService)
+                    		.rememberMeParameter("rememberMe")
+                    		.rememberMeCookieName("remember-me-cookie")
                     );
                     
 

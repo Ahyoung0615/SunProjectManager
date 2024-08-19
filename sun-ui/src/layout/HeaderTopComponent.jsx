@@ -53,7 +53,8 @@ const HeaderTopComponent = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:8787/logout', {}, { withCredentials: false });
+      await axios.post('http://localhost:8787/logout', {}, { withCredentials: true });
+
       window.sessionStorage.removeItem("user");
       setUserName(null); 
       alert('로그아웃 완료');
@@ -86,7 +87,7 @@ const HeaderTopComponent = () => {
       <div>
         {userName !== null ?
           <div style={{ color: 'white', marginLeft: 30 }}>
-            {userName.empcode}님, 반갑습니다</div> :
+            {userName.empName}님, 반갑습니다</div> :
           <div style={{ color: 'white', marginLeft: 30 }}>
             로그인이 필요합니다</div>
         }

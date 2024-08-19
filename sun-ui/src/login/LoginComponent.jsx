@@ -5,25 +5,44 @@ import sunImage from '../img/image07.png'; // 이미지 경로를 실제 경로�
 
 const LoginComponent = () => {
     const navigate = useNavigate();
-
+    let ws;
     const storedUserData = window.sessionStorage.getItem("user");
     const initialUser = storedUserData ? JSON.parse(storedUserData) : { empcode: '', emppw: '' };
     const [userData, setUserData] = useState();
     const [user, setUser] = useState(initialUser);
     const [rememberMe, setRememberMe] = useState(false);
+    ws = new WebSocket("ws://localhost:3000/");
+    console.log(ws);
+    // 페이지 로드 시 자동 로그인 체크
+    useEffect(() => {
+      const checkRememberMe = async () => {
+          try {
+              // 서버에서 자동 로그인 여부 확인
+              const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
+              if (response.status === 200 && response.data.empcode) {
+                  // 사용자 정보가 있다면 자동으로 로그인
+                  window.sessionStorage.setItem("user", JSON.stringify(response.data));
+                  navigate('/access', { state: { userData: response.data } });
+              }
+          } catch (error) {
+              console.error('자동 로그인 체크 실패:', error);
+          }
+      };
 
+      checkRememberMe();
+  }, [navigate]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUser({ ...user, [name]: value });
     };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const formData = new FormData();
             formData.append('empcode', user.empcode);
             formData.append('emppw', user.emppw);
-
+            formData.append('rememberMe', rememberMe);
             console.log('전송된 empcode:', user.empcode); // 확인
             console.log('전송된 emppw:', user.emppw); // 확인
             const response = await axios({
@@ -42,11 +61,12 @@ const LoginComponent = () => {
                 const userData = {
                     empcode: response.data.empcode,
                     authorities: response.data.authorities,
+                    empName: response.data.empName,
                 };
 
                 window.sessionStorage.setItem("user", JSON.stringify(userData));
 
-                navigate('/access', { state: { userData: response.data } });
+                navigate('/home', { state: { userData: response.data } });
             }
         } catch (error) {
             alert('로그인 실패');

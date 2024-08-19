@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.model.service.EmployeeService;
+import com.brs.sun.vo.EmployeeVo;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
 
 	
+	private final EmployeeService employeeService;
+	
 	//로그인
 	@GetMapping(value="/loginOk")
 	public ResponseEntity<Map<String, String>> loginOk(){
@@ -33,11 +38,12 @@ public class LoginController {
 		
 		String empcode = authentication.getName();
 		String authorities = authentication.getAuthorities().toString();
-		
+		EmployeeVo vo = employeeService.getOneMember(empcode);
+		String empName = vo.getEmpName();
 		log.info("로그인한 유저 아이디:" + empcode);
         log.info("유저 권한:" + authentication.getAuthorities());
 
-        Map<String, String> login = createUserInfo(empcode, authorities);
+        Map<String, String> login = createUserInfo(empcode, authorities, empName);
 
 		
         return ResponseEntity.ok(login);
@@ -56,17 +62,51 @@ public class LoginController {
             session.invalidate();
         }
 
+        // 쿠키를 삭제하기 위한 명시적인 설정
         Cookie cookie = new Cookie("JSESSIONID", null);
-        cookie.setPath(request.getContextPath());
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+
+        Cookie rememberMeCookie = new Cookie("remember-me-cookie", null);
+        rememberMeCookie.setPath("/");
+        rememberMeCookie.setMaxAge(0);
+        response.addCookie(rememberMeCookie);
         log.info("로그아웃 완료 {}", cookie);
         return ResponseEntity.ok().build();
     }
-	private Map<String, String> createUserInfo(String empcode, String authorities) {
+	private Map<String, String> createUserInfo(String empcode, String authorities, String empName) {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("empcode", empcode);
         userInfo.put("authorities", authorities);
+        userInfo.put("empName", empName);
         return userInfo;
     }
+	
+	// 로그인 성공 후 자동 로그인 상태 확인
+    @GetMapping("/checkRememberMe")
+    public ResponseEntity<Map<String, String>> checkRememberMe(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        
+        Map<String, String> response = new HashMap<>();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("remember-me-cookie".equals(cookie.getName())) {
+                    // Remember-me 쿠키가 존재하는 경우
+                    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                    if (authentication != null && authentication.isAuthenticated()) {
+                        String empcode = authentication.getName();
+                        EmployeeVo vo = employeeService.getOneMember(empcode);
+                		String empName = vo.getEmpName();
+                        response.put("empcode", empcode);
+                        response.put("empName", empName); // 사용자 이름 등 추가 정보
+                        response.put("authorities", authentication.getAuthorities().toString());
+                        return ResponseEntity.ok(response);
+                    }
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+	
 }
