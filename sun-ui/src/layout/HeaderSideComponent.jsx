@@ -71,6 +71,7 @@ const HeaderSideComponent = () => {
                         <nav className="sb-sidenav-menu-nested nav">
                             <Link className='nav-link' to='/documentList'>발신함</Link>
                             <Link className='nav-link' to='/documentAppList'>수신함</Link>
+                            <Link className='nav-link' to='/documentTempList'>임시저장</Link>
                         </nav>
                     </div>
                     <Link className='nav-link' to='/documentInsertForm'>

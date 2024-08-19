@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import styles from '../css/DocumentListComponent.module.css';
 
-const DocumentListComponent = () => {
-
-    const [docList, setDocList] = useState([]);
+const DocumentTempListComponent = () => {
+    const [docTempList, setDocTempList] = useState([]);
     const [filteredDocList, setFilteredDocList] = useState([]);
-    const [status, setStatus] = useState("A");
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(""); 
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
+
         if (sessionStorageInfo) {
             try {
                 const user = JSON.parse(sessionStorageInfo);
@@ -31,78 +30,48 @@ const DocumentListComponent = () => {
 
     useEffect(() => {
         if (sessionEmpCode !== null) {
-            selectDocList(currentPage, status);
+            selectDocList(currentPage);
         }
-    }, [currentPage, status, sessionEmpCode]);
+    }, [currentPage, sessionEmpCode]);
 
     useEffect(() => {
         if (searchTerm === "") {
-            setFilteredDocList(docList);
+            setFilteredDocList(docTempList);
         } else {
-            const filtered = docList.filter(doc => doc.edocTitle.toLowerCase().includes(searchTerm.toLowerCase()));
+            const filtered = docTempList.filter(doc => doc.edtempTitle.toLowerCase().includes(searchTerm.toLowerCase()));
             setFilteredDocList(filtered);
         }
-    }, [searchTerm, docList]);
-
-    const selectDocList = async (page) => {
-        if (page < 0) {
-            console.error("Page index must not be less than zero");
-            page = 0;
-        }
-
-        try {
-            const response = await axios.get("http://localhost:8787/api/edoc/eDocList", {
-                params: {
-                    status: status,
-                    empCode: sessionEmpCode,
-                    page: page,
-                    size: 10,
-                },
-            });
-            setDocList(response.data.content);
-            setFilteredDocList(response.data.content);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-    };
+    }, [searchTerm, docTempList]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
 
-    const handleStatusChange = (statusValue) => {
-        setStatus(statusValue.target.value);
-    };
-
-    const getStatusText = (status) => {
-        switch (status) {
-            case 'A': return '결재중';
-            case 'S': return '결재 완료';
-            case 'R': return '반려';
-            case 'C': return '회수';
-            default: return '';
+    const selectDocList = async (page) => {
+        try {
+            const response = await axios.get("http://localhost:8787/api/edoc/eDocTempList", {
+                params: {
+                    empCode: sessionEmpCode,
+                    page: page,
+                    size: 10,
+                },
+            });
+            setDocTempList(response.data.content);
+            setFilteredDocList(response.data.content);
+            setTotalPages(response.data.totalPages);
+        } catch (error) {
+            console.error("Error fetching document list:", error);
         }
     };
 
-    const isEmpty = docList.length === 0;
+    const isEmpty = docTempList.length === 0;
     const displayTotalPages = totalPages > 0 ? totalPages : 1;
 
     return (
         <div>
-            <a href='/fileTest'>파일 테스트</a>
             <div className="container" style={{ marginTop: 30 }}>
                 <br></br>
-                <h4>발신함</h4>
-
-                <div>
-                    <select value={status} onChange={handleStatusChange}>
-                        <option value="A">결재중</option>
-                        <option value="S">결재 완료</option>
-                        <option value="R">반려</option>
-                        <option value="C">회수</option>
-                    </select>
-                </div>
+                <h4>임시저장</h4>
 
                 {/* 검색어 입력 필드 */}
                 <input
@@ -116,23 +85,19 @@ const DocumentListComponent = () => {
                             <th className={styles['th-id']}>번호</th>
                             <th>제목</th>
                             <th>작성일</th>
-                            <th>상태</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             filteredDocList.map((doc, index) =>
                                 <tr key={index}>
-                                    <td><Link to={`/documentDetail/${doc.edocCode}`} >{doc.edocCode}</Link></td>
-                                    <td>{doc.edocTitle}</td>
-                                    <td>{doc.edocDate}</td>
-                                    <td>{getStatusText(doc.edocStatus)}</td>
+                                    <td><Link to={`/documentTempDetail/${doc.edtempCode}`} >{doc.edtempCode}</Link></td>
+                                    <td>{doc.edtempTitle}</td>
+                                    <td>{doc.edtempDate}</td>
                                 </tr>
                             )}
                     </tbody>
                 </table>
-
-                {/* 페이지 네이션 버튼 */}
                 <div className={styles['pagination-container']}>
                     <button
                         className={classNames(styles['pagination-button'], { [styles['disabled']]: currentPage === 0 || isEmpty })}
@@ -165,4 +130,4 @@ const DocumentListComponent = () => {
     );
 };
 
-export default DocumentListComponent;
+export default DocumentTempListComponent;

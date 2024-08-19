@@ -63,6 +63,7 @@ public class JsTreeController {
 	@PostMapping("/empList")
 	public String getChoiceEmp(@RequestBody List<String> choiceList) {
 		log.info("choiceArr: {}", choiceList);
+		
 		return "ok";
 	}
 }

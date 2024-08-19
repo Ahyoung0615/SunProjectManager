@@ -7,7 +7,6 @@ import 'jstree/dist/themes/default/style.min.css';
 import styles from '../css/OrgChartComponent.modul.css';
 
 const OrgChartComponent = (props) => {
-
     const [jsonData, setJsonData] = useState([]);
     const [choiceArr, setChoiceArr] = useState([]);
     const [show, setShow] = useState(false);
@@ -44,7 +43,12 @@ const OrgChartComponent = (props) => {
             if(data.node.original.parent !== "#"){
                 const selectedText = data.node.original.text;
                 setChoiceArr((prevChoices) => {
-                    if(!prevChoices.includes(selectedText)){
+                    // maxSelection 값을 props로 받아서 동적 제한
+                    if (props.maxSelection && prevChoices.length >= props.maxSelection) {
+                        alert(`최대 ${props.maxSelection}명까지 선택할 수 있습니다.`);
+                        return prevChoices;
+                    }
+                    if (!prevChoices.includes(selectedText)) {
                         return [...prevChoices, selectedText];
                     }
                     return prevChoices;
@@ -56,7 +60,7 @@ const OrgChartComponent = (props) => {
             $(treeRef.current).jstree("destroy").off("select_node.jstree");
           };
         }
-      }, [jsonData, show]);
+      }, [jsonData, show, props.maxSelection]);
     
       const handleSearch = () => {
         const searchValue = $("#schName").val();
@@ -76,6 +80,7 @@ const OrgChartComponent = (props) => {
                 });
                 console.log("server ok: ", res.data);
                 setChoiceArr([]);
+                closeModal();
             } catch (error) {
                 console.log("error", error.message);
             }

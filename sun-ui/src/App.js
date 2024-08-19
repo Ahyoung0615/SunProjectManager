@@ -46,6 +46,8 @@ import Error404Component from './error/Error404Component';
 
 
 import FileUploadTest from './document/FileUploadTest';
+import DocumentTempListComponent from './document/DocumentTempListComponent';
+import DocumentTempDetailComponent from './document/DocumentTempDetailComponent';
 
 function App() {
   const [sessionAccess, setSessionAccess] = useState(false);
@@ -101,6 +103,8 @@ function App() {
                 <Route path="/documentDetail/:edocCode" element={renderComponent(DocumentDetailComponent)} />
                 <Route path="/documentAppList" element={renderComponent(DocumentAppComponent)} />
                 <Route path="/documentAppDetail" element={renderComponent(DocumentAppDetailComponent)} />
+                <Route path='/documentTempList' element={renderComponent(DocumentTempListComponent)}/>
+                <Route path='/documentTempDetail/:edtempCode' element={renderComponent(DocumentTempDetailComponent)}/>
                 <Route path="/documentInsertForm" element={renderComponent(DocumentInsertComponent)} />
 
                 <Route path="/memberList" element={renderComponent(MemberListComponent)} />
