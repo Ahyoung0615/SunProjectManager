@@ -24,5 +24,5 @@ public class EDocLineVo {
 	// 현재 결재 대상자 사번
 	private int edtempApp;
 	// 결재 상태
-	private String edclState;
+	private String edclStatus;
 }

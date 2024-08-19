@@ -1,0 +1,95 @@
+/* VacationDocComponent.module.css */
+
+/* 전체 컨테이너 스타일 */
+.vacationDocContainer {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* 헤더 스타일 */
+.vacationDocHeader {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* 테이블 스타일 */
+.vacationDocTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.vacationDocTable th, 
+.vacationDocTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.vacationDocTable th {
+    background-color: #f2f2f2;
+    width: 20%;
+}
+
+.vacationDocTable td select, 
+.vacationDocTable td input[type='text'], 
+.vacationDocTable td input[type='date'] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 서명 섹션 스타일 */
+.vacationDocSignatureSection {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.vacationDocSignature {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.vacationDocDate {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.vacationDocDate span {
+    margin: 0 5px;
+}
+
+/* 주식회사 썬 컴퍼니 스타일 */
+.companyName {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* 제출 버튼 스타일 */
+.vacationDocSubmitButton {
+    display: block;
+    margin: 20px 0 0 auto;  /* 오른쪽 정렬 */
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100px;
+}
+
+.vacationDocSubmitButton:hover {
+    background-color: #0056b3;
+}
