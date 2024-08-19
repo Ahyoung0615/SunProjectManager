@@ -3,12 +3,5 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="TestMapper">
-	<insert id="testInsert">
-		INSERT INTO JOB (JOB_CODE, JOB_NAME)
-		VALUES(2, 'test2')
-	</insert>
 	
-	<select id="testSelect" resultType="JobVo">
-		SELECT * FROM JOB
-	</select>
 </mapper>

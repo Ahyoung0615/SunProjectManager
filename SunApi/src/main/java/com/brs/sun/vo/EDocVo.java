@@ -23,10 +23,14 @@ public class EDocVo {
 	private String edocTitle;
 	// 문서 내용
 	private String edocContent;
+	// 문서 타입
+	private String edocType;
 	// 기안자 사번
 	private int empCode;
 	// 기안 일자
 	private LocalDateTime edocDate;
 	// 결재 상태 (결재 대기중 A, 결재 완료 S, 반려 R, 회수 C)
 	private String edocStatus;
+	// 반려 사유
+	private String edocReply;
 }

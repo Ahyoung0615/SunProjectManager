@@ -1,0 +1,45 @@
+/* DocumentInsertComponent.module.css */
+
+/* 전체 컨테이너 스타일 */
+.documentInsertContainer {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+/* 헤더 스타일 */
+.documentInsertHeader {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* 셀렉트 박스 스타일 */
+.documentSelectBox {
+    width: 200px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* 버튼과 셀렉트 박스 정렬 */
+.documentControl {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 컨텐츠 영역 스타일 */
+.documentContent {
+    margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 20px;
+}

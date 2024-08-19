@@ -23,6 +23,8 @@ public class EdTempVo {
 	private String edtempTitle;
 	// 상세
 	private String edtempContent;
+	// 문서 타입
+	private String edocType;
 	// 기안자 사번
 	private int empCode;
 	// 기안 일자
