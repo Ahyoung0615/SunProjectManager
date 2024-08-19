@@ -136,7 +136,7 @@ const VehicleDetailComponent = () => {
               </tr>
               <tr>
                 <th>등록일</th>
-                <td>{vehicleDetail.vehicleRegdate}</td>
+                <td>{new Date(vehicleDetail.vehicleRegdate).toLocaleDateString()}</td>
               </tr>
               <tr>
                 <th>구분</th>

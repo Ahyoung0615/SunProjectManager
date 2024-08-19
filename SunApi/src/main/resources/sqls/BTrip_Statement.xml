@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.brs.sun.model.dao.BTripDao">
+
+
+	<!-- 배차 신청 리스트 전체 조회(관리자), 페이징, 날짜검색 getAllVehicleRsv -->
+	<select id="getAllVehicleRsv" resultType="VehicleReservationVo">
+		SELECT * FROM (
+		SELECT
+		v.VRSV_CODE, v.BTRIP_CODE, b.EMP_CODE, e.EMP_NAME,
+		j.JOB_NAME ,
+		d.DEPT_NAME, v.VEHICLE_CODE, v2.VEHICLE_NO,
+		v.VRSV_DATE, v.VRSV_DETAIL,
+		v.VRSV_STATUS, v.VRSV_REPLY,
+		ROW_NUMBER() OVER (ORDER BY v.VRSV_DATE
+		ASC, v.VRSV_CODE ASC) AS rn
+		FROM VEHICLERESERVATION v
+		JOIN BTRIP b ON
+		v.BTRIP_CODE = b.BTRIP_CODE
+		JOIN EMPLOYEE e ON b.EMP_CODE = e.EMP_CODE
+		JOIN JOB j ON e.JOB_CODE = j.JOB_CODE
+		JOIN DEPARTMENT d ON e.DEPT_CODE
+		= d.DEPT_CODE
+		JOIN VEHICLE v2 ON v.VEHICLE_CODE = v2.VEHICLE_CODE
+		WHERE
+		v.VRSV_STATUS = 'Y'
+		AND v.VRSV_DATE BETWEEN TO_DATE(#{startDate},
+		'YYYY-MM-DD') AND
+		TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		)
+		WHERE rn BETWEEN
+		#{first} AND #{last}
+	</select>
+
+	<!-- 사용자 출장 조회 getMyBTrip -->
+
+	<select id="getMyBTrip" resultType="BTripVo">
+		SELECT BTRIP_CODE, EMP_CODE,
+		BTRIP_DEPART, BTRIP_ARRIVAL, BTRIP_DETAIL,
+		BTRIP_START_DATE,
+		BTRIP_END_DATE, VEHICLE_CODE
+		FROM BTRIP
+		WHERE TO_CHAR(EMP_CODE) = #{empCode}
+		ORDER BY BTRIP_CODE DESC
+	</select>
+
+
+	<!-- 출장 등록 insertBTrip -->
+	<insert id="insertBTrip">
+		INSERT INTO BTRIP (BTRIP_CODE, EMP_CODE,
+		BTRIP_DEPART, BTRIP_ARRIVAL,
+		BTRIP_DETAIL, BTRIP_START_DATE,
+		BTRIP_END_DATE, VEHICLE_CODE)
+		VALUES((SELECT MAX(NVL(BTRIP_CODE, 0))+1
+		FROM BTRIP b), #{empCode}, #{bTripDepart},
+		#{bTripArrival},
+		#{bTripDetail},
+		#{bTripStartDate}, #{bTripEndDate}, #{vehicleCode})
+	</insert>
+
+
+	<!-- 배차 신청서 등록 insertVehicleRsv -->
+	<insert id="insertVehicleRsv">
+		INSERT INTO VEHICLERESERVATION (VRSV_CODE, BTRIP_CODE, VEHICLE_CODE,
+		VRSV_DATE, VRSV_DETAIL, VRSV_STATUS, VRSV_REPLY)
+		VALUES((SELECT
+		MAX(NVL(VRSV_CODE, 0))+1 FROM VEHICLERESERVATION),
+		<if test="bTripCode==null">
+			(SELECT MAX(NVL(BTRIP_CODE, 0))+1
+			FROM BTRIP b),
+		</if>
+		<if test="bTripCode!=null">
+			#{bTripCode},
+		</if>
+		#{vehicleCode}, #{vrsvDate}, #{vrsvDetail}, 'W', '')
+	</insert>
+
+	<!-- 출장 내역 상세 조회 getOneBTrip -->
+	<select id="getOneBTrip" resultType="BTripVo">
+		SELECT BTRIP_CODE, EMP_CODE,
+		BTRIP_DEPART,
+		BTRIP_ARRIVAL, BTRIP_DETAIL, BTRIP_START_DATE,
+		BTRIP_END_DATE, VEHICLE_CODE
+		FROM BTRIP b
+		WHERE TO_CHAR(BTRIP_CODE) = #{bTripCode}
+		AND TO_CHAR(EMP_CODE) = #{empCode}
+	</select>
+
+	<!-- 출장건별 개인 배차 신청 리스트 조회 getMyVehicleRsv -->
+	<select id="getMyVehicleRsv" resultType="VehicleReservationVo">
+		SELECT v.VRSV_CODE,
+		v.BTRIP_CODE, v.VEHICLE_CODE,
+		v.VRSV_DATE, v.VRSV_DETAIL,
+		v.VRSV_STATUS, v.VRSV_REPLY
+		FROM VEHICLERESERVATION v JOIN BTRIP b
+		ON
+		v.BTRIP_CODE = b.BTRIP_CODE
+		WHERE v.BTRIP_CODE = #{bTripCode}
+		AND
+		TO_CHAR(b.EMP_CODE) = #{empCode}
+	</select>
+
+	<!-- 협력사 검색 조회 (전체/이름/주소) searchCoWork -->
+	<select id="searchCoWork" resultType="CoWorkVo">
+		SELECT * FROM (
+		SELECT COW_CODE, COW_NAME, COW_ADDRESS, COW_TEL,
+		ROW_NUMBER() OVER (ORDER BY COW_CODE ASC) AS rn
+		FROM COWORK c
+		<where>
+			<if test="cowName != null and cowName != ''">
+				COW_NAME LIKE '%' || #{cowName} || '%'
+			</if>
+			<if test="cowAddress != null and cowAddress != ''">
+				COW_ADDRESS LIKE '%' || #{cowAddress} || '%'
+			</if>
+		</where>
+		)
+		WHERE rn BETWEEN #{first} AND #{last}
+	</select>
+
+
+
+
+</mapper>

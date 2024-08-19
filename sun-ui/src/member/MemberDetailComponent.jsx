@@ -7,9 +7,9 @@ const MemberDetailComponent = () => {
       
       {/* 상태 표시 버튼들 */}
       <div style={{ display: "flex", marginBottom: 20 }}>
-      <span class="badge badge-success">출차</span>
-      <span class="badge badge-warning">수리</span>
-      <span class="badge badge-primary">보관</span>
+      <span className="badge badge-success">출차</span>
+      <span className="badge badge-warning">수리</span>
+      <span className="badge badge-primary">보관</span>
       </div>
 
       {/* 이미지와 차량 정보 테이블을 가로로 배치 */}

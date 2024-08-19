@@ -13,16 +13,20 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class VehicleReservation {
+public class VehicleReservationVo {
 
 	// 배차 신청서 코드, PK
-	private int vrsv_code;
+	private int vrsvCode;
 	// 출장 코드
-	private int btrip_code;
+	private int btripCode;
 	// 차량 코드
-	private int vehicle_code;
+	private int vehicleCode;
 	// 차량 대여일
-	private LocalDateTime vrsv_date;
+	private LocalDateTime vrsvDate;
 	// 신청서 상세
-	private String vrsv_detail;
+	private String vrsvDetail;
+	// 신청서 승인 현황 (대기 W, 승인 Y, 반려 N)
+	private String vrsvStatus;
+	// 신청서 반려 사유
+	private String vrsvReply;
 }
