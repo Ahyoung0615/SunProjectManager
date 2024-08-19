@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 const MemberDetailComponent = () => {
     const { empCode } = useParams();
     const [employee, setEmployee] = useState([]);
-
+    const [file, setFile] = useState(null);
     useEffect(() => {
       // API 호출
       fetch(`http://localhost:8787/memberDetail/${empCode}`)
@@ -20,7 +20,38 @@ const MemberDetailComponent = () => {
           .catch(error => {
           });
   }, [empCode]);
+  const handleUpload = () => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("empCode", empCode);
 
+    fetch('http://localhost:8787/uploadImage', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Network response was not ok: ${text}`);
+            });
+        }
+        return response.text();  // 응답을 텍스트로 받아옵니다.
+    })
+    .then(text => {
+        try {
+            // 응답이 비어있을 수도 있으므로, JSON으로 파싱을 시도합니다.
+            const data = text ? JSON.parse(text) : {};
+            console.log(data);
+            alert(data.message || '파일 업로드 성공');
+        } catch (error) {
+            throw new Error('Invalid JSON format');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('파일 업로드 중 오류가 발생했습니다.');
+    });
+};
       const getJobTitle = (jobCode) => {
         switch (jobCode) {
             case 1:
@@ -90,6 +121,9 @@ const MemberDetailComponent = () => {
         'width=500,height=600'
       )
   };
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
     const handlePasswordReset = () => {
       fetch(`http://localhost:8787/resetPassword/${empCode}`, {
         method: 'POST',
@@ -110,19 +144,28 @@ const MemberDetailComponent = () => {
         alert('비밀번호 초기화 중 오류가 발생했습니다.');
     });
   };
-
+  
     return (
-        <div className="container" style={{ marginTop: 30 }}>
+      <div className="container" style={{ marginTop: 30 }}>
       <h1>사원 상세</h1>
- 
-
-      {/* 이미지와 원사원 정보 테이블을 가로로 배치 */}
+      {/* 이미지와 사원 정보 테이블을 가로로 배치 */}
       <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
-        {/* 사원 이미지 */}
-        <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginRight: 20 }}>
-          {/* 이미지 영역 */}
-        </div>
-
+          {/* 사원 이미지 및 파일 업로드 */}
+          <div style={{ marginRight: 20, textAlign: "center" }}>
+              <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
+                        {employee.empImg ? (
+                                      <img src={`http://localhost:8787/memberImage/${employee.empImg}`} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
+                        ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
+                                이미지 없음
+                            </div>
+                        )}
+              </div>
+              <label>파일 업로드:</label>
+              <input type="file" onChange={handleFileChange}/>
+              <br></br>
+              <button className="btn btn-primary" onClick={handleUpload}>업로드</button>
+          </div>
         {/*  세부 정보 테이블 */}
         <div style={{ flex: 2 }}>
           <table className="table table-bordered">

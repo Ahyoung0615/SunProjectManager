@@ -1,6 +1,8 @@
 package com.brs.sun.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.model.dao.EmployeeDao;
 import com.brs.sun.model.service.EmployeeService;
@@ -44,6 +47,18 @@ public class EmployeeController {
 		return employeeService.getOneMember(empCode);
 	}
 	
+	@PostMapping("/uploadImage")
+	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("empCode") String empCode) {
+	    Map<String, String> response = new HashMap<>();
+	    try {
+	        employeeService.saveImage(file, empCode);
+	        response.put("message", "이미지 파일 업로드 성공");
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        response.put("message", "이미지 파일 업로드 실패: " + e.getMessage());
+	        return ResponseEntity.status(500).body(response);
+	    }
+	}
 	@PostMapping("/resetPassword/{empCode}")
     public ResponseEntity<String> resetPassword(@PathVariable String empCode) {
 		int result = employeeService.passwordReset(empCode);

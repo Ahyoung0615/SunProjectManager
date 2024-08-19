@@ -45,6 +45,7 @@ public class SecurityConfig{
                 //.antMatchers("/주소입력").hasRole("")<< 만약 입력 1을 넣으면 prefix로 ROLE_가 붙으면서 새로운 권한이 생김
         				.requestMatchers("/memberList").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
+                        .requestMatchers("/memberImage/**").permitAll()     // 이미지 미리보기 허용
                         .anyRequest().permitAll()                      // 그 외의 모든 요청은 누구나 접근 가능
                     )
                     .formLogin(formLogin -> formLogin
@@ -60,12 +61,14 @@ public class SecurityConfig{
                         .invalidateHttpSession(true)                    // 로그아웃 시 세션 무효화
                         .deleteCookies("JSESSIONID")                    // 세션 쿠키 삭제
                     )
-                    .sessionManagement(session -> session
-                            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .sessionManagement(sessionManagement -> sessionManagement
                             .maximumSessions(1) // 사용자당 최대 세션 수를 1로 설정
                             .maxSessionsPreventsLogin(false) // 최대 세션 수 초과 시 새로운 로그인 허용 여부
-                            .sessionRegistry(sessionRegistry())
-                        );
+                            .expiredUrl("/")
+                        )
+                    .sessionManagement(session -> session
+                    		.invalidSessionUrl("/")
+                    );
                     
 
                 // CORS 필터를 추가
