@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.brs.sun.jpa.entity.EDocEntity;
 import com.brs.sun.jpa.entity.EDocTempEntity;
+import com.brs.sun.jpa.entity.EmployeeEntity;
 import com.brs.sun.jpa.service.EDocJpaService;
 
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/edoc")
 @RequiredArgsConstructor
-public class EDocController {
+public class EDocJPAController {
 
 	private final EDocJpaService service;
 	
@@ -43,5 +44,10 @@ public class EDocController {
 											   @RequestParam(defaultValue = "0") int page,
 											   @RequestParam(defaultValue = "10") int size){
 		return service.docTempSelect(empCode, page, size);
+	}
+	
+	@GetMapping("/employeeInfo")
+	public EmployeeEntity employeeInfo(@RequestParam Integer empCode) {
+		return service.employeeInfo(empCode);
 	}
 }
