@@ -34,7 +34,7 @@ const LoginComponent = () => {
           if (response.status === 200) {
             alert('로그인 성공!');
             console.log('유저 이메일: ' + response.data.empcode);
-            console.log('권한: ' + response.data.emppw);
+            console.log('권한: ' + response.data.empAuth);
             
              // 세션 스토리지에 사용자 데이터 저장 (JSON 형식)
             const userData = {

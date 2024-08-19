@@ -23,5 +23,45 @@
 		ORDER BY EMP_CODE ASC
 	</select>
 	
+	<select id="MemberList1" resultType="EmployeeVo">
+		SELECT *
+		FROM EMPLOYEE
+		WHERE EMP_STATUS = 'N'
+		ORDER BY EMP_CODE ASC
+	</select>
+	
+	<select id="MemberList2" resultType="EmployeeVo">
+		SELECT *
+		FROM EMPLOYEE
+		WHERE EMP_STATUS = 'V'
+		ORDER BY EMP_CODE ASC
+	</select>
+	<update id="passwordReset">
+		UPDATE EMPLOYEE 
+		SET EMP_PW = '$2a$10$DDBV.BAmuu5WMchtQLLadu9Cdx/vjuxBfZFnTKx73FGLhSqLcqXEy'
+		WHERE EMP_CODE = #{empCode}
+	</update>
+	<update id="updateMember">
+		UPDATE EMPLOYEE
+		SET DEPT_CODE = #{deptCode}, JOB_CODE = #{jobCode}, EMP_TEL = #{empTel},
+	        EMP_EMAIL = #{empEmail}, EMP_ADDRESS = #{empAddress}, EMP_STATUS = #{empStatus}
+	        WHERE EMP_CODE = #{empCode}
+	</update>
+
+    <!-- 사원 정보 삽입 쿼리 -->
+    <insert id="insertEmployee" parameterType="EmployeeVo">
+	        INSERT INTO EMPLOYEE (
+	        EMP_CODE,EMP_NAME,EMP_PW,
+	        DEPT_CODE,JOB_CODE,EMP_TEL,
+	        EMP_EMAIL,EMP_ADDRESS,GENDER,
+	        JOINDATE,EMP_STATUS,EMP_AUTH
+	    ) VALUES (
+	        (SELECT NVL(MAX(EMP_CODE), 0) + 1 FROM EMPLOYEE),
+	        #{empName},'$2a$10$DDBV.BAmuu5WMchtQLLadu9Cdx/vjuxBfZFnTKx73FGLhSqLcqXEy',#{deptCode},
+	        #{jobCode},#{empTel},#{empEmail},
+			#{empAddress},#{gender},SYSDATE,
+	        'Y','U'
+	    )
+    </insert>
 	
 </mapper>

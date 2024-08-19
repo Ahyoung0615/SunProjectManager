@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @Builder
 @ToString
 @NoArgsConstructor
@@ -43,5 +45,6 @@ public class EmployeeVo {
 	private String empImg;
 	// 사용자 권한 (유저 U, 관리자 A)
 	private String empAuth;
+	
 
 }
