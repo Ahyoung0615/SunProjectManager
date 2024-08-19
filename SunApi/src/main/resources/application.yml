@@ -1,13 +1,22 @@
 spring:
   application:
     name: SunApi
-
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@localhost:1521:xe
     username: SUNPJ
     password: SUNPJ
-    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      dialect: org.hibernate.dialect.Oracle12cDialect
+      hibernate:
+        format_sql: true
+#      spring.jpa.properties.hibernate.format_sql=true
+      
+          
 server:
   servlet:
     encoding:

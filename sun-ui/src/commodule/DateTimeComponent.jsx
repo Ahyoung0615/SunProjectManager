@@ -1,22 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const DateTimeComponent = () => {
-  const [startDate, setStartDate] = useState(new Date());
-
+const DateTimeComponent = ({ selectedDate, setSelectedDate }) => {
   return (
     <div>
       <DatePicker
-        selected={startDate}
-        onChange={(date) => setStartDate(date)}
-        //showTimeSelect
-        //dateFormat="Pp"
+        selected={selectedDate}
+        onChange={(date) => setSelectedDate(date)}
         dateFormat="yyyy/MM/dd"
-        placeholderText="Select a date"
+        placeholderText="날짜 입력 버튼"
       />
     </div>
-    
   );
 };
 

@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String empcode) throws UsernameNotFoundException {
         System.out.println("넘어온 아이디: " + empcode);
         System.out.println("loadUserByUsername 실행");
-
+        
         
         // 사용자 조회, 없으면 예외 발생
         EmployeeVo emp = employeeDao.Info(empcode);

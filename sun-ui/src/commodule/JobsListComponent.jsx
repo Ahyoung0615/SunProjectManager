@@ -17,7 +17,7 @@ const JobsListComponent = () => {
                 <tbody>
                     {
                         jobs.map(
-                            job =>
+                            (job, index) =>
                                 <tr key={job.job_id}>
                                     <td>{job.job_title}</td>
                                 </tr>

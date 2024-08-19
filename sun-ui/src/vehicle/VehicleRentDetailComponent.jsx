@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Modal, Button, Alert } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 
 const VehicleRentDetailComponent = () => {
+  const {vehicleCode} = useParams();
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -26,9 +28,9 @@ const VehicleRentDetailComponent = () => {
         <br></br>
         <h4 style={{ marginTop: 30}}>배차 관리 상세 현황</h4>
         <div>
-        <span class="badge badge-success" style={{ marginRight: 850 }}>승인</span>
-        <span class="badge badge-warning" style={{ marginRight: 30 }}>승인대기중</span>
-        <span class="badge badge-danger" style={{ marginRight: 30 }}>반려</span>
+        <span className="badge badge-success" style={{ marginRight: 850 }}>승인</span>
+        <span className="badge badge-warning" style={{ marginRight: 30 }}>승인대기중</span>
+        <span className="badge badge-danger" style={{ marginRight: 30 }}>반려</span>
         </div>
       </div>
 
