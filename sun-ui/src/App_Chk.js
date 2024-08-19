@@ -21,11 +21,12 @@ import DocumentAppDetailComponent from './document/DocumentAppDetailComponent';
 import DocumentInsertComponent from './document/DocumentInsertComponent';
 import MemberListComponent from './member/MemberListComponent';
 import MemberDetailComponent from './member/MemberDetailComponent';
+import MemberUpdateComponent from './member/MemberUpdateComponent';
 import MemberAddComponent from './member/MemberAddComponent';
+import NewEmp from './member/NewEmp';
 import VehicleListComponent from './vehicle/VehicleListComponent';
 import BoardListComponent from './board/BoardListComponent';
 import ChatSunComponent from './chat/ChatSunComponent';
-import MemberTreeComponent from './member/MemberTreeComponent';
 import HeaderTopComponent from './layout/HeaderTopComponent';
 import HeaderSideComponent from './layout/HeaderSideComponent';
 import FooterComponent from './layout/FooterComponent';
@@ -40,12 +41,14 @@ import VehicleDetailComponent from './vehicle/VehicleDetailComponent';
 import BTripDetailComponent from './btrip/BTripDetailComponent';
 import VehicleRentDetailComponent from './vehicle/VehicleRentDetailComponent';
 import VehicleRentListComponent from './vehicle/VehicleRentListComponent';
+import VehicleFormComponent from './vehicle/VehicleFormComponent';
 import FVehicleDetailComponent from './fvehicle/FVehicleDetailComponent';
 import Error404Component from './error/Error404Component';
 
 
 import FileUploadTest from './document/FileUploadTest';
-import VehicleFormComponent from './vehicle/VehicleFormComponent';
+import DocumentTempListComponent from './document/DocumentTempListComponent';
+import DocumentTempDetailComponent from './document/DocumentTempDetailComponent';
 
 function App() {
     const [sessionAccess, setSessionAccess] = useState(false);
@@ -89,7 +92,7 @@ function App() {
 
                                 <Route path="/bTripList" element={renderComponent(BTripListComponent)} />
                                 <Route path="/bTripForm" element={renderComponent(BTripFormComponent)} />
-                                <Route path="/bTripDetail" element={renderComponent(BTripDetailComponent)} />
+                                <Route path="/bTripDetail/:btripCode" element={renderComponent(BTripDetailComponent)} />
 
                                 <Route path="/fDeliveryList" element={renderComponent(FDeliveryListComponent)} />
                                 <Route path="/fDeliveryNowDetail/:fdelcode" element={renderComponent(FDeliveryNowDetailComponent)} />
@@ -98,15 +101,18 @@ function App() {
                                 <Route path="/fDeliveryRsvForm" element={renderComponent(FDeliveryRsvFormComponent)} />
 
                                 <Route path="/documentList" element={renderComponent(DocumentListComponent)} />
-                                <Route path="/documentDetail" element={renderComponent(DocumentDetailComponent)} />
+                                <Route path="/documentDetail/:edocCode" element={renderComponent(DocumentDetailComponent)} />
                                 <Route path="/documentAppList" element={renderComponent(DocumentAppComponent)} />
                                 <Route path="/documentAppDetail" element={renderComponent(DocumentAppDetailComponent)} />
+                                <Route path='/documentTempList' element={renderComponent(DocumentTempListComponent)} />
+                                <Route path='/documentTempDetail/:edtempCode' element={renderComponent(DocumentTempDetailComponent)} />
                                 <Route path="/documentInsertForm" element={renderComponent(DocumentInsertComponent)} />
 
                                 <Route path="/memberList" element={renderComponent(MemberListComponent)} />
-                                <Route path="/memberDetail" element={renderComponent(MemberDetailComponent)} />
+                                <Route path="/memberDetail/:empCode" element={renderComponent(MemberDetailComponent)} />
+                                <Route path="/memberUpdate/:empCode" element={renderComponent(MemberUpdateComponent)} />
                                 <Route path="/memberAdd" element={renderComponent(MemberAddComponent)} />
-                                <Route path="/memberTree" element={renderComponent(MemberTreeComponent)} />
+                                <Route path="/NewEmp" element={renderComponent(NewEmp)} />
 
                                 <Route path="/vehicleList" element={renderComponent(VehicleListComponent)} />
                                 <Route path="/vehicleDetail/:vehicleCode" element={renderComponent(VehicleDetailComponent)} />
