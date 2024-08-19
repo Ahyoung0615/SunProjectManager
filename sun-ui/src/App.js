@@ -18,6 +18,8 @@ import DocumentListComponent from './document/DocumentListComponent';
 import DocumentDetailComponent from './document/DocumentDetailComponent';
 import DocumentAppComponent from './document/DocumentAppComponent';
 import DocumentAppDetailComponent from './document/DocumentAppDetailComponent';
+import DocumentTempListComponent from './document/DocumentTempListComponent';
+import DocumentTempDetailComponent from './document/DocumentTempDetailComponent';
 import DocumentInsertComponent from './document/DocumentInsertComponent';
 import MemberListComponent from './member/MemberListComponent';
 import MemberDetailComponent from './member/MemberDetailComponent';
@@ -47,8 +49,6 @@ import Error404Component from './error/Error404Component';
 
 
 import FileUploadTest from './document/FileUploadTest';
-import DocumentTempListComponent from './document/DocumentTempListComponent';
-import DocumentTempDetailComponent from './document/DocumentTempDetailComponent';
 
 function App() {
     const [sessionAccess, setSessionAccess] = useState(false);
