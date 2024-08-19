@@ -1,7 +1,49 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import CoWorkMapComponent from "../cowork/CoWorkMapComponent";
 
 const BTripDetailComponent = () => {
+  const { btripCode } = useParams();
+  const [btripDetail, setBTripDetail] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sessionEmp, setSessionEmp] = useState(null);
+  const [showRoute, setShowRoute] = useState(false);
+  
+
+  useEffect(() => {
+    const sessionUser = sessionStorage.getItem("user");
+    if (sessionUser) {
+      const parsedUser = JSON.parse(sessionUser);
+      console.log("접속자 사번 : ", parsedUser.empcode)
+      setSessionEmp(parsedUser.empcode);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!sessionEmp) {
+      console.log("세션없음");
+      return;
+    }
+
+    const getBtripDetail = async () => {
+      try {
+        console.log("세션있음");
+        const response = await axios.get(`http://localhost:8787/api/btripDetail/${btripCode}`, {
+          params: { empCode: sessionEmp }
+        });
+        setBTripDetail(response.data);
+      } catch (error) {
+        alert("출장상세조회불가", error);
+      }
+    };
+
+    getBtripDetail();
+  }, [sessionEmp, btripCode]);
+
+  if (!btripDetail) {
+    return <div>Loading...</div>; // 데이터가 로드되기 전까지 로딩 상태를 표시합니다.
+  }
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -11,130 +53,126 @@ const BTripDetailComponent = () => {
     setIsModalOpen(false);
   };
 
+  const handleRouteClick = () => {
+    setShowRoute(true); // 버튼 클릭 시 경로보기 활성화
+  };
+
   return (
     <div className="container" style={{ marginTop: 30 }}>
       <h4>출장 상세</h4>
-      
+
       <div style={{ display: "flex" }}>
-        {/* 지도 및 주소 정보 */}
-        <div style={{ flex: 1, marginRight: 20 }}>
-          <div style={{ width: "300px", height: "200px", backgroundColor: "#ccc" }}>
-            {/* 지도 컴포넌트 자리 */}
+        <div style={{ flex: 1, marginRight: 20, marginTop: 20 }}>
+          <div>
+            <CoWorkMapComponent
+              btripDepartAdd={btripDetail.btripDepart}
+              btripArrivalAdd={btripDetail.btripArrival}
+              showRoute={showRoute}
+            />
           </div>
-          <p>부산광역시 동래구 사직북로28번길 148</p>
+          <div style={{ display: 'flex', alignItems: 'center', marginLeft: 30, marginTop: 5}}>
+            <p style={{ margin: 0 }}>
+              <i className="bi bi-arrow-up-square-fill"></i> {btripDetail.btripArrival}
+            </p>
+            <button
+              type="button"
+              className="btn btn-warning"
+              style={{
+                marginLeft: 10, // 주소와 버튼 간의 간격
+                padding: '5px 10px', // 버튼 내부 패딩을 줄여 크기 조정
+                fontSize: '0.9rem', // 글꼴 크기를 줄여 버튼 크기 축소
+                lineHeight: 1, // 버튼 내 텍스트의 줄 간격을 줄임
+              }}
+              onClick={handleRouteClick}
+            >
+              <b>경로보기</b>
+            </button>
+          </div>
         </div>
 
-        {/* 출장 세부 현황 */}
+
         <div style={{ flex: 2, marginRight: 20 }}>
           <h4>출장 세부 현황</h4>
           <table className="table table-bordered">
             <tbody>
               <tr>
-                <td>출장번호</td>
-                <td>1123</td>
-                <td>출장목적</td>
-                <td>제조 공장 검수</td>
+                <th>출장번호</th>
+                <td>{btripDetail.btripCode}</td>
+                <th>출장목적</th>
+                <td>{btripDetail.btripDetail}</td>
               </tr>
               <tr>
-                <td>출장지</td>
-                <td>부산제철</td>
-                <td>출장기간</td>
-                <td>2024.07.17 ~ 2024.07.21</td>
+                <th>출발지</th>
+                <td>{btripDetail.btripDepart}</td>
+                <th>출장지</th>
+                <td>{btripDetail.btripArrival}</td>
               </tr>
               <tr>
-                <td>차량이용여부</td>
-                <td>1허1234</td>
-                <td>비고</td>
-                <td>-</td>
+                <th>시작일자</th>
+                <td>{new Date(btripDetail.btripStartDate).toLocaleDateString()}</td>
+                <th>종료일자</th>
+                <td>{new Date(btripDetail.btripEndDate).toLocaleDateString()}</td>
+              </tr>
+              <tr>
+                <th>차량여부</th>
+                <td>{btripDetail.vehicleCode == null ? "미사용" : "사용"}</td>
+                <th>차량코드</th>
+                <td>{btripDetail.vehicleCode}</td>
               </tr>
             </tbody>
           </table>
 
-          {/* 여비 상세 구분 */}
-          <h4>여비 상세 구분</h4>
+          <h4>여비 상세 구분</h4><p style={{marginLeft: 360, fontSize:13, marginTop:-30}}>여비 신청은 지출결의서를 통해 청구할 수 있습니다</p>
           <table className="table table-bordered">
             <tbody>
               <tr>
-                <td>교통비</td>
+                <th>교통비</th>
                 <td>-</td>
-                <td>유류비</td>
+                <th>유류비</th>
                 <td>52,000</td>
               </tr>
               <tr>
-                <td>식비</td>
+                <th>식비</th>
                 <td>12,000</td>
-                <td>숙박비</td>
+                <th>숙박비</th>
                 <td>-</td>
               </tr>
               <tr>
-                <td>영업비</td>
+                <th>영업비</th>
                 <td>-</td>
-                <td>기타 경비</td>
+                <th>기타 경비</th>
                 <td>-</td>
               </tr>
             </tbody>
           </table>
-          <button className="btn btn-primary" onClick={openModal}>여비 신청</button>
         </div>
       </div>
 
-      {/* 상세 업무 내역 */}
       <div style={{ marginTop: 20 }}>
         <h4>상세 업무 내역</h4>
         <table className="table table-bordered">
           <tbody>
             <tr>
-              <td>참석자 대표</td>
-              <td>송품질 대리</td>
-              <td>대상자 대표</td>
+              <th>담당자</th>
+              <td>{sessionEmp}</td>
+              <th>대상업체</th>
               <td>임강철 소장</td>
             </tr>
             <tr>
-              <td>세부 일정</td>
-              <td>14:00 제조 공장 검수</td>
-              <td>업체 연락처</td>
-              <td>010-1234-1245</td>
-            </tr>
-            <tr>
-              <td>결과 요약</td>
-              <td colSpan="3">송품질 대리 외 0명 부산제철 공장 방문하여 제조 공장을 검수하였음</td>
+              <th>출장 사유</th>
+              <td>{btripDetail.btripDetail}</td>
+              <th>업체 연락처</th>
+              <td>024556897</td>
             </tr>
           </tbody>
         </table>
-        <button className="btn btn-secondary" onClick={openModal}>상세 수정</button>
       </div>
 
-      {/* 목록 버튼 */}
-      <div style={{ marginTop: 20 }}>
-        <button className="btn btn-secondary">목록</button>
+      <div style={{ marginTop: 20, marginLeft: 500, marginBottom: 50 }}>
+        <Link to="/bTripList"><button className="btn btn-primary">목록</button></Link>
       </div>
 
-      {/* 모달 컴포넌트 */}
-      {isModalOpen && (
-        <div className="modal show" style={{ display: 'block' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">결과 요약</h5>
-                <button type="button" className="close" onClick={closeModal}>
-                  <span>&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <textarea 
-                  className="form-control" 
-                  defaultValue="송품질 대리 외 0명 부산제철 공장 방문하여 제조 공장을 검수하였음"
-                  rows="4"
-                />
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={closeModal}>창닫기</button>
-                <button type="button" className="btn btn-primary">저장</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };

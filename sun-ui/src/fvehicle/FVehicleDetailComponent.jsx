@@ -9,7 +9,7 @@ const FVehicleDetailComponent = ({ shipment }) => {
     <div>
             <br></br>
             <h4>화물 운송 상세 정보</h4>
-            <span class="badge badge-success">운송중</span>
+            <span className="badge badge-success">운송중</span>
             <table className="table table-bordered">
             <thead>
                     <tr>

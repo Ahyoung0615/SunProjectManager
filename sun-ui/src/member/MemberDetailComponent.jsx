@@ -114,16 +114,16 @@ const MemberDetailComponent = () => {
     return (
         <div className="container" style={{ marginTop: 30 }}>
       <h1>사원 상세</h1>
-      
+ 
 
-      {/* 이미지와 차량 정보 테이블을 가로로 배치 */}
+      {/* 이미지와 원사원 정보 테이블을 가로로 배치 */}
       <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
-        {/* 차량 이미지 */}
+        {/* 사원 이미지 */}
         <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginRight: 20 }}>
           {/* 이미지 영역 */}
         </div>
 
-        {/* 차량 세부 정보 테이블 */}
+        {/*  세부 정보 테이블 */}
         <div style={{ flex: 2 }}>
           <table className="table table-bordered">
             <tbody>

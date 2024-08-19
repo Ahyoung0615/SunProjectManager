@@ -18,19 +18,19 @@ public class BTripVo {
 	// 출장
 	
 	// 출잘 번호, PK
-	private int btripCode;
+	private int bTripCode;
 	// 사번
 	private int empCode;
 	// 출장지
-	private String btripArrival;
+	private String bTripArrival;
 	// 출발지
-	private String btripDepart;
+	private String bTripDepart;
 	// 상세
-	private String btripDetail;
+	private String bTripDetail;
 	// 시작 날짜
-	private LocalDateTime btripStartDate;
+	private LocalDateTime bTripStartDate;
 	// 종료 날짜
-	private LocalDateTime btripEndDate;
+	private LocalDateTime bTripEndDate;
 	// 차량 코드
 	private String vehicleCode;
 }

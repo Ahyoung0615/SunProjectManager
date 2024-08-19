@@ -20,7 +20,7 @@ const RepairListComponent = ({ repairDetail, handleStatusChange }) => {
               <tr key={index}>
                 <td>{repair.repairCode}</td>
                 <td>{repair.repairDetail}</td>
-                <td>{repair.repairDate}</td>
+                <td>{new Date(repair.repairDate).toLocaleDateString()}</td>
                 <td>{repair.repairReason}</td>
                 <td>
                   {repair.repairStatus !== "O" ? (

@@ -74,7 +74,7 @@ const VehicleListComponent = () => {
               </td>
               <td>{item.vehicleNo}</td>
               <td>{item.vehicleModel}</td>
-              <td>{item.vehicleRegdate}</td>
+              <td>{new Date(item.vehicleRegdate).toLocaleDateString()}</td>
               <td>{item.vehicleSize}</td>
               <td>{item.vehicleType=='C'?"영업":"화물"}</td>
             </tr>
