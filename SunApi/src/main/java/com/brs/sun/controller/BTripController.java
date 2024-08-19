@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.brs.sun.model.service.BTripService;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
+import com.brs.sun.vo.PagingVo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,17 +39,26 @@ public class BTripController {
 	}
 	
 	@GetMapping("/cowork")
-	public List<CoWorkVo> searchCoWork(
-	    @RequestParam(defaultValue = "1") int first,
-	    @RequestParam(defaultValue = "5") int last,
+	public PagingVo<CoWorkVo> searchCoWork(
+	    @RequestParam(defaultValue = "1") int page,
+	    @RequestParam(defaultValue = "5") int countList,
 	    @RequestParam(required = false) String cowName,
 	    @RequestParam(required = false) String cowAddress) {
-		log.info("searchCoWork 이름검색 cowName : {}", cowName);
-		log.info("searchCoWork 주소검색 coAddress : {}", cowAddress);
-	    return service.searchCoWork(first, last, cowName, cowAddress);
+
+	    // 전체 게시글 수 조회
+	    int totalCount = service.countCoWork(cowName, cowAddress);
+
+	    // 페이징 정보 생성
+	    PagingVo<CoWorkVo> paging = new PagingVo<>(page, countList, totalCount, 10);
+
+	    // 게시글 목록 조회
+	    List<CoWorkVo> results = service.searchCoWork((page - 1) * countList + 1, page * countList, cowName, cowAddress);
+
+	    // 게시글 목록을 PagingVo 객체에 설정
+	    paging.setContent(results);
+
+	    // 결과 반환
+	    return paging;
 	}
-
-
-
 
 }

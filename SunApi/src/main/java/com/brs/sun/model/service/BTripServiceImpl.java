@@ -64,4 +64,9 @@ public class BTripServiceImpl implements BTripService {
 		return dao.searchCoWork(first, last, cowName, cowAddress);
 	}
 
+	@Override
+	public int countCoWork(String cowName, String cowAddress) {
+		return dao.countCoWork(cowName, cowAddress);
+	}
+
 }

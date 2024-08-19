@@ -72,4 +72,13 @@ public class BTripDaoImpl implements BTripDao {
 		return template.selectList(NS+"searchCoWork",params);
 	}
 
+	@Override
+	public int countCoWork(String cowName, String cowAddress) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("cowName", cowName);
+	    params.put("cowAddress", cowAddress);
+	    return template.selectOne(NS + "countCoWork", params);
+	}
+
+
 }
