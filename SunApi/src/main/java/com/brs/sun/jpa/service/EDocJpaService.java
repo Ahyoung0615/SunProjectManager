@@ -3,6 +3,7 @@ package com.brs.sun.jpa.service;
 import org.springframework.data.domain.Page;
 
 import com.brs.sun.jpa.entity.EDocEntity;
+import com.brs.sun.jpa.entity.EDocTempEntity;
 
 public interface EDocJpaService {
 
@@ -13,6 +14,7 @@ public interface EDocJpaService {
 	 * @param size
 	 * @return
 	 */
-	Page<EDocEntity> docSelect(String eDocStatus, int page, int size);
+	Page<EDocEntity> docSelect(String eDocStatus, Integer empCode, int page, int size);
 
+	Page<EDocTempEntity> docTempSelect(Integer empCode, int page, int size);
 }

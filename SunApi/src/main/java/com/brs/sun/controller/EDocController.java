@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brs.sun.jpa.entity.EDocEntity;
+import com.brs.sun.jpa.entity.EDocTempEntity;
 import com.brs.sun.jpa.service.EDocJpaService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,20 @@ public class EDocController {
 	 */
 	@GetMapping("/eDocList")
 	public Page<EDocEntity> selectEdocByStatus(@RequestParam String status, 
-											   @RequestParam(defaultValue = "0") int page, 
+	                                           @RequestParam Integer empCode,
+	                                           @RequestParam(defaultValue = "0") int page, 
+	                                           @RequestParam(defaultValue = "10") int size){
+	    if (page < 0) {
+	        throw new IllegalArgumentException("Page index must not be less than zero");
+	    }
+	    return service.docSelect(status, empCode, page, size);
+	}
+
+	
+	@GetMapping("/eDocTempList")
+	public Page<EDocTempEntity> selectEDocTemp(@RequestParam Integer empCode,
+											   @RequestParam(defaultValue = "0") int page,
 											   @RequestParam(defaultValue = "10") int size){
-		return service.docSelect(status, page, size);
+		return service.docTempSelect(empCode, page, size);
 	}
 }

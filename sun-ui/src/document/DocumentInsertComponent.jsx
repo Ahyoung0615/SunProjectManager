@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OrgChartComponent from '../commodule/OrgChartComponent';
 
 
@@ -13,11 +13,12 @@ const DocumentInsertComponent = () => {
 
     return (
         <div>
-            DocumentInsertComponent
+            {/* DocumentInsertComponent
             <br></br>
-            <OrgChartComponent mappingUrl="empList" buttonName="결재자"/>
+            <OrgChartComponent mappingUrl="empList" buttonName="결재자" maxSelection="3"/>
 
             {/* <select value={selectedDoc} onChange={handleChange}>
+
                 <option value="Vacation">doc1</option>
                 <option value="TestDoc">doc2</option>
             </select>

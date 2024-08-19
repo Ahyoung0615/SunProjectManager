@@ -1,23 +1,42 @@
 import React, { useState } from 'react';
 import styles from '../css/DocumentComponent.module.css'; // CSS 모듈 임포트
 import axios from 'axios';
+import OrgChartComponent from '../commodule/OrgChartComponent';
+import ModalComponent from '../commodule/ModalComponent';
 
 const DocumentComponent = () => {
     const [selectedValue, setSelectedValue] = useState('apple');
 
-    const [a, setA] = useState('aTest');
-    const [b, setB] = useState('bTest');
-    const [c, setC] = useState('cTest');
     const [d, setD] = useState();
     const [e, setE] = useState();
     const [f, setF] = useState();
     const [g, setG] = useState();
+    const [sessionEmpCode, setSessionEmpCode] = useState(null);
+    const [empInfo, setEmpInfo] = useState([]);
+
+    useEffect(() => {
+        // sessionStorage에서 user 정보를 가져오기
+        const sessionStorageInfo = window.sessionStorage.getItem("user");
+
+        if (sessionStorageInfo) {
+            try {
+                // JSON 파싱 후 empCode 추출
+                const user = JSON.parse(sessionStorageInfo);
+                setSessionEmpCode(user.empcode);
+                console.log(user.empcode);
+            } catch (error) {
+                console.error("Failed to parse session storage item 'user':", error);
+            }
+        } else {
+            console.error("No 'user' item found in session storage");
+        }
+    }, []);
 
     const handleChange = (event) => {
         setSelectedValue(event.target.value);
     };
 
-   const eChange = (event) => {
+    const eChange = (event) => {
         setE(event.target.value);
     };
 
@@ -30,9 +49,6 @@ const DocumentComponent = () => {
     };
 
     const data = {
-        a: a,
-        b: b,
-        c: c,
         d: selectedValue,
         e: e,
         f:f
@@ -51,6 +67,7 @@ const DocumentComponent = () => {
     return (
         <div className={styles.box}>
             <h1 className={styles.heading}>휴 가 신 청 서</h1>
+            <ModalComponent/>
             <form>
                 <table className={styles.table}>
                     <thead>
@@ -71,18 +88,6 @@ const DocumentComponent = () => {
                 <table className={styles.table}>
                     <tbody>
                         {/* 소속, 성명, 직위는 session 가져옴, 사용자 입장에서 보일지 생각 해보기 */}
-                        <tr>
-                            <th className={styles.th}>소속</th>
-                            <td className={styles.td}><input type='text' value={a} readOnly name='a'/></td>
-                        </tr>
-                        <tr>
-                            <th className={styles.th}>성명</th>
-                            <td className={styles.td}><input type='text' value={b} readOnly name='b'/></td>
-                        </tr>
-                        <tr>
-                            <th className={styles.th}>직위</th>
-                            <td className={styles.td}><input type='text' value={c} readOnly name='c'/></td>
-                        </tr>
                         <tr>
                             <th className={styles.th}>종류</th>
                             <td className={styles.td}>
