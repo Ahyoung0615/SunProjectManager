@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('1');
-    
+    const [sessionEmp, setSessionEmp] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // 선택된 상태에 따라 API 호출
@@ -37,11 +40,42 @@ const MemberListComponent = () => {
     };
     const handleNewEmp = () => {
         window.open(
-            '/NewEmp', // 실제로 팝업 창에서 열고자 하는 경로를 지정합니다.
+            '/memberAdd', // 실제로 팝업 창에서 열고자 하는 경로를 지정합니다.
             '신규사원등록',
             'width=500,height=600' // 팝업 창의 크기 설정
           );
     };
+
+    useEffect(() => {
+        const storedUserData = window.sessionStorage.getItem("user");
+        if (storedUserData) {
+            const parsedData = JSON.parse(storedUserData);
+            setUserData(parsedData);
+    
+            if (parsedData.authorities !== '[ROLE_A]') {
+                setTimeout(() => {
+                    console.log("권한이없습니다");
+                    console.log(parsedData.authorities);
+                    setLoading(false);
+                    navigate('/home');
+                }, 1700); 
+            } else {
+                console.log("권한이있습니다");
+                setLoading(true); 
+            }
+        } else {
+            setTimeout(() => {
+                navigate('/');
+            }, 1700);
+        }
+    }, [navigate]);
+    if (!userData || userData.authorities !== '[ROLE_A]') {
+        return<div style={{marginLeft:700, marginTop:100}}><br></br>
+            <div style={{fontSize:30, marginTop:30}}>
+             <b>관리자 권한이 필요합니다<br></br>2초 후 메인 페이지로 이동합니다</b>
+        </div></div>;
+    }
+
     const getJobTitle = (jobCode) => {
         switch (jobCode) {
             case 1:
