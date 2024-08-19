@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import CoWorkComponent from '../cowork/CoWorkComponent';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import AdminComponent from '../commodule/AdminComponent';
-
+import admin from '../img/admin.png';
+import { useNavigate } from 'react-router-dom';
 const BTripListComponent = () => {
     const [bTripList, setBTripList] = useState([]);
     const [sessionEmp, setSessionEmp] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const sessionUser = sessionStorage.getItem("user");
@@ -34,6 +35,7 @@ const BTripListComponent = () => {
             }
         };
         getBTrip(sessionEmp);
+        
     }, [sessionEmp]);
 
     return (
