@@ -21,4 +21,6 @@ public interface BTripDao {
 	public List<VehicleReservationVo> getAllVehicleRsv(int first, int last, String startDate, String endDate);
 	
 	public List<CoWorkVo> searchCoWork(int first, int last, String cowName, String cowAddress);
+	
+	public int countCoWork(String cowName, String cowAddress);
 }

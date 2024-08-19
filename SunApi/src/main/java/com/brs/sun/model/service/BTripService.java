@@ -74,4 +74,12 @@ public interface BTripService {
 	 * @return List<CoWorkVo>
 	 */
 	public List<CoWorkVo> searchCoWork(int first, int last, String cowName, String cowAddress);
+	
+	/**
+	 * 협력사 조회 총 갯수
+	 * @param cowName
+	 * @param cowAddress
+	 * @return int (몇 개의 행이 조회되는지)
+	 */
+	public int countCoWork(String cowName, String cowAddress);
 }

@@ -43,7 +43,8 @@
 		BTRIP_START_DATE,
 		BTRIP_END_DATE, VEHICLE_CODE
 		FROM BTRIP
-		WHERE TO_CHAR(EMP_CODE) = #{empCode}
+		WHERE TO_CHAR(EMP_CODE) =
+		#{empCode}
 		ORDER BY BTRIP_CODE DESC
 	</select>
 
@@ -85,7 +86,8 @@
 		BTRIP_ARRIVAL, BTRIP_DETAIL, BTRIP_START_DATE,
 		BTRIP_END_DATE, VEHICLE_CODE
 		FROM BTRIP b
-		WHERE TO_CHAR(BTRIP_CODE) = #{bTripCode}
+		WHERE TO_CHAR(BTRIP_CODE) =
+		#{bTripCode}
 		AND TO_CHAR(EMP_CODE) = #{empCode}
 	</select>
 
@@ -106,15 +108,19 @@
 	<!-- 협력사 검색 조회 (전체/이름/주소) searchCoWork -->
 	<select id="searchCoWork" resultType="CoWorkVo">
 		SELECT * FROM (
-		SELECT COW_CODE, COW_NAME, COW_ADDRESS, COW_TEL,
+		SELECT
+		COW_CODE,
+		COW_NAME,
+		COW_ADDRESS,
+		COW_TEL,
 		ROW_NUMBER() OVER (ORDER BY COW_CODE ASC) AS rn
 		FROM COWORK c
 		<where>
 			<if test="cowName != null and cowName != ''">
-				COW_NAME LIKE '%' || #{cowName} || '%'
+				AND COW_NAME LIKE '%' || #{cowName} || '%'
 			</if>
 			<if test="cowAddress != null and cowAddress != ''">
-				COW_ADDRESS LIKE '%' || #{cowAddress} || '%'
+				AND COW_ADDRESS LIKE '%' || #{cowAddress} || '%'
 			</if>
 		</where>
 		)
@@ -122,6 +128,18 @@
 	</select>
 
 
-
+	<!-- 협력사 출력 갯수 -->
+	<select id="countCoWork" resultType="int">
+		SELECT COUNT(*)
+		FROM COWORK c
+		<where>
+			<if test="cowName != null and cowName != ''">
+				AND COW_NAME LIKE '%' || #{cowName} || '%'
+			</if>
+			<if test="cowAddress != null and cowAddress != ''">
+				AND COW_ADDRESS LIKE '%' || #{cowAddress} || '%'
+			</if>
+		</where>
+	</select>
 
 </mapper>
