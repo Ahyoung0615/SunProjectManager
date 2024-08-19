@@ -41,7 +41,7 @@ public class EDocTempEntity {
 
     // 기안자 사번
     @Column(name = "EMP_CODE")
-    private int empCode;
+    private Integer empCode;
 
     // 기안 일자
     @Column(name = "EDTEMP_DATE")

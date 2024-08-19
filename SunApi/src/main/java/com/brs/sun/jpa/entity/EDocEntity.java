@@ -52,4 +52,8 @@ public class EDocEntity {
     // 결재 상태 (결재 대기중 A, 결재 완료 S, 반려 R, 회수 C)
     @Column(name = "EDOC_STATUS")
     private String eDocStatus;
+    
+    // 결재 타입 (연차 V, 지출결의서 E)
+    @Column(name = "EDOC_TPYE")
+    private String eDocTpye;
 }

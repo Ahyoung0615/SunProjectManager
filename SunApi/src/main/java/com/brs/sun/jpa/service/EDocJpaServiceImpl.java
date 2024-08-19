@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.brs.sun.jpa.entity.EDocEntity;
+import com.brs.sun.jpa.entity.EDocTempEntity;
 import com.brs.sun.jpa.repository.EDocRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,14 @@ public class EDocJpaServiceImpl implements EDocJpaService {
 	 * Page 객체로 전달
 	 */
 	@Override
-	public Page<EDocEntity> docSelect(String status, int page, int size) {
+	public Page<EDocEntity> docSelect(String status, Integer empCode, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return repository.eDocSelectByStatus(status, pageable);
+		return repository.eDocSelectByStatus(status, empCode, pageable);
+	}
+	
+	@Override
+	public Page<EDocTempEntity> docTempSelect(Integer empCode, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		return repository.eDocTempSelect(empCode, pageable);
 	}
 }
