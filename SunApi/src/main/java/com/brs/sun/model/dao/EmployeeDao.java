@@ -23,6 +23,8 @@ public interface EmployeeDao {
 	
 	int updateMember(EmployeeVo employeeVo);
 	
+	int updateImage(String empCode, String empImg);
+	
 	int passwordReset(String empCode);
 	
 	String generateEmpCode(String joinDate);
