@@ -2,40 +2,52 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import sunImage from '../img/image07.png'; // 이미지 경로를 실제 경로로 변경하세요.
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const LoginComponent = () => {
     const navigate = useNavigate();
-    let ws;
     const storedUserData = window.sessionStorage.getItem("user");
     const initialUser = storedUserData ? JSON.parse(storedUserData) : { empcode: '', emppw: '' };
-    const [userData, setUserData] = useState();
     const [user, setUser] = useState(initialUser);
     const [rememberMe, setRememberMe] = useState(false);
-    ws = new WebSocket("ws://localhost:3000/");
-    console.log(ws);
-    // 페이지 로드 시 자동 로그인 체크
-    useEffect(() => {
-      const checkRememberMe = async () => {
-          try {
-              // 서버에서 자동 로그인 여부 확인
-              const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
-              if (response.status === 200 && response.data.empcode) {
-                  // 사용자 정보가 있다면 자동으로 로그인
-                  window.sessionStorage.setItem("user", JSON.stringify(response.data));
-                  navigate('/access', { state: { userData: response.data } });
-              }
-          } catch (error) {
-              console.error('자동 로그인 체크 실패:', error);
-          }
-      };
+    let stompClient;
 
-      checkRememberMe();
-  }, [navigate]);
+    useEffect(() => {
+        const checkRememberMe = async () => {
+            try {
+                const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
+                if (response.status === 200 && response.data.empcode) {
+                    window.sessionStorage.setItem("user", JSON.stringify(response.data));
+                    navigate('/access', { state: { userData: response.data } });
+                    connectWebSocket(response.data.empcode);
+                }
+            } catch (error) {
+                console.error('자동 로그인 체크 실패:', error);
+            }
+        };
+
+        checkRememberMe();
+    }, [navigate]);
+
+    const connectWebSocket = (empcode) => {
+        const socket = new SockJS('http://localhost:8787/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, () => {
+            console.log('WebSocket 연결 성공');
+            stompClient.subscribe('/topic/login', (message) => {
+                console.log('WebSocket 메시지 수신:', JSON.parse(message.body));
+            });
+            stompClient.send('/app/login', {}, JSON.stringify({ empcode }));
+        });
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUser({ ...user, [name]: value });
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -43,29 +55,22 @@ const LoginComponent = () => {
             formData.append('empcode', user.empcode);
             formData.append('emppw', user.emppw);
             formData.append('rememberMe', rememberMe);
-            console.log('전송된 empcode:', user.empcode); // 확인
-            console.log('전송된 emppw:', user.emppw); // 확인
             const response = await axios({
                 url: 'http://localhost:8787/loginProc',
                 method: 'POST',
                 data: formData,
                 withCredentials: true,
             });
-            console.log('서버 응답:', response.data); // 응답 확인
+
             if (response.status === 200) {
                 alert('로그인 성공!');
-                console.log('유저 이메일: ' + response.data.empcode);
-                console.log('권한: ' + response.data.empAuth);
-
-                // 세션 스토리지에 사용자 데이터 저장 (JSON 형식)
                 const userData = {
                     empcode: response.data.empcode,
                     authorities: response.data.authorities,
                     empName: response.data.empName,
                 };
-
                 window.sessionStorage.setItem("user", JSON.stringify(userData));
-
+                connectWebSocket(response.data.empcode);
                 navigate('/home', { state: { userData: response.data } });
             }
         } catch (error) {

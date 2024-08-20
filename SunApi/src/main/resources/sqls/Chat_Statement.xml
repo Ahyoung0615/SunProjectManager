@@ -4,8 +4,17 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.brs.sun.model.dao.ChatDao">
 	
-	<insert id="">
-	
+	<insert id="createChatRoom">
+		INSERT INTO CHATROOM(
+		CHATROOM_CODE,CHATROOM_PARTI,CHATROOM_CREDTEDAT)
+		VALUES(
+		(SELECT NVL(MAX(CHATROOM_CODE), 0) + 1 FROM CHATROOM),#{empCodes},SYSDATE)
 	</insert>
+	
+	<select id="findChatRoom" resultType="ChatRoomVo">
+	    SELECT CHATROOM_CODE, REGEXP_REPLACE(CHATROOM_PARTI, '^'||#{empCode}||'(,|$)|(,)'||#{empCode}||'(,|$)', '') AS CHATROOM_PARTI
+	    FROM CHATROOM
+	    WHERE REGEXP_LIKE(CHATROOM_PARTI, '(^|,)' || #{empCode} || '(,|$)')
+	</select>
 	
 </mapper>

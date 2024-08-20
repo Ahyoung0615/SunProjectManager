@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,7 +33,7 @@ public class LoginController {
 
 	
 	private final EmployeeService employeeService;
-	
+	private final SimpMessagingTemplate messagingTemplate; 
 	//로그인
 	@GetMapping(value="/loginOk")
 	public ResponseEntity<Map<String, String>> loginOk(){
@@ -45,9 +48,16 @@ public class LoginController {
 
         Map<String, String> login = createUserInfo(empcode, authorities, empName);
 
+        messagingTemplate.convertAndSend("/topic/login", login);
 		
         return ResponseEntity.ok(login);
 	}
+	@MessageMapping("/login")
+    @SendTo("/topic/login")
+    public Map<String, String> handleLoginMessage(Map<String, String> message) {
+        log.info("WebSocket 메시지 수신: {}", message);
+        return message;
+    }
 	//로그아웃
 	@GetMapping("/logoutOk")
     public String logoutOk() {
