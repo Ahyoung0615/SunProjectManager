@@ -88,10 +88,24 @@ const OrgChartComponent = (props) => {
     };
 
     const sendDataToServer = useCallback(async () => {
-        console.log(serverDataArr);
-        if (serverDataArr.length > 0) {
+        
+        // sessionStorage에서 저장된 ID를 가져오기
+        const sessionData = window.sessionStorage.getItem('user');
+        let sessionId = null;
+        if (sessionData) {
+            const parsedSessionData = JSON.parse(sessionData);
+            sessionId = parsedSessionData.empcode; // 필요한 ID 필드
+        }
+        
+        // sessionId가 존재하고, serverDataArr에 포함되어 있지 않으면 추가
+        const finalDataArr = sessionId && !serverDataArr.includes(sessionId) 
+        ? [...serverDataArr, sessionId] 
+        : serverDataArr;
+        console.log(finalDataArr);
+        
+        if (finalDataArr.length > 0) {
             try {
-                const res = await axios.post(`${serverUrl}${props.mappingUrl}`, serverDataArr, {
+                const res = await axios.post(`${serverUrl}${props.mappingUrl}`, finalDataArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });
                 console.log("server ok: ", res.data);
@@ -105,7 +119,7 @@ const OrgChartComponent = (props) => {
             console.log("빈 요소");
             alert("최소 한 명 이상 선택해 주세요");
         }
-    }, [serverDataArr]);
+    }, [serverDataArr, props.mappingUrl]);
 
     const openModal = () => {
         setShow(true);
