@@ -122,7 +122,7 @@ function App() {
                                 <Route path="/pagination" element={<AUPagination />} />
                                 <Route path="/coWork" element={<AUCoWork />} />
                                 <Route path="/coWorkMap" element={<AUCoWorkMap />} />
-                                <Route path="/documentApp" element={<AUDocumentApp />} />
+                                <Route path="/documentAppList" element={<AUDocumentApp />} />
                                 <Route path="/documentDetail/:edocCode" element={<AUDocumentDetail />} />
                                 <Route path="/documentAppDetail/:edocCode" element={<AUDocumentAppDetail />} />
                                 <Route path="/documentInsert" element={<AUDocumentInsert />} />
