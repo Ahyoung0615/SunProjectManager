@@ -7,7 +7,6 @@ const BTripListComponent = () => {
     const [bTripList, setBTripList] = useState([]);
     const [sessionEmp, setSessionEmp] = useState(null);
 
-
     useEffect(() => {
         const sessionUser = sessionStorage.getItem("user");
         if (sessionUser) {

@@ -51,7 +51,7 @@ const DocumentListComponent = () => {
         }
 
         try {
-            const response = await axios.get("http://localhost:8787/api/edoc/eDocList", {
+            const response = await axios.get("http://localhost:8787/api/jpa/edoc/eDocList", {
                 params: {
                     status: status,
                     empCode: sessionEmpCode,

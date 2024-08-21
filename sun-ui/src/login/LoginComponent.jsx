@@ -26,7 +26,6 @@ const LoginComponent = () => {
                 console.error('자동 로그인 체크 실패:', error);
             }
         };
-
         checkRememberMe();
     }, [navigate]);
 
@@ -42,7 +41,6 @@ const LoginComponent = () => {
             stompClient.send('/app/login', {}, JSON.stringify({ empcode }));
         });
     };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUser({ ...user, [name]: value });

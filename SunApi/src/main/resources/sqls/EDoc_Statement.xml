@@ -6,6 +6,19 @@
 	
 	<!-- 결재 문서 상세 -->
 	
+	
+	<!-- 남은 연차 조회 -->
+	<select id="selectDayOff" resultType="DayOffVo">
+		SELECT DAYOFF_LEFT - DAYOFF_USED AS DAYOFF_LEFT
+		FROM DAYOFF d 
+		WHERE EMP_CODE = #{empCode}
+	</select>
+	
+	<!-- 사용 연차 갯수 추가 -->
+	<update id="updateDayOff">
+		UPDATE DAYOFF SET DAYOFF_USED = DAYOFF_USED + #{dayOff}
+		WHERE EMP_CODE = #{empCode}
+	</update>
 	<!-- 결재 문서 기안 -->
 	
 </mapper>

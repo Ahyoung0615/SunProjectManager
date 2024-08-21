@@ -13,6 +13,7 @@ const ExpenseApprovalComponent = () => {
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState([]);
     const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
+    const [selectedApprovers, setSelectedApprovers] = useState([]);
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
@@ -33,7 +34,7 @@ const ExpenseApprovalComponent = () => {
         const serverEmpInfo = async () => {
             if (sessionEmpCode) {
                 try {
-                    const response = await axios.get("http://localhost:8787/api/edoc/employeeInfo", {
+                    const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", {
                         params: {
                             empCode: sessionEmpCode
                         }
@@ -84,7 +85,7 @@ const ExpenseApprovalComponent = () => {
         expenseDate,
         paymentDate,
         department,
-        expenseItems,
+        expenseItems
     };
 
     const serverSend = () => {
@@ -107,11 +108,63 @@ const ExpenseApprovalComponent = () => {
         }
     };
 
+    const handleApproverSelection = (approvers) => {
+        // sessionEmpCode와 일치하는 사원을 가장 앞으로 이동
+        const sortedApprovers = approvers.sort((a, b) => {
+            if (a.empCode == sessionEmpCode) return -1;
+            if (b.empCode == sessionEmpCode) return 1;
+            return 0;
+        });
+        setSelectedApprovers(sortedApprovers);
+        console.log("결재자 데이터: ", sortedApprovers);
+    };
+
     return (
         <div className={styles.vacationDocContainer}>
-            <OrgChartComponent mappingUrl="empList" buttonName="결재자" maxSelection="3" />
+            <OrgChartComponent mappingUrl="empList" buttonName="결재자" 
+            maxSelection="3" onSelectionChange={handleApproverSelection}/>
             <h1 className={styles.vacationDocHeader}>지출결의서</h1>
             <form>
+            <table className={styles.vacationDocTable} 
+                style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
+                    <thead>
+                        <tr>
+                            {selectedApprovers.map((approver) => (
+                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                    {approver.empName} {approver.jobName}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {selectedApprovers.map((approver) => (
+                                <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                    {approver.empCode == sessionEmpCode ? (
+                                        <img 
+                                            src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png' 
+                                            alt='싸인' 
+                                            style={{ 
+                                                width: '80px', 
+                                                height: 'auto', 
+                                                objectFit: 'contain',
+                                                minHeight: '50px', // 최소 높이 설정
+                                                maxHeight: '50px'  // 최대 높이 설정
+                                            }} 
+                                        />
+                                    ) : (
+                                        <div 
+                                            style={{ 
+                                                width: '80px', 
+                                                height: '50px' // 빈 공간을 위한 최소 높이
+                                            }} 
+                                        />
+                                    )}
+                                </td>
+                            ))}
+                        </tr>
+                    </tbody>
+                </table>
                 <table className={styles.vacationDocTable}>
                     <tbody>
                         <tr>
@@ -126,13 +179,6 @@ const ExpenseApprovalComponent = () => {
                             <td colSpan="3">
                                 <input type="date" name="paymentDate" value={paymentDate} 
                                 onChange={handleChange(setPaymentDate)}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>부서 / 담당</th>
-                            <td colSpan="3">
-                                <input type="text" name="department" value={department}
-                                    onChange={handleChange(setDepartment)}/>
                             </td>
                         </tr>
                         {expenseItems.map((item, index) => (

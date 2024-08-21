@@ -14,7 +14,7 @@ import com.brs.sun.jpa.service.EDocJpaService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/edoc")
+@RequestMapping("/api/jpa/edoc")
 @RequiredArgsConstructor
 public class EDocJPAController {
 
