@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const NowTimeComponent = () => {
     const [currentTime, setCurrentTime] = useState('');

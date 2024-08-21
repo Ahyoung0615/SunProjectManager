@@ -26,4 +26,8 @@ public class JsTreeServiceImpl implements JsTreeService {
 		return dao.getEmp();
 	}
 
+	@Override
+	public List<EmployeeVo> getApprovers(List<String> empCodes) {
+		return dao.getApprovers(empCodes);
+	}
 }

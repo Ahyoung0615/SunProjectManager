@@ -61,9 +61,9 @@ public class JsTreeController {
 	 * @return ok 문자열 반환
 	 */
 	@PostMapping("/empList")
-	public List<EmployeeVo> getChoiceEmp(@RequestBody List<String> choiceList) {
+	public List<EmployeeVo> getApprovers(@RequestBody List<String> choiceList) {
 		log.info("choiceArr: {}", choiceList);
-		
-		return null;
+		List<EmployeeVo> approverList = service.getApprovers(choiceList);
+		return approverList;
 	}
 }

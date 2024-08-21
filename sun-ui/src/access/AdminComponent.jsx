@@ -18,7 +18,7 @@ const AdminComponent = ({ children }) => {
     
             setUserData(parsedData);
     
-            if (parsedData.authorities !== '[A]') {
+            if (parsedData.authorities !== '[ROLE_A]') {
                 setLoading(false);
                 setTimeout(() => {
                     navigate('/home'); // 2초 후 홈으로 리다이렉트
