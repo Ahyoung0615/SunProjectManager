@@ -1,6 +1,9 @@
 package com.brs.sun.model.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.vo.RepairVo;
 import com.brs.sun.vo.VehicleVo;
@@ -12,7 +15,7 @@ public interface VehicleService {
 	 * @param vehicleType (전체 null, 영업 C, 화물 F)
 	 * @return List<VehicleVo>
 	 */
-	public List<VehicleVo> getAllVehicle(String vehicleType);
+	public List<VehicleVo> getAllVehicle(int first, int last, String vehicleType);
 
 	/**
 	 * 차량 상세 조회
@@ -32,15 +35,18 @@ public interface VehicleService {
 	 * 차량 신규 등록
 	 * 
 	 * @return 0 또는 1
+	 * @throws Exception 
 	 */
-	public int insertVehicle(VehicleVo vo);
+	public int insertVehicle(VehicleVo vo, MultipartFile file) throws Exception;
 
 	/**
 	 * 차량 이미지 파일 등록
 	 * 
 	 * @return 0 또는 1
+	 * @throws IOException 파일 처리 중 오류 발생 시
+	 * @throws Exception 
 	 */
-	public int updateVehicleImage(String vehicleCode, String vehicleImg);
+	int updateVehicleImage(String vehicleCode, MultipartFile file) throws IOException, Exception;
 
 	/**
 	 * 차량 상태 변경 (출차 O, 보관 I, 수리 R)

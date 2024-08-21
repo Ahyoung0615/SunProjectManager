@@ -7,7 +7,7 @@ import com.brs.sun.vo.VehicleVo;
 
 public interface VehicleDao {
 	
-	public List<VehicleVo> getAllVehicle(String vehicleType);
+	public List<VehicleVo> getAllVehicle(int first, int last, String vehicleType);
 
 	public VehicleVo getOneVehicle(String vehicleCode);
 

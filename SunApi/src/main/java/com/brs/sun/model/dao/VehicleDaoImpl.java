@@ -21,9 +21,12 @@ public class VehicleDaoImpl implements VehicleDao {
 	private final String NS = "com.brs.sun.model.dao.VehicleDao.";
 
 	@Override
-	public List<VehicleVo> getAllVehicle(String vehicleType) {
-		System.out.println("vehicleType service :" + vehicleType);
-		return template.selectList(NS + "getAllVehicle", vehicleType);
+	public List<VehicleVo> getAllVehicle(int first, int last, String vehicleType) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("first", first);
+		params.put("last", last);
+		params.put("vehicleType", vehicleType);
+		return template.selectList(NS + "getAllVehicle", params);
 	}
 
 	@Override

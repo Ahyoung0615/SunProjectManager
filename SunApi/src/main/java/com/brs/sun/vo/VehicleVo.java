@@ -1,6 +1,6 @@
 package com.brs.sun.vo;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +24,7 @@ public class VehicleVo {
 	// 차종
 	private String vehicleModel;
 	// 등록 일자
-	private LocalDateTime vehicleRegdate;
+	private LocalDate vehicleRegdate;
 	// 구분 (영엽용 C, 화물용 F)
 	private String vehicleType;
 	// 인승

@@ -2,7 +2,7 @@ import React from "react";
 
 const RepairListComponent = ({ repairDetail, handleStatusChange }) => {
   return (
-    <div style={{ marginTop: 20 }}>
+    <div style={{ marginTop: 120 }}>
       <h5>수리 내역</h5>
       <table className="table table-bordered">
         <thead>

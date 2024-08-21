@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import carImg from "../img/image07.png";
 import Swal from "sweetalert2";
 import VehicleRepairFormComponent from "./VehicleRepairFormComponent";
@@ -11,6 +11,8 @@ const VehicleDetailComponent = () => {
   const { vehicleCode } = useParams();
   const [vehicleDetail, setVehicleDetail] = useState(null);
   const [repairDetail, setRepairDetail] = useState([]);
+  const [image, setImage] = useState(null);
+  const [showImage, setShowImage] = useState(null);
 
   const getVehicleDetail = async () => {
     try {
@@ -40,22 +42,43 @@ const VehicleDetailComponent = () => {
       .filter((repair) => repair.repairStatus === "OS")
       .map((repair) => repair.repairCode);
   
+    if (image !== null) {
+      const formImgData = new FormData();
+      formImgData.append("vehicleCode", vehicleCode);
+      formImgData.append("file", image);  // `image`에 실제 파일 객체를 추가해야 합니다.
+      console.log("vehicleCode",vehicleCode);
+      console.log("file",image);
+      try {
+        const response = await axios.post("http://localhost:8787/api/vehicleImg", formImgData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        if (response.status === 200) {
+          alert("변경 저장 완료");
+          await getVehicleDetail();
+          await getRepairDetail();
+        }
+      } catch (error) {
+        console.error('이미지 변경 실패', error);
+      }
+    }
+  
     if (repairsToSave.length > 0) {
       try {
         for (const repairCode of repairsToSave) {
           await axios.post(`http://localhost:8787/api/updateRepair/${repairCode}`);
         }
-        alert("저장 완료");
-        
+        alert("변경 저장 완료");
+  
         await getVehicleDetail();
         await getRepairDetail();
       } catch (error) {
         console.error("저장 실패", error);
       }
-    } else {
-      alert("저장할 항목이 없습니다.");
     }
   };
+  
 
   const deleteVehicle = async () => {
     try {
@@ -83,7 +106,7 @@ const VehicleDetailComponent = () => {
       cancelButtonText: "취소"
     }).then((result) => {
       if (result.isConfirmed) {
-        deleteVehicle(); 
+        deleteVehicle();
       }
     });
   };
@@ -94,7 +117,7 @@ const VehicleDetailComponent = () => {
   };
 
   const handleStatusChange = (index, newStatus) => {
-    const updatedRepairDetail = repairDetail.map((repair, i) => 
+    const updatedRepairDetail = repairDetail.map((repair, i) =>
       i === index ? { ...repair, repairStatus: newStatus } : repair
     );
     setRepairDetail(updatedRepairDetail);
@@ -104,10 +127,18 @@ const VehicleDetailComponent = () => {
     return <div>Loading...</div>;
   }
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setShowImage(URL.createObjectURL(file));
+      setImage(file);
+    }
+  }
+
   return (
     <div className="container" style={{ marginTop: 30 }}>
       <h1>차량 상세</h1>
-      
+
       <div style={{ display: "flex", marginBottom: 20 }}>
         {vehicleDetail.vehicleStatus === 'R' && <span className="badge badge-danger">수리</span>}
         {vehicleDetail.vehicleStatus === 'I' && <span className="badge badge-primary">보관</span>}
@@ -115,11 +146,19 @@ const VehicleDetailComponent = () => {
       </div>
 
       <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
-        <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginRight: 20 }}>
-          <img src={carImg} alt="차량 이미지" style={{ width: "100%", height: "100%" }} />
+        <div style={{ width: "450px", height: "320px", backgroundColor: "#ccc", marginRight: 50, marginLeft:50 }}>
+
+          {showImage ? (
+            <img src={showImage} alt="차량 이미지" style={{ width: "100%", height: "100%" }} />
+          ) : (
+            <img src={`http://localhost:8787/vehicleImage/${vehicleDetail.vehicleImg}`} alt="차량 이미지" style={{ width: "100%", height: "100%" }} />
+          )}
+
+          <input type="file" onChange={handleImageUpload} style={{ marginTop: 10 }} />
+
         </div>
 
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, marginTop: 45, marginRight: 50 }}>
           <table className="table table-bordered">
             <tbody>
               <tr>
@@ -155,15 +194,17 @@ const VehicleDetailComponent = () => {
         </div>
       </div>
 
-      <RepairListComponent 
+      <RepairListComponent
         repairDetail={repairDetail}
         handleStatusChange={handleStatusChange}
+
       />
 
       <div style={{ marginTop: 20, display: "flex", justifyContent: "space-between" }}>
-        <button className="btn btn-danger" style={{ marginLeft: 300 }} onClick={handleDeleteClick}>차량 삭제</button>
+      <Link to={'/vehicleList'}> <button className="btn btn-info" style={{ marginLeft: 150 }}>전체 목록</button></Link>
+        <button className="btn btn-danger" style={{ marginLeft: 40 }} onClick={handleDeleteClick}>차량 삭제</button>
         <VehicleRepairFormComponent onRegisterComplete={handleRegisterComplete} />
-        <button className="btn btn-info" style={{ marginRight: 300 }} onClick={handleSaveClick}>변경 저장</button>
+        <button className="btn btn-success" style={{ marginRight: 300 }} onClick={handleSaveClick}>변경 저장</button>
       </div>
       <br /><br /><br />
     </div>
