@@ -61,7 +61,12 @@ const ChatSunComponent = () => {
 
     // 채팅방 페이지로 이동하는 함수
     const handleChatRoomClick = (chatroomCode) => {
-        navigate(`/chatRoom/${chatroomCode}`); // 채팅방 페이지로 이동
+        window.open(
+            `/chatRoom/${chatroomCode}`,
+            '채팅방',
+            'width=500,height=600'
+        )
+        
     };
 
     return (
