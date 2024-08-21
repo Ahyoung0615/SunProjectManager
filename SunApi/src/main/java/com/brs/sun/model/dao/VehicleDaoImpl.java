@@ -85,4 +85,9 @@ public class VehicleDaoImpl implements VehicleDao {
 		return template.update(NS + "updateVehicleStatusI", RepairCode);
 	}
 
+	@Override
+	public int countVehicle(String vehicleType) {
+		return template.selectOne(NS + "countVehicle",vehicleType);
+	}
+
 }
