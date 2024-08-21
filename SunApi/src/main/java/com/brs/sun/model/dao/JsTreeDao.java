@@ -7,7 +7,10 @@ import com.brs.sun.vo.EmployeeVo;
 
 public interface JsTreeDao {
 
-	public List<DepartmentVo> getDept();
+	List<DepartmentVo> getDept();
 	
-	public List<EmployeeVo> getEmp();
+	List<EmployeeVo> getEmp();
+	
+	List<EmployeeVo> getApprovers(List<String> empCodes);
 }
+ 

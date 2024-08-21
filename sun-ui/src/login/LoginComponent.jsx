@@ -15,27 +15,27 @@ const LoginComponent = () => {
     console.log(ws);
     // 페이지 로드 시 자동 로그인 체크
     useEffect(() => {
-      const checkRememberMe = async () => {
-          try {
-              // 서버에서 자동 로그인 여부 확인
-              const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
-              if (response.status === 200 && response.data.empcode) {
-                  // 사용자 정보가 있다면 자동으로 로그인
-                  window.sessionStorage.setItem("user", JSON.stringify(response.data));
-                  navigate('/access', { state: { userData: response.data } });
-              }
-          } catch (error) {
-              console.error('자동 로그인 체크 실패:', error);
-          }
-      };
+        const checkRememberMe = async () => {
+            try {
+                // 서버에서 자동 로그인 여부 확인
+                const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
+                if (response.status === 200 && response.data.empcode) {
+                    // 사용자 정보가 있다면 자동으로 로그인
+                    window.sessionStorage.setItem("user", JSON.stringify(response.data));
+                    navigate('/access', { state: { userData: response.data } });
+                }
+            } catch (error) {
+                console.error('자동 로그인 체크 실패:', error);
+            }
+        };
 
-      checkRememberMe();
-  }, [navigate]);
+        checkRememberMe();
+    }, [navigate]);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUser({ ...user, [name]: value });
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {

@@ -43,6 +43,8 @@ public class EmployeeVo {
 	private String empStatus;
 	// 사원 사진(경로)
 	private String empImg;
+	// 사원 싸인 사진(경로)
+	private String empSig;
 	// 사용자 권한 (유저 U, 관리자 A)
 	private String empAuth;
 	

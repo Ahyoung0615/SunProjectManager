@@ -8,6 +8,7 @@
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
     "@react-google-maps/api": "^2.19.3",
+    "@stomp/stompjs": "^7.0.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -31,6 +32,7 @@
     "react-scripts": "5.0.1",
     "react-simple-jstree": "^0.2.2",
     "simple-datatables": "^9.0.4",
+    "sockjs-client": "^1.6.1",
     "sweetalert2": "^11.12.4",
     "web-vitals": "^2.1.4"
   },

@@ -5,7 +5,7 @@ import VacationDocComponent from './VacationDocComponent';
 import ExpenseApprovalComponent from './ExpenseApprovalComponent';
 
 const DocumentInsertComponent = () => {
-    const [selectedDoc, setSelectDoc] = useState('Expense');
+    const [selectedDoc, setSelectDoc] = useState('Vacation');
 
     // 선택된 값에 따라 상태 업데이트
     const handleChange = (event) => {

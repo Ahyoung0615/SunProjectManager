@@ -93,3 +93,22 @@
 .vacationDocSubmitButton:hover {
     background-color: #0056b3;
 }
+
+.dateRangeContainer {
+    display: flex;
+    align-items: center;
+}
+
+.dateInput {
+    width: 150px;
+    margin: 0 5px;
+}
+
+.dateSeparator {
+    margin: 0 10px;
+}
+
+.dateError {
+    color: red;
+}
+

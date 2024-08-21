@@ -74,7 +74,7 @@ const HeaderSideComponent = () => {
                             <Link className='nav-link' to='/documentTempList'>임시저장</Link>
                         </nav>
                     </div>
-                    <Link className='nav-link' to='/documentInsertForm'>
+                    <Link className='nav-link' to='/documentInsert'>
                         <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-pencil-square"></i></div>
                         결재문서작성
                     </Link>
