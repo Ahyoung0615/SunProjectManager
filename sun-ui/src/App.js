@@ -35,6 +35,7 @@ import {
     AUBTripForm,
     AUBTripList,
     AUChatSun,
+    AUChatRoom,
     AUCalendar,
     AUDateTime,
     AUNowTime,
@@ -109,6 +110,7 @@ function App() {
                                 {/* User Protected Routes Continued */}
                                 <Route path="/boardList" element={<AUBoardList />} />
                                 <Route path="/chatSun" element={<AUChatSun />} />
+                                <Route path="/chatRoom/:chatroomCode" element={<AUChatRoom/>} />
                                 <Route path="/bTripList" element={<AUBTripList />} />
                                 <Route path="/bTripForm" element={<AUBTripForm />} />
                                 <Route path="/bTripDetail/:btripCode" element={<AUBTripDetail />} />

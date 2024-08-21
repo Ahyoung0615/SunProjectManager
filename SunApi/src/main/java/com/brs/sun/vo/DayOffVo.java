@@ -19,6 +19,6 @@ public class DayOffVo {
 	private int empCode;
 	// 잔여 연차
 	private int dayoffLeft;
-	// 사용 연차
+	// 사용한 연차
 	private int dayoffUsed;
 }

@@ -49,7 +49,7 @@ const DocumentTempListComponent = () => {
 
     const selectDocList = async (page) => {
         try {
-            const response = await axios.get("http://localhost:8787/api/edoc/eDocTempList", {
+            const response = await axios.get("http://localhost:8787/api/jpa/edoc/eDocTempList", {
                 params: {
                     empCode: sessionEmpCode,
                     page: page,

@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -47,6 +48,7 @@ public class SecurityConfig{
         		.csrf(csrf -> csrf.disable())
         		.authorizeHttpRequests(authorize -> authorize
                 //.antMatchers("/주소입력").hasRole("")<< 만약 입력 1을 넣으면 prefix로 ROLE_가 붙으면서 새로운 권한이 생김
+        				.requestMatchers("/ws/**").permitAll()
         				.requestMatchers("/memberList").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
                         .requestMatchers("/member").permitAll()     // 이미지 미리보기 허용
@@ -69,7 +71,7 @@ public class SecurityConfig{
                             .maximumSessions(1) // 사용자당 최대 세션 수를 1로 설정
                             .maxSessionsPreventsLogin(false) // 최대 세션 수 초과 시 새로운 로그인 허용 여부
                             .expiredUrl("/")
-                        )
+                    )
                     .sessionManagement(session -> session
                     		.invalidSessionUrl("/")
                     )
@@ -115,5 +117,14 @@ public class SecurityConfig{
 		    @Bean
 		    public CorsFilter corsFilter() {
 		        return new CorsFilter(corsConfigurationSource());
+		    }
+		    @Bean
+		    public SecurityFilterChain webSocketSecurityFilterChain(HttpSecurity http) throws Exception {
+		        http
+		            .authorizeHttpRequests(authorize -> authorize
+		                .requestMatchers("/ws/chat").authenticated() // 웹소켓 엔드포인트 보호
+		            );
+
+		        return http.build();
 		    }
 }

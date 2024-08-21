@@ -27,5 +27,10 @@ public class JsTreeDaoImpl implements JsTreeDao {
 	public List<EmployeeVo> getEmp() {
 		return template.selectList(NS + "selectEmp");
 	}
+	
+	@Override
+	public List<EmployeeVo> getApprovers(List<String> empCodes) {
+		return template.selectList(NS + "selectApprovers", empCodes);
+	}
 
 }

@@ -15,12 +15,15 @@
 		FROM EMPLOYEE
 	</select>
 	
-	<select id="choiceEmployee" resultType="EmployeeVo">
+	<select id="selectApprovers" resultType="EmployeeVo">
 		SELECT EMP_CODE , EMP_NAME , d.DEPT_NAME , j.JOB_NAME
 		FROM EMPLOYEE e JOIN DEPARTMENT d 
 		ON e.DEPT_CODE = d.DEPT_CODE 
 	    JOIN JOB j 
 	    ON e.JOB_CODE = j.JOB_CODE 
-	    WHERE EMP_CODE IN ('20010101','20081001','20071001')
+	    WHERE EMP_CODE IN
+	    <foreach collection="list" item="empCode" open="(" separator="," close=")">
+	    	#{empCode}
+	    </foreach>
 	</select>
 </mapper>
