@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.model.dao.ChatDao;
 import com.brs.sun.model.dao.EmployeeDao;
 import com.brs.sun.model.service.ChatService;
 import com.brs.sun.model.service.EmployeeService;
@@ -60,10 +61,17 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage/{chatroomCode}")
     @SendTo("/topic/chatRoom/{chatroomCode}")
     public ChatVo sendMessage(@DestinationVariable String chatroomCode, ChatVo message) {
-    	log.info("메세지 서버에는 옴 {}" ,message);
-        return message;
+        // Save the message to the database
+        chatService.saveChatMessage(message);
+        return message; // Return message to be broadcasted to other clients
     }
-   
+    @GetMapping("/chatList")
+    public ResponseEntity<List<ChatVo>> getChatList1(@RequestParam("chatroomCode") String chatroomCode) {
+        log.info("Received request to get chat list for chatroomCode: {}", chatroomCode);
+        List<ChatVo> chatMessages = chatService.chatList2(chatroomCode);
+        log.info("Returning chat messages: {}", chatMessages);
+        return ResponseEntity.ok(chatMessages);
+    }
     
     
 }

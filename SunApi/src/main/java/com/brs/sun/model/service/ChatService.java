@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.brs.sun.model.dao.ChatDao;
 import com.brs.sun.vo.ChatRoomVo;
+import com.brs.sun.vo.ChatVo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,4 +29,11 @@ public class ChatService {
         chatDao.createChatRoom(empCodes);
     }
 	
+    public void saveChatMessage(ChatVo message) {
+        chatDao.insertChatMessage(message);
+    }
+    
+    public List<ChatVo> chatList2(String chatroomCode){
+    	return chatDao.chatList(chatroomCode);
+    }
 }
