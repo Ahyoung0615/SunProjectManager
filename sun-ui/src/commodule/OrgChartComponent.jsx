@@ -85,16 +85,16 @@ const OrgChartComponent = ({ buttonName, maxSelection, mappingUrl, onSelectionCh
     };
 
     const sendDataToServer = useCallback(async () => {
+        // sessionStorage에서 저장된 ID를 가져오기
         const sessionData = window.sessionStorage.getItem('user');
         let sessionId = null;
         if (sessionData) {
             const parsedSessionData = JSON.parse(sessionData);
-            sessionId = parsedSessionData.empcode;
+            sessionId = parsedSessionData.empcode; // 필요한 ID 필드
         }
         
-        const finalDataArr = sessionId && !serverDataArr.includes(sessionId)
-            ? [...serverDataArr, sessionId]
-            : serverDataArr;
+        // sessionId가 존재하고, serverDataArr에 포함되어 있지 않으면 추가
+        const finalDataArr = sessionId && !serverDataArr.includes(sessionId)? [...serverDataArr, sessionId]: serverDataArr;
 
         if (finalDataArr.length > 0) {
             try {

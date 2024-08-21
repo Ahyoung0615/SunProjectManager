@@ -34,7 +34,8 @@
     "simple-datatables": "^9.0.4",
     "sockjs-client": "^1.6.1",
     "sweetalert2": "^11.12.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "websocket": "^1.0.35"
   },
   "scripts": {
     "start": "react-scripts start",

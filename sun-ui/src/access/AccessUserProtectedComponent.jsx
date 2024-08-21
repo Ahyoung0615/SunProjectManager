@@ -4,6 +4,7 @@ import BTripDetailComponent from '../btrip/BTripDetailComponent';
 import BTripFormComponent from '../btrip/BTripFormComponent';
 import BTripListComponent from '../btrip/BTripListComponent';
 import ChatSunComponent from '../chat/ChatSunComponent';
+import ChatRoomComponent from '../chat/ChatRoomPage';
 import CalendarComponent from '../commodule/CalendarComponent';
 import DateTimeComponent from '../commodule/DateTimeComponent';
 import NowTimeComponent from '../commodule/NowTimeComponent';
@@ -72,6 +73,12 @@ export const AUBTripList = () => (
 export const AUChatSun = () => (
     <AccessUserComponent>
         <ChatSunComponent />
+    </AccessUserComponent>
+);
+
+export const AUChatRoom = () => (
+    <AccessUserComponent>
+        <ChatRoomComponent />
     </AccessUserComponent>
 );
 

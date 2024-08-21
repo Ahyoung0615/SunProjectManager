@@ -14,7 +14,12 @@ spring:
       dialect: org.hibernate.dialect.Oracle12cDialect
       hibernate:
         format_sql: true
+  web:
+    websocket:
+      enabled: true 
 #      spring.jpa.properties.hibernate.format_sql=true
+# WebSocket 설정
+
       
           
 server:
