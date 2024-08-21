@@ -89,7 +89,7 @@ const HeaderTopComponent = () => {
           <div style={{ color: 'white', marginLeft: 30 }}>
             {userName.empName}님, 반갑습니다</div> :
           <div style={{ color: 'white', marginLeft: 30 }}>
-            로그인이 필요합니다</div>
+            </div>
         }
       </div>
       <HeaderSearchComponent style={{ marginRight: 50 }} />

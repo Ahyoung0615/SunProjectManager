@@ -9,6 +9,7 @@ const VehicleFormComponent = () => {
     const [vehicleModel, setVehicleModel] = useState("");
     const [vehicleType, setVehicleType] = useState("");
     const [vehicleSize, setVehicleSize] = useState("");
+    const [vfile, setVfile] = useState(null);
     const [vehicleRegDate, setVehicleRegDate] = useState(new Date());  // 등록일자 상태 추가
     const navigate = useNavigate();
 
@@ -16,25 +17,37 @@ const VehicleFormComponent = () => {
         const file = e.target.files[0];
         if (file) {
             setImage(URL.createObjectURL(file));
+            setVfile(file);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
+    
+        const vehicleData = {
+            vehicleNo: vehicleNumber,
+            vehicleModel: vehicleModel,
+            vehicleRegdate: vehicleRegDate.toISOString().split('T')[0],  // 날짜만 추출
+            vehicleType: vehicleType,
+            vehicleSize: vehicleSize
+        };
+    
+        formData.append("vehicle", new Blob([JSON.stringify(vehicleData)], { type: "application/json" }));
+        formData.append("file", vfile);
+    
         try {
-            const response = await axios.post('http://localhost:8787/api/insertVehicle', {
-                vehicleNo: vehicleNumber,
-                vehicleModel: vehicleModel,
-                vehicleRegdate: vehicleRegDate,
-                vehicleType: vehicleType,
-                vehicleSize: vehicleSize
-            });
-            alert("차량 등록 완료");
-            navigate("/vehicleList");
+            const response = await axios.post('http://localhost:8787/api/insertVehicle', formData);
+            if (response.status === 200) {
+                alert("차량 등록 완료");
+                navigate("/vehicleList");
+            }
         } catch (error) {
-            console.error('Error inserting vehicle:', error);
+            console.error('등록실패:', error);
         }
     };
+    
+    
 
     const handleCancel = () => {
         alert("등록이 취소되었습니다.");
