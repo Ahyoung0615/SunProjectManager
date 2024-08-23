@@ -33,6 +33,10 @@ public class EDocEntity {
     @Column(name = "EDOC_CODE")
     private Long eDocCode;
 
+	// 결재 타입 (연차 V, 지출결의서 E)
+    @Column(name = "EDOC_TYPE")
+    private String eDocType;
+	
     // 문서 제목
     @Column(name = "EDOC_TITLE")
     private String eDocTitle;
@@ -53,7 +57,5 @@ public class EDocEntity {
     @Column(name = "EDOC_STATUS")
     private String eDocStatus;
     
-    // 결재 타입 (연차 V, 지출결의서 E)
-    @Column(name = "EDOC_TPYE")
-    private String eDocTpye;
+    
 }

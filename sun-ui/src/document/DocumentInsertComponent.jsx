@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styles from '../css/DocumentInsertComponent.module.css'; // CSS 모듈 임포트
-
 import VacationDocComponent from './VacationDocComponent';
 import ExpenseApprovalComponent from './ExpenseApprovalComponent';
 

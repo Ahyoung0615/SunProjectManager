@@ -1,6 +1,6 @@
 package com.brs.sun.vo;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +28,8 @@ public class EDocVo {
 	// 기안자 사번
 	private int empCode;
 	// 기안 일자
-	private LocalDateTime edocDate;
-	// 결재 상태 (결재 대기중 A, 결재 완료 S, 반려 R, 회수 C)
+	private LocalDate edocDate;
+	// 결재 상태 (결재 대기중 A, 결재 완료(승인) S, 반려 R, 회수 C)
 	private String edocStatus;
 	// 반려 사유
 	private String edocReply;

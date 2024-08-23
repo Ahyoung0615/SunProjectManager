@@ -17,18 +17,12 @@ public class DayOffServiceImpl implements DayOffService {
 	private final DayOffDao dao; 
 	
 	@Override
-	@Transactional
-	public boolean dayOffTransaction(int empCode, Map<String, Object> map) {
-		DayOffVo dayOffCount = dao.selectDayOff(empCode);
-		DayOffVo vo = DayOffVo.builder()
-								.dayoffLeft(dayOffCount.getDayoffLeft())
-								.build();
-		int dayOff = (int) map.get("dayOff");
-		if(vo.getDayoffLeft() - dayOff < 0) {
-			throw new IllegalArgumentException("잔여 휴가가 부족합니다");
-		}
-
-		boolean chk = dao.updateDayOff(map);
-		return chk;	
+	public DayOffVo selectDayOff(int empCode) {
+		return dao.selectDayOff(empCode);
+	}
+	
+	@Override
+	public boolean updateDayOff(Map<String, Object> map) {
+		return dao.updateDayOff(map);
 	}
 }

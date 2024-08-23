@@ -2,8 +2,11 @@ package com.brs.sun.model.service;
 
 import java.util.Map;
 
-public interface DayOffService {
-	
+import com.brs.sun.vo.DayOffVo;
 
-	boolean dayOffTransaction(int empCode, Map<String, Object> map);
+public interface DayOffService {
+
+	DayOffVo selectDayOff(int empCode);
+	
+	boolean updateDayOff(Map<String, Object> map);
 }
