@@ -35,11 +35,11 @@ public class BTripDaoImpl implements BTripDao {
 	}
 
 	@Override
-	public VehicleReservationVo getMyVehicleRsv(String bTripCode, String empCode) {
+	public List<VehicleReservationVo> getMyVehicleRsv(String bTripCode, String empCode) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("bTripCode", bTripCode);
 		params.put("empCode", empCode);
-		return template.selectOne(NS+"getMyVehicleRsv", params);
+		return template.selectList(NS+"getMyVehicleRsv", params);
 	}
 
 	@Override
@@ -79,6 +79,24 @@ public class BTripDaoImpl implements BTripDao {
 	    params.put("cowAddress", cowAddress);
 	    return template.selectOne(NS + "countCoWork", params);
 	}
+
+	@Override
+	public int countVehicleRsv(String startDate, String endDate) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("startDate", startDate);
+	    params.put("endDate", endDate);
+		return template.selectOne(NS + "countVehicleRsv", params);
+	}
+
+	@Override
+	public List<Map<String, Object>> getAvailableVehicles(String startDate, String endDate) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("startDate", startDate);
+	    params.put("endDate", endDate);
+	    return template.selectList(NS + "getAvailableVehicles", params);
+	}
+
+
 
 
 }

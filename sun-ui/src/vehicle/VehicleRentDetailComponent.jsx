@@ -27,13 +27,13 @@ const VehicleRentDetailComponent = () => {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
         <br></br>
         <h4 style={{ marginTop: 30}}>배차 관리 상세 현황</h4>
-        <div>
-        <span className="badge badge-success" style={{ marginRight: 850 }}>승인</span>
-        <span className="badge badge-warning" style={{ marginRight: 30 }}>승인대기중</span>
-        <span className="badge badge-danger" style={{ marginRight: 30 }}>반려</span>
-        </div>
+        <div style={{ display: "flex", marginBottom: 20 }}>
+          {/* 
+        {vehicleDetail.vehicleStatus === 'N' && <span className="badge badge-danger">반려</span>}
+        {vehicleDetail.vehicleStatus === 'W' && <span className="badge badge-primary">승인대기중</span>}
+        {vehicleDetail.vehicleStatus === 'Y' && <span className="badge badge-success">승인</span>}*/}
       </div>
-
+    </div>
       {/* 신청자 정보 테이블 */}
       <table className="table table-bordered" style={{ marginBottom: 20 }}>
         <thead>

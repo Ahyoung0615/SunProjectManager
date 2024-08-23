@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import CoWorkComponent from '../cowork/CoWorkComponent';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
+import BTripCalComponent from './BTripCalComponent';
 
 const BTripListComponent = () => {
     const [bTripList, setBTripList] = useState([]);
     const [sessionEmp, setSessionEmp] = useState(null);
+    const [clickedButton, setClickedButton] = useState('list'); 
+    const [showlist, setShowlist] = useState(true);
 
     useEffect(() => {
         const sessionUser = sessionStorage.getItem("user");
@@ -17,7 +20,6 @@ const BTripListComponent = () => {
     }, []);
 
     useEffect(() => {
-
         if (!sessionEmp) {
             console.log("세션없음");
             return;
@@ -26,7 +28,6 @@ const BTripListComponent = () => {
         const getBTrip = async (sessionEmp) => {
             try {
                 const response = await axios.get(`http://localhost:8787/api/btrip/${sessionEmp}`);
-
                 setBTripList(response.data);
             } catch (error) {
                 alert("출장조회불가", error);
@@ -36,10 +37,32 @@ const BTripListComponent = () => {
         
     }, [sessionEmp]);
 
+    const handleButtonClick = (buttonType) => {
+        setClickedButton(buttonType);
+        setShowlist(buttonType === 'list');
+    };
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <br></br>
             <h4>출장목록조회</h4>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginRight:13 }}>
+                <button 
+                    className={`btn ${clickedButton === 'list' ? 'btn-primary' : 'btn-secondary'}`} 
+                    style={{ borderRadius: 2 }} 
+                    onClick={() => handleButtonClick('list')}
+                >
+                    목록
+                </button>
+                <button 
+                    className={`btn ${clickedButton === 'calendar' ? 'btn-primary' : 'btn-secondary'}`} 
+                    style={{ borderRadius: 2 }} 
+                    onClick={() => handleButtonClick('calendar')}
+                >
+                    캘린더
+                </button>
+            </div>
+            {showlist?(
             <table className="table table-bordered">
                 <thead>
                     <tr style={{ backgroundColor: '#f2f2f2' }}>
@@ -59,15 +82,17 @@ const BTripListComponent = () => {
                             <td>{item.btripDetail}</td>
                             <td>{new Date(item.btripStartDate).toLocaleDateString()}</td>
                             <td>{new Date(item.btripEndDate).toLocaleDateString()}</td>
-                            <td>{item.vehicleCode}</td>
+                            <td>{item.vehicleCode===null?"미사용":item.vehicleCode}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+        ) : (
+                <BTripCalComponent bTripList={bTripList}/>
+            )}
             <div style={{ marginTop: 50 , marginBottom:80}}>
                 <CoWorkComponent />
             </div>
-
         </div>
     );
 };

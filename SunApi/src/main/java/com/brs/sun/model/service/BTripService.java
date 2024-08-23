@@ -1,7 +1,9 @@
 package com.brs.sun.model.service;
 
 import java.util.List;
+import java.util.Map;
 
+import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
 import com.brs.sun.vo.VehicleReservationVo;
@@ -26,9 +28,9 @@ public interface BTripService {
 	 * 배차신청 상세조회
 	 * @param bTripCode
 	 * @param empCode
-	 * @return VehicleReservationVo
+	 * @return List<VehicleReservationVo>
 	 */
-	public VehicleReservationVo getMyVehicleRsv(String bTripCode, String empCode);
+	public List<VehicleReservationVo> getMyVehicleRsv(String bTripCode, String empCode);
 	
 	/**
 	 * 출장 단일 입력
@@ -51,7 +53,7 @@ public interface BTripService {
 	 * @param vo2
 	 * @return 0 또는 1
 	 */
-	public int insertBTripVRsv(BTripVo vo, VehicleReservationVo vo2);
+	public int insertBTripVRsv(BTripRequestDTO dto);
 	
 	/**
 	 * 관리자 배차신청서 전체 조회, 기간 지정
@@ -82,4 +84,20 @@ public interface BTripService {
 	 * @return int (몇 개의 행이 조회되는지)
 	 */
 	public int countCoWork(String cowName, String cowAddress);
+	
+	/**
+	 * 날짜별 배차신청서 총 갯수
+	 * @param startDate
+	 * @param endDate
+	 * @return int (몇 개의 행이 조회되는지)
+	 */
+	public int countVehicleRsv(String startDate, String endDate);
+	
+	/**
+	 * 예약 가능한 차량 조회
+	 * @param startDate
+	 * @param endDate
+	 * @return VehicleReservationVo
+	 */
+	public List<Map<String, Object>>getAvailableVehicles(String startDate, String endDate);
 }

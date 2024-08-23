@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import CoWorkMapComponent from './CoWorkMapComponent';
 
-const CoWorkComponent = () => {
+const CoWorkComponent = ({onSelect}) => {
     const [coworkList, setCoworkList] = useState([]);
     const [searchType, setSearchType] = useState("cowName");
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -43,6 +43,9 @@ const CoWorkComponent = () => {
     const getcowOneAddress = (cowAddress) => {
         console.log("Selected Address:", cowAddress);
         setSelectedAddress(cowAddress);
+        if (onSelect) {
+            onSelect(cowAddress);  // 상위 컴포넌트에 선택된 주소를 전달
+        }
     };
 
     const handlePageChange = (page) => {
@@ -60,8 +63,8 @@ const CoWorkComponent = () => {
 
     return (
         <div>
-            <h4>협력사 정보</h4>
-            <div style={{ display: 'flex', marginTop: '20px' }}>
+            <h4 style={{marginTop:30}}>협력사 정보</h4>
+            <div style={{ display: 'flex', marginTop: 50 }}>
 
                 <CoWorkMapComponent selectedAddress={selectedAddress} />
 

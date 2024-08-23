@@ -1,10 +1,12 @@
 package com.brs.sun.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.model.dao.BTripDao;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -29,7 +31,7 @@ public class BTripServiceImpl implements BTripService {
 	}
 
 	@Override
-	public VehicleReservationVo getMyVehicleRsv(String bTripCode, String empCode) {
+	public List<VehicleReservationVo> getMyVehicleRsv(String bTripCode, String empCode) {
 		return dao.getMyVehicleRsv(bTripCode, empCode);
 	}
 
@@ -42,17 +44,40 @@ public class BTripServiceImpl implements BTripService {
 	public int insertVehicleRsv(VehicleReservationVo vo) {
 		return dao.insertVehicleRsv(vo);
 	}
-	
 	@Transactional
 	@Override
-	public int insertBTripVRsv(BTripVo vo, VehicleReservationVo vo2) {
-		int b = dao.insertBTrip(vo);
-		int v = dao.insertVehicleRsv(vo2);
-		if((b+v)==2) {
-			return 1;
-		}
-		return 0;
+	public int insertBTripVRsv(BTripRequestDTO dto) {
+	    // BTripVo로 변환
+	    BTripVo bTripVo = BTripVo.builder()
+	            .empCode(dto.getEmpCode())
+	            .bTripStartDate(dto.getBrstartdate())
+	            .bTripEndDate(dto.getBrenddate())
+	            .bTripDetail(dto.getBrdetail())
+	            .bTripDepart(dto.getBrdepart())
+	            .bTripArrival(dto.getBrarrival())
+	            .vehicleCode(dto.getVehicleCode() != 0 ? dto.getVehicleCode() : null) // vehicleCode가 0이 아닐 때만 설정
+	            .build();
+
+	    // BTrip 테이블에 출장 정보 삽입 및 생성된 키 값 가져오기
+	    dao.insertBTrip(bTripVo);
+	    int generatedBTripCode = bTripVo.getBTripCode(); // MyBatis의 selectKey나 useGeneratedKeys를 통해 값이 설정됨
+
+	    // 배차 신청서가 있는 경우만 처리
+	    if (dto.getVehicleCode() != 0 && dto.getVrsvDetail() != null && !dto.getVrsvDetail().isEmpty()) {
+	        VehicleReservationVo vehicleReservationVo = VehicleReservationVo.builder()
+	                .bTripCode(generatedBTripCode)
+	                .vehicleCode(dto.getVehicleCode())
+	                .vrsvDate(dto.getVrsvDate())
+	                .vrsvDetail(dto.getVrsvDetail())
+	                .build();
+
+	        // VEHICLERESERVATION 테이블에 배차 정보 삽입
+	        dao.insertVehicleRsv(vehicleReservationVo);
+	    }
+
+	    return generatedBTripCode;
 	}
+
 
 	@Override
 	public List<VehicleReservationVo> getAllVehicleRsv(int first, int last, String startDate, String endDate) {
@@ -67,6 +92,16 @@ public class BTripServiceImpl implements BTripService {
 	@Override
 	public int countCoWork(String cowName, String cowAddress) {
 		return dao.countCoWork(cowName, cowAddress);
+	}
+
+	@Override
+	public int countVehicleRsv(String startDate, String endDate) {
+		return dao.countVehicleRsv(startDate, endDate);
+	}
+
+	@Override
+	public List<Map<String, Object>> getAvailableVehicles(String startDate, String endDate) {
+		return dao.getAvailableVehicles(startDate, endDate);
 	}
 
 }
