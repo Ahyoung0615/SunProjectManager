@@ -35,10 +35,10 @@ const LoginComponent = () => {
 
         stompClient.connect({}, () => {
             console.log('WebSocket 연결 성공');
-            stompClient.subscribe('/topic/login', (message) => {
+            stompClient.subscribe('/topic/chatRoom', (message) => {
                 console.log('WebSocket 메시지 수신:', JSON.parse(message.body));
             });
-            stompClient.send('/app/login', {}, JSON.stringify({ empcode }));
+            stompClient.send('/app/chatRoom', {}, JSON.stringify({ empcode }));
         });
     };
     const handleChange = (e) => {

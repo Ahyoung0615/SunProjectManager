@@ -5,9 +5,11 @@ import { Link, useNavigate } from 'react-router-dom';
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState('1');
-    const [sessionEmp, setSessionEmp] = useState(null);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [employeesPerPage] = useState(10); // 페이지 당 사원 수
+    const [pageGroupSize] = useState(5); // 페이지 그룹 크기
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,14 +38,16 @@ const MemberListComponent = () => {
     }, [selectedStatus]);
 
     const handleSelect = (eventKey) => {
-        setSelectedStatus(eventKey);;
+        setSelectedStatus(eventKey);
+        setCurrentPage(1); // 상태가 변경될 때 첫 페이지로 이동
     };
+
     const handleNewEmp = () => {
         window.open(
-            '/memberAdd', // 실제로 팝업 창에서 열고자 하는 경로를 지정합니다.
+            '/memberAdd',
             '신규사원등록',
-            'width=500,height=600' // 팝업 창의 크기 설정
-          );
+            'width=500,height=600'
+        );
     };
 
     useEffect(() => {
@@ -51,17 +55,17 @@ const MemberListComponent = () => {
         if (storedUserData) {
             const parsedData = JSON.parse(storedUserData);
             setUserData(parsedData);
-    
+
             if (parsedData.authorities !== '[ROLE_A]') {
                 setTimeout(() => {
                     console.log("권한이없습니다");
                     console.log(parsedData.authorities);
                     setLoading(false);
                     navigate('/home');
-                }, 1700); 
+                }, 1700);
             } else {
                 console.log("권한이있습니다");
-                setLoading(true); 
+                setLoading(true);
             }
         } else {
             setTimeout(() => {
@@ -69,11 +73,16 @@ const MemberListComponent = () => {
             }, 1700);
         }
     }, [navigate]);
+
     if (!userData || userData.authorities !== '[ROLE_A]') {
-        return<div style={{marginLeft:700, marginTop:100}}><br></br>
-            <div style={{fontSize:30, marginTop:30}}>
-             <b>관리자 권한이 필요합니다<br></br>2초 후 메인 페이지로 이동합니다</b>
-        </div></div>;
+        return (
+            <div style={{ marginLeft: 700, marginTop: 100 }}>
+                <br />
+                <div style={{ fontSize: 30, marginTop: 30 }}>
+                    <b>관리자 권한이 필요합니다<br />2초 후 메인 페이지로 이동합니다</b>
+                </div>
+            </div>
+        );
     }
 
     const getJobTitle = (jobCode) => {
@@ -100,7 +109,7 @@ const MemberListComponent = () => {
     };
 
     const getDeptTitle = (deptCode) => {
-        switch (deptCode){
+        switch (deptCode) {
             case 1:
                 return '경영총괄';
             case 11:
@@ -117,25 +126,70 @@ const MemberListComponent = () => {
                 return '자재관리';
             case 71:
                 return '생산제조';
+            default:
+                return '부서명 없음';
         }
     };
 
-    const getStatus = (empStatus) =>{
-        switch(empStatus){
-          case 'Y':
-            return '재직';
-          case 'N':
-            return '퇴사';
-          case 'V':
-            return '휴가';
+    const getStatus = (empStatus) => {
+        switch (empStatus) {
+            case 'Y':
+                return '재직';
+            case 'N':
+                return '퇴사';
+            case 'V':
+                return '휴가';
+            default:
+                return '상태 미정';
         }
-      }
+    };
+
+    // 페이지네이션 로직
+    const indexOfLastEmployee = currentPage * employeesPerPage;
+    const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
+    const currentEmployees = emp.slice(indexOfFirstEmployee, indexOfLastEmployee);
+
+    // 페이지 그룹 로직
+    const totalPages = Math.ceil(emp.length / employeesPerPage);
+    const currentGroupStart = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+    const currentGroupEnd = Math.min(currentGroupStart + pageGroupSize - 1, totalPages);
+
+    // 페이지 그룹 버튼 클릭 핸들러
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    // 페이지 그룹 버튼 생성
+    const pageButtons = [];
+    for (let page = currentGroupStart; page <= currentGroupEnd; page++) {
+        pageButtons.push(
+            <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                style={{
+                    margin: '0 5px',
+                    padding: '5px 10px',
+                    backgroundColor: currentPage === page ? '#007bff' : '#fff',
+                    color: currentPage === page ? '#fff' : '#000',
+                    border: '1px solid #007bff',
+                    borderRadius: '5px',
+                }}
+            >
+                {page}
+            </button>
+        );
+    }
+
+    // 이전/다음 페이지 그룹 버튼
+    const showPrevGroup = currentGroupStart > 1;
+    const showNextGroup = currentGroupEnd < totalPages;
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
-          <br></br>
+            <br />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <h4 style={{ marginBottom: 0 }}>사원 목록 조회</h4>
-            <DropdownButton
+                <DropdownButton
                     id="dropdown-basic-button"
                     title="재직상태"
                     onSelect={handleSelect}
@@ -143,7 +197,7 @@ const MemberListComponent = () => {
                     <Dropdown.Item eventKey="1">재직</Dropdown.Item>
                     <Dropdown.Item eventKey="2">퇴사</Dropdown.Item>
                     <Dropdown.Item eventKey="3">휴가</Dropdown.Item>
-            </DropdownButton>
+                </DropdownButton>
             </div>
             <table className="table table-bordered">
                 <thead>
@@ -157,7 +211,7 @@ const MemberListComponent = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {emp.map((item, index) =>(
+                    {currentEmployees.map((item, index) => (
                         <tr key={index}>
                             <td><Link to={`/memberDetail/${item.empCode}`}>{item.empCode}</Link></td>
                             <td>{item.empName}</td>
@@ -168,10 +222,46 @@ const MemberListComponent = () => {
                         </tr>
                     ))}
                 </tbody>
-                <button className="btn btn-primary" onClick={handleNewEmp} style={{position: 'absolute', right: '190px'}}>
-                        신규사원 등록
-                </button>
             </table>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                {/* 이전 페이지 그룹 버튼 */}
+                {showPrevGroup && (
+                    <button
+                        onClick={() => handlePageChange(currentGroupStart - pageGroupSize)}
+                        style={{
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            border: '1px solid #007bff',
+                            borderRadius: '5px',
+                        }}
+                    >
+                        &laquo; 이전
+                    </button>
+                )}
+                {/* 페이지 버튼 */}
+                {pageButtons}
+                {/* 다음 페이지 그룹 버튼 */}
+                {showNextGroup && (
+                    <button
+                        onClick={() => handlePageChange(currentGroupEnd + 1)}
+                        style={{
+                            margin: '0 5px',
+                            padding: '5px 10px',
+                            backgroundColor: '#007bff',
+                            color: '#fff',
+                            border: '1px solid #007bff',
+                            borderRadius: '5px',
+                        }}
+                    >
+                        다음 &raquo;
+                    </button>
+                )}
+            </div>
+            <button className="btn btn-primary" onClick={handleNewEmp} style={{ position: 'absolute', right: '190px' }}>
+                신규사원 등록
+            </button>
         </div>
     );
 };

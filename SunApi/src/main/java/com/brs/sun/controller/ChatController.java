@@ -2,6 +2,7 @@ package com.brs.sun.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -34,6 +35,7 @@ public class ChatController {
 	private final ChatService chatService;
 	private final EmployeeDao employeeDao;
 	private final EmployeeService employeeService;
+	
     @PostMapping("/api/chat")
     public ResponseEntity<String> createChatRoom(@RequestBody List<String> empCodes) {
         // 배열을 쉼표로 구분된 문자열로 변환
@@ -61,7 +63,6 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage/{chatroomCode}")
     @SendTo("/topic/chatRoom/{chatroomCode}")
     public ChatVo sendMessage(@DestinationVariable String chatroomCode, ChatVo message) {
-        // Save the message to the database
         chatService.saveChatMessage(message);
         return message; // Return message to be broadcasted to other clients
     }
@@ -71,6 +72,17 @@ public class ChatController {
         List<ChatVo> chatMessages = chatService.chatList2(chatroomCode);
         log.info("Returning chat messages: {}", chatMessages);
         return ResponseEntity.ok(chatMessages);
+    }
+    @GetMapping("/getLastChatMessage")
+    public ResponseEntity<String> getLastChatMessage(@RequestParam("chatroomCode") String chatroomCode) {
+        try {
+            String lastChat = chatService.getLastChatMessage(chatroomCode);
+            log.info("마지막 메세지 {}", lastChat);
+            return ResponseEntity.ok(lastChat);
+        } catch (Exception e) {
+            log.error("Error getting last chat message", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving last chat message");
+        }
     }
     
     

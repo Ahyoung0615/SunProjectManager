@@ -18,11 +18,22 @@
 	</select>
 	<insert id="insertChatMessage" parameterType="ChatVo">
         INSERT INTO CHAT (CHAT_CODE, CHATROOM_CODE, CHAT_CONTENT, CHAT_SENDER, CHAT_TIME)
-        VALUES ((SELECT NVL(MAX(CHAT_CODE), 0) + 1 FROM CHAT), #{chatroomCode}, #{chatContent}, #{chatSender}, #{chatTime})
+        VALUES ((SELECT NVL(MAX(CHAT_CODE), 0) + 1 FROM CHAT), #{chatroomCode}, #{chatContent}, #{chatSender}, SYSDATE)
     </insert>
     <select id="chatList" resultType="ChatVo">
     	SELECT *
     	FROM CHAT
     	WHERE CHATROOM_CODE = #{chatroomCode}
+    	ORDER BY CHAT_CODE ASC
     </select>
+    <select id="getLastChatMessage" resultType="ChatVo">
+    SELECT CHAT_CONTENT
+    FROM (
+        SELECT *
+        FROM CHAT
+        WHERE CHATROOM_CODE = #{chatroomCode}
+        ORDER BY CHAT_CODE DESC
+    )
+    WHERE ROWNUM = 1
+</select>
 </mapper>
