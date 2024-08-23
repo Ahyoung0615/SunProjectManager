@@ -4,8 +4,11 @@ import 'react-datepicker/dist/react-datepicker.css'; // datepicker 스타일
 import styles from '../css/VacationDocComponent.module.css';
 import axios from 'axios';
 import OrgChartComponent from '../commodule/OrgChartComponent';
+import { useNavigate } from 'react-router-dom';
 
 const VacationDocComponent = () => {
+    const navigate = useNavigate();
+
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
     const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
@@ -16,12 +19,17 @@ const VacationDocComponent = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [reason, setReason] = useState('');
+    const [docTitle, setDocTitle] = useState('');
+    const [dayOffLeft, setDayOffLeft] = useState(null);
+    const [remainingDays, setRemainingDays] = useState(null); // 잔여 연차 표시
+    const [balanceError, setBalanceError] = useState(''); // 잔여 연차 오류 메시지
 
     useEffect(() => {
         const today = new Date();
         const formattedDate = `${today.getFullYear()}년 ${String(today.getMonth() + 1).padStart(2, '0')}월 ${String(today.getDate()).padStart(2, '0')}일`;
         setCurrentData(formattedDate);
     }, []);
+    
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
@@ -39,7 +47,7 @@ const VacationDocComponent = () => {
 
     useEffect(() => {
         if (sessionEmpCode) {
-            fetchEmployeeInfo(sessionEmpCode);
+            employeeInfo(sessionEmpCode);
         }
     }, [sessionEmpCode]);
 
@@ -49,10 +57,27 @@ const VacationDocComponent = () => {
         }
     }, [startDate, endDate]);
 
-    const fetchEmployeeInfo = async (empCode) => {
+    // weekdayCount 변경될 때마다 잔여 연차 계산 및 오류 처리
+    useEffect(() => {
+        if (weekdayCount !== null && dayOffLeft !== null) {
+            const remaining = dayOffLeft - weekdayCount;
+            setRemainingDays(remaining);
+            if (remaining < 0) {
+                setBalanceError('잔여 연차가 부족합니다.');
+            } else {
+                setBalanceError('');
+            }
+        }
+    }, [weekdayCount, dayOffLeft]);
+
+    const employeeInfo = async (empCode) => {
         try {
             const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
+            const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff",{ params: { empCode } });
             const empData = response.data;
+            const dayOff = dayOffData.data;
+            console.log("dayOff:", dayOff);
+            setDayOffLeft(dayOff);
             setEmpInfo(empData);
             setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
         } catch (error) {
@@ -112,10 +137,13 @@ const VacationDocComponent = () => {
 
     const handleSubmit = () => {
         // 필수 값이 모두 존재하는지 확인
-        if (!startDate || !endDate || !reason || !selectedApprovers.length || !weekdayCount) {
-            alert("모든 필수 항목을 입력해주세요.");
+        if (!startDate || !endDate || !reason || !docTitle || !selectedApprovers.length || !weekdayCount || balanceError) {
+            alert("필수값을 모두 입력해 주세요");
             return;
         }
+        
+        const date = new Date();
+        const serverSendDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         // JSON 데이터 생성
         const data = {
@@ -125,11 +153,14 @@ const VacationDocComponent = () => {
             reason,
             weekdayCount,
             docType: "V",
+            docTitle,
+            uploadDate: serverSendDate,
+            empCode: sessionEmpCode,
             approvers: selectedApprovers.map(approver => approver.empCode) // 결재자 목록
         };
 
         axios.post("http://localhost:8787/api/edoc/insertVacation", data)
-            .then((res) => console.log(res.data))
+            .then((res) => navigate('/documentList'))
             .catch((error) => console.log(error));
     };
 
@@ -189,6 +220,14 @@ const VacationDocComponent = () => {
                 <table className={styles.vacationDocTable}>
                     <tbody>
                         <tr>
+                            <th>문서 제목</th>
+                            <td><input type='text' onChange={(e) => setDocTitle(e.target.value)}/></td>
+                        </tr>
+                        <tr>
+                            <th>잔여 연차</th>
+                            <td>{dayOffLeft}</td>
+                        </tr>
+                        <tr>
                             <th>기간</th>
                             <td colSpan="3">
                                 <div className={styles.dateRangeContainer}>
@@ -210,6 +249,12 @@ const VacationDocComponent = () => {
                                 </div>
                                 {dateError && <p className={styles.dateError}>{dateError}</p>}
                                 {weekdayCount !== null && !dateError && <p>사용일수: {weekdayCount}일</p>}
+                                {remainingDays !== null && (
+                                    <p className={remainingDays < 0 ? styles.balanceError : ''}>
+                                        잔여 연차: {remainingDays}일
+                                    </p>
+                                )}
+                                {balanceError && <p className={styles.balanceError}>{balanceError}</p>}
                             </td>
                         </tr>
                         <tr>

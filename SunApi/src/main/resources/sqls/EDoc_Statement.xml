@@ -4,9 +4,6 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.brs.sun.model.dao.EDocDao">
 	
-	<!-- 결재 문서 상세 -->
-	
-	
 	<!-- 남은 연차 조회 -->
 	<select id="selectDayOff" resultType="DayOffVo">
 		SELECT DAYOFF_LEFT - DAYOFF_USED AS DAYOFF_LEFT
@@ -19,6 +16,63 @@
 		UPDATE DAYOFF SET DAYOFF_USED = DAYOFF_USED + #{dayOff}
 		WHERE EMP_CODE = #{empCode}
 	</update>
-	<!-- 결재 문서 기안 -->
 	
+	<!-- 문서 번호 조회 -->
+<!-- 	<select id="getEDocCode" resultType="java.lang.Integer"> -->
+<!-- 		SELECT  -->
+<!-- 	    <if test='edocType == "V"'> -->
+<!-- 	    	NVL(MAX(EDOC_CODE), 100) + 1 -->
+<!-- 	    </if> -->
+<!-- 	    <if test='edocType == "C"'> -->
+<!-- 	    	NVL(MAX(EDOC_CODE), 2000) + 1 -->
+<!-- 	    </if> -->
+<!-- 	    as EDOC_CODE -->
+<!-- 		FROM EDOC  -->
+<!-- 		WHERE EDOC_TYPE = #{edocType} -->
+<!-- 	</select> -->
+	
+	<!-- 결재 문서 기안 -->
+	<insert id="insertEDoc" parameterType="com.brs.sun.vo.EDocVo">
+		<selectKey keyProperty="edocCode" resultType="java.lang.Integer" order="BEFORE">
+			SELECT 
+			    <if test='edocType == "V"'>
+			    	NVL(MAX(EDOC_CODE), 100) + 1
+			    </if>
+			    <if test='edocType == "E"'>
+			    	NVL(MAX(EDOC_CODE), 2000) + 1
+			    </if>
+			    as EDOC_CODE
+				FROM EDOC 
+			WHERE EDOC_TYPE = #{edocType}
+		</selectKey>
+		INSERT INTO EDOC
+		(EDOC_CODE, EDOC_TYPE, EDOC_TITLE, EDOC_CONTENT, EMP_CODE, EDOC_DATE, EDOC_STATUS)
+		VALUES(#{edocCode}, #{edocType}, #{edocTitle}, #{edocContent}, #{empCode}, #{edocDate}, 'A')
+	</insert>
+	
+	<!-- 결재라인 insert -->
+	<insert id="insertEDocLine">
+		INSERT INTO EDOCLINE
+			(EDCL_CODE, EDOC_CODE, EMP_CODE, EDCL_STATUS)
+			<foreach collection="list" item="edocLine" index="index" separator=" UNION ALL ">
+				SELECT (SELECT NVL(MAX(EDCL_CODE), 0) + #{index} + 1 FROM EDOCLINE), 
+				#{edocLine.edocCode}, #{edocLine.empCode}, 'F'
+				FROM DUAL
+			</foreach>
+	</insert>
+		
+	<select id="selectAppEmp" resultType="EDocVo">
+		SELECT *
+		FROM (
+		    SELECT 
+		        e.*, 
+		        ROW_NUMBER() OVER (PARTITION BY e.EDOC_CODE ORDER BY e.EDCL_CODE) AS RN
+		    FROM EDOCLINE e
+		    WHERE e.EDCL_STATUS = 'A' <!-- 아직 결재되지 않은 상태 -->
+		) ch
+		JOIN EDOC ed 
+		ON ed.EDOC_CODE = ch.EDOC_CODE
+		WHERE ch.EMP_CODE = #{edocCode}
+		AND ch.RN = 1 <!-- 첫 번째 결재자 (현재 결재 차례인 사람) -->
+	</select>
 </mapper>
