@@ -28,6 +28,7 @@ const VacationListComponent = () => {
         getDayOff(sessionEmp);
     }, [sessionEmp]); // sessionEmp가 변경될 때마다 실행
 
+
     return (
         <div>
             <div className="container" style={{ marginTop: 30 }}>
@@ -49,6 +50,7 @@ const VacationListComponent = () => {
                         </tr>
                     </tbody>
                 </table>
+                
             </div>
         </div>
     );

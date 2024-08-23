@@ -1,6 +1,7 @@
 package com.brs.sun.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -12,7 +13,7 @@ public interface BTripDao {
 
 	public BTripVo getOneBTrip(String bTripCode, String empCode);
 	
-	public VehicleReservationVo getMyVehicleRsv(String bTripCode, String empCode);
+	public List<VehicleReservationVo> getMyVehicleRsv(String bTripCode, String empCode);
 	
 	public int insertBTrip(BTripVo vo);
 	
@@ -23,4 +24,9 @@ public interface BTripDao {
 	public List<CoWorkVo> searchCoWork(int first, int last, String cowName, String cowAddress);
 	
 	public int countCoWork(String cowName, String cowAddress);
+	
+	public int countVehicleRsv(String startDate, String endDate);
+	
+	public List<Map<String, Object>>getAvailableVehicles(String startDate, String endDate);
 }
+

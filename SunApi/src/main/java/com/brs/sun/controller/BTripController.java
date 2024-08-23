@@ -1,17 +1,22 @@
 package com.brs.sun.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.model.service.BTripService;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
 import com.brs.sun.vo.PagingVo;
+import com.brs.sun.vo.VehicleReservationVo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +43,15 @@ public class BTripController {
 	    return service.getOneBTrip(bTripCode, empCode);
 	}
 	
+	@GetMapping("/vrsvDetail/{btripCode}")
+	public List<VehicleReservationVo> getMyVehicleRsv(
+			@PathVariable("btripCode") String bTripCode,
+            @RequestParam String empCode){
+		log.info("getMyVehicleRsv 요청 empCode : {}", empCode);
+		log.info("getMyVehicleRsv 요청 bTripCode : {}", bTripCode);
+		return service.getMyVehicleRsv(bTripCode, empCode);
+	}
+	
 	@GetMapping("/cowork")
 	public PagingVo<CoWorkVo> searchCoWork(
 	    @RequestParam(defaultValue = "1") int page,
@@ -60,5 +74,36 @@ public class BTripController {
 	    // 결과 반환
 	    return paging;
 	}
+	
+	@GetMapping("/getAllVehicleRsv")
+	public PagingVo<VehicleReservationVo> getAllVehicleRsv(
+			@RequestParam(defaultValue = "1") int page,
+		    @RequestParam(defaultValue = "50") int countList,
+		    @RequestParam(required = false) String startDate,
+		    @RequestParam(required = false) String endDate ){
+		log.info("startDate : {}",startDate);
+		log.info("endDate : {}",endDate);
+		int totalCount = service.countVehicleRsv(startDate, endDate);
+		 PagingVo<VehicleReservationVo> paging = new PagingVo<>(page, countList, totalCount, 10);
+		List<VehicleReservationVo> results = service.getAllVehicleRsv((page - 1) * countList + 1, page * countList, startDate, endDate);
+		  paging.setContent(results);
+		return paging;
+	}
+	
+	@GetMapping("/availableVehicle")
+	public List<Map<String, Object>> getAvailableVehicles(
+		    @RequestParam(required = false) String startDate,
+		    @RequestParam(required = false) String endDate){
+		log.info("startDate : {}",startDate);
+		log.info("endDate : {}",endDate);
+		return service.getAvailableVehicles(startDate, endDate);
+	}
+	
+	@PostMapping("/insertBTrip")
+	public int insertBTripVRsv(@RequestBody BTripRequestDTO requestDto) {
+		log.info("requestDto:{}", requestDto);
+	    return service.insertBTripVRsv(requestDto);
+	}
+
 
 }

@@ -79,4 +79,11 @@ public interface VehicleService {
 	 * @return 0 또는 1
 	 */
 	public int updateVRStatusOI(String RepairCode);
+	
+	/**
+	 * 차량 조회 갯수 확인
+	 * @param vehicleType
+	 * @return int
+	 */
+	public int countVehicle(String vehicleType);
 }

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import FVehicleDetailComponent from './../fvehicle/FVehicleDetailComponent';
+import VehicleRentDetailComponent from './VehicleRentDetailComponent';
 
 const VehicleRentListComponent = () => {
-
+    const [isfvehicledetailopen, setIsfvehicledetailopen] = useState(false);
+    const [selectedFvehicleCode, setSelectedFvehicleCode] = useState(null);
     const navigate = useNavigate();
 
     const [vrentlist, setVrentlist] = useState([{
@@ -24,6 +27,11 @@ const VehicleRentListComponent = () => {
         alert(`Selected option: ${eventKey}`);
     };
 
+    const handleDetailToggle = (fvehiclecode) => {
+        setSelectedFvehicleCode(fvehiclecode);
+        setIsfvehicledetailopen(!isfvehicledetailopen);
+      };
+
     return (
         <div className='container' style={{ marginTop: 30 }}>
             <br></br>
@@ -39,7 +47,9 @@ const VehicleRentListComponent = () => {
                     <Dropdown.Item eventKey="3">승인완료</Dropdown.Item>
                 </DropdownButton>
             </div>
-
+            <div style={{marginTop:-40, marginLeft:130}}>
+                <span>신청 번호를 누르면 상세보기</span>
+                </div> 
             {/* 배차 관리 테이블 */}
             <table className="table table-bordered" style={{ marginTop: 20 }}>
                 <thead>
@@ -51,26 +61,27 @@ const VehicleRentListComponent = () => {
                         <th>기간</th>
                         <th>거리</th>
                         <th>배차 현황</th>
-                        <th>상세</th>
                     </tr>
                 </thead>
                 <tbody>
                     {vrentlist.map((item, index) => (
                         <tr key={index}>
-                            <td>{item.vrentcode}</td>
+                            <td style={{color:'blue'}} onClick={() => handleDetailToggle(item.vrentcode)}><b>{item.vrentcode}</b></td>
                             <td>{item.empname}</td>
                             <td>{item.jobname}</td>
                             <td>{item.deptname}</td>
                             <td>{item.vrentdate}</td>
                             <td>{item.vrentlength}</td>
                             <td>{item.vrentstate}</td>
-                            <td>
-                                <button className="btn btn-secondary" onClick={() => showDetail(item.vrentcode)}>상세</button>
-                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            {isfvehicledetailopen && selectedFvehicleCode && (
+        <div>
+            <VehicleRentDetailComponent vrentlist={vrentlist.find(item => item.vrentcode === selectedFvehicleCode)}  />
+        </div>
+      )}
         </div>
     );
 };

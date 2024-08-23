@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.model.service.VehicleService;
+import com.brs.sun.vo.PagingVo;
 import com.brs.sun.vo.RepairVo;
 import com.brs.sun.vo.VehicleVo;
 
@@ -29,14 +30,32 @@ public class VehicleController {
 	private final VehicleService service;
 	
 	@GetMapping("/vehicle")
-	public List<VehicleVo> getAllVehicle(
-			@RequestParam(defaultValue = "1") int page,
-		    @RequestParam(defaultValue = "10") int countList,
-		    @RequestParam(required = false) String vehicleType
-			){
-		log.info("선택된 vehicleType : {}", vehicleType);
-		return service.getAllVehicle(page, countList, vehicleType);
+	public PagingVo<VehicleVo> getAllVehicle(
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int countList,
+	        @RequestParam(required = false) String vehicleType
+	) {
+	    log.info("선택된 vehicleType : {}", vehicleType);
+
+	    // 총 차량 수 조회
+	    int totalCount = service.countVehicle(vehicleType);
+
+	    // 페이징 객체 생성
+	    PagingVo<VehicleVo> paging = new PagingVo<>(page, countList, totalCount, 10);
+
+	    // 페이지 인덱스 계산
+	    int startRow = (page - 1) * countList + 1;
+	    int endRow = page * countList;
+
+	    // 데이터 조회
+	    List<VehicleVo> results = service.getAllVehicle(startRow, endRow, vehicleType);
+
+	    // 페이징 객체에 데이터 설정
+	    paging.setContent(results);
+
+	    return paging;
 	}
+
 	
 	@GetMapping("/vehicle/{vehicleCode}")
 	public VehicleVo getOneVehicle(@PathVariable String vehicleCode) {

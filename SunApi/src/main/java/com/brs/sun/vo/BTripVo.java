@@ -1,6 +1,6 @@
 package com.brs.sun.vo;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,9 +28,9 @@ public class BTripVo {
 	// 상세
 	private String bTripDetail;
 	// 시작 날짜
-	private LocalDateTime bTripStartDate;
+	private LocalDate bTripStartDate;
 	// 종료 날짜
-	private LocalDateTime bTripEndDate;
+	private LocalDate bTripEndDate;
 	// 차량 코드
-	private String vehicleCode;
+	private Integer vehicleCode;
 }

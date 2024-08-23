@@ -8,26 +8,37 @@
 	<!-- 차량 관련 -->
 
 	<!-- 차량 전체 조회 getAllVehicle() 파라미터 C(영업),F(화물),NULL(전체) -->
-<select id="getAllVehicle" resultType="VehicleVo">
-    SELECT * FROM (
-        SELECT 
-            VEHICLE_CODE, 
-            VEHICLE_NO, 
-            VEHICLE_MODEL,
-            VEHICLE_REGDATE,
-            VEHICLE_TYPE, 
-            VEHICLE_SIZE,
-            VEHICLE_STATUS,
-            ROW_NUMBER() OVER (ORDER BY VEHICLE_CODE ASC) AS rn
-        FROM VEHICLE
-        WHERE VEHICLE_DELFLAG = 'N'
-        <if test="vehicleType != null and vehicleType != ''">
-            AND VEHICLE_TYPE = #{vehicleType}
-        </if>
-    )
-    WHERE rn BETWEEN #{first} AND #{last}
-</select>
+	<select id="getAllVehicle" resultType="VehicleVo">
+		SELECT * FROM (
+		SELECT
+		VEHICLE_CODE,
+		VEHICLE_NO,
+		VEHICLE_MODEL,
+		VEHICLE_REGDATE,
+		VEHICLE_TYPE,
+		VEHICLE_SIZE,
+		VEHICLE_STATUS,
+		ROW_NUMBER() OVER (ORDER BY VEHICLE_CODE ASC) AS rn
+		FROM VEHICLE
+		WHERE VEHICLE_DELFLAG = 'N'
+		<if test="vehicleType != null and vehicleType != ''">
+			AND VEHICLE_TYPE = #{vehicleType}
+		</if>
+		)
+		WHERE rn BETWEEN #{first} AND #{last}
+	</select>
 
+
+	<!-- 조회하는 차량 총 갯수 -->
+	<select id="countVehicle" resultType="Integer">
+		SELECT COUNT(VEHICLE_CODE)
+		FROM VEHICLE
+		<where>
+			<if test="vehicleType != null and vehicleType != ''">
+				VEHICLE_TYPE = #{vehicleType}
+			</if>
+		</where>
+	</select>
 
 	<!-- 차량 상세 조회 getOneVehicle -->
 	<select id="getOneVehicle" resultType="VehicleVo">
@@ -63,7 +74,8 @@
 	<update id="updateVehicleImage">
 		UPDATE VEHICLE
 		SET VEHICLE_IMG = #{vehicleImg}
-		WHERE VEHICLE_CODE = #{vehicleCode}
+		WHERE
+		VEHICLE_CODE = #{vehicleCode}
 	</update>
 
 
