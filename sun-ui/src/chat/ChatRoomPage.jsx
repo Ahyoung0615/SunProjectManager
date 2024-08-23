@@ -23,7 +23,6 @@ const ChatRoomComponent = () => {
         }
     }, []);
 
-
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -57,7 +56,10 @@ const ChatRoomComponent = () => {
                 client.subscribe(`/topic/chatRoom/${chatroomCode}`, (message) => {
                     try {
                         const parsedMessage = JSON.parse(message.body);
-                        setMessages((prevMessages) => [...prevMessages, parsedMessage]);
+                        // 메시지가 중복되지 않도록 조건을 추가
+                        if (!messages.find(msg => msg.chatCode === parsedMessage.chatCode)) {
+                            setMessages((prevMessages) => [...prevMessages, parsedMessage]);
+                        }
                     } catch (error) {
                         console.error('Error parsing message:', error);
                     }
@@ -82,17 +84,25 @@ const ChatRoomComponent = () => {
                 client.deactivate();
             }
         };
-    }, [chatroomCode]);
+    }, [chatroomCode, messages]);
 
     const handleSendMessage = () => {
         if (stompClient && isConnected && inputMessage.trim() !== '') {
+            const now = new Date();
+            const chatTime = now.toISOString(); // ISO 형식으로 저장
+
             const chatMessage = {
-                chatCode: 0,
                 chatroomCode: parseInt(chatroomCode, 10),
                 chatContent: inputMessage,
                 chatSender: emp?.empName || 'Anonymous',
-                chatTime: new Date().toISOString()
+                chatTime: chatTime // ISO 문자열로 설정
             };
+
+            // 클라이언트에서 메시지 상태를 추가하여 즉시 렌더링
+            // setMessages((prevMessages) => [
+            //     ...prevMessages,
+            //     chatMessage // 전송 직후, 한국 시간 포함
+            // ]);
 
             stompClient.publish({
                 destination: `/app/chat.sendMessage/${chatroomCode}`,
@@ -107,11 +117,30 @@ const ChatRoomComponent = () => {
         }
     };
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // 기본 Enter 동작을 방지합니다.
+            handleSendMessage();
+        }
+    };
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     }, [messages]);
+
+    // 시간을 "오전/오후 시:분" 형식으로 변환하는 함수
+    const formatTime = (chatTime) => {
+        const date = new Date(chatTime);
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? '오후' : '오전';
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        
+        return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
+    };
 
     return (
         <div>
@@ -121,7 +150,7 @@ const ChatRoomComponent = () => {
                     border: '1px solid #ccc',
                     padding: '10px',
                     marginBottom: '10px',
-                    width: '56.5%',
+                    width: '80%',
                     height: '400px',
                     overflowY: 'scroll'
                 }}
@@ -145,7 +174,10 @@ const ChatRoomComponent = () => {
                                 textAlign: 'left'
                             }}
                         >
-                            <strong>{message.chatSender}:</strong> {message.chatContent}
+                            <div>{message.chatContent}</div>
+                            <div style={{ fontSize: '0.8em', color: 'gray', marginTop: '5px' }}>
+                                {formatTime(message.chatTime)}
+                            </div>
                         </div>
                     </div>
                 ))}
@@ -156,8 +188,9 @@ const ChatRoomComponent = () => {
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={handleKeyDown} // onKeyDown 이벤트 핸들러 추가
                     placeholder="Enter your message..."
-                    style={{ width: '50%', marginRight: '10px' }}
+                    style={{ width: '68%', marginRight: '10px' }}
                 />
                 <button onClick={handleSendMessage}>Send</button>
             </div>

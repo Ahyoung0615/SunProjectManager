@@ -36,4 +36,13 @@ public class ChatService {
     public List<ChatVo> chatList2(String chatroomCode){
     	return chatDao.chatList(chatroomCode);
     }
+    public String getLastChatMessage(String chatroomCode){
+    	// chatRepository를 통해 채팅방의 마지막 메시지를 조회
+        ChatVo chatVo = chatDao.getLastChatMessage(chatroomCode);
+        if (chatVo != null) {
+            return chatVo.getChatContent(); // 마지막 메시지의 내용을 반환
+        } else {
+            return "No messages found";
+        }
+    }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brs.sun.model.dao.BoardDao">
+	
+	<insert id="insertBoard">
+		INSERT INTO NOTICE (
+		    NOTI_CODE,NOTI_TITLE,NOTI_CONTENT,
+		    EMP_CODE,NOTI_DATE,NOTI_STATUS
+		) VALUES (
+		    (SELECT NVL(MAX(NOTI_CODE), 0) + 1 FROM NOTICE),#{notiTitle},#{notiContent},
+		    #{empCode},SYSDATE,#{notiStatus}
+		)
+	</insert>
+	<select id="boardList" resultType="NoticeVo">
+		SELECT *
+		FROM NOTICE
+	</select>
+	
+
+</mapper>
