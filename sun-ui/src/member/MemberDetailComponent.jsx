@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import MemberUpdateModal from './MemberUpdateComponent';
 
 const MemberDetailComponent = () => {
     const { empCode } = useParams();
     const [employee, setEmployee] = useState([]);
     const [file, setFile] = useState(null);
     const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${employee.empImg}`);
+    const [showModal, setShowModal] = useState(false);
 
+    const handleShow = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
     useEffect(() => {
       // API 호출
       fetch(`http://localhost:8787/memberDetail/${empCode}`)
@@ -117,13 +121,7 @@ const MemberDetailComponent = () => {
                 return '생산제조';
         }
     };
-    const handleUpdate = () => {
-      window.open(
-        `/memberUpdate/${empCode}`,
-        '사원정보수정',
-        'width=500,height=600'
-      )
-  };
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
@@ -217,9 +215,11 @@ const MemberDetailComponent = () => {
           </table>
         </div>
       </div>
-      <button className="btn btn-primary" onClick={handleUpdate} style={{position: 'absolute', right: '350px'}}>
-            수정
-      </button>
+      <button className="btn btn-primary" onClick={handleShow} style={{position: 'absolute', right: '350px'}}>
+                사원 정보 수정
+            </button>
+            <MemberUpdateModal show={showModal} handleClose={handleClose} />
+      
       <button className="btn btn-primary" onClick={handlePasswordReset} style={{position: 'absolute', right: '190px'}}>
             비밀번호 초기화
       </button>

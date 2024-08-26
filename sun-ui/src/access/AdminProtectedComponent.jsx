@@ -2,8 +2,8 @@ import React from 'react';
 import AdminComponent from './AdminComponent';
 import MemberDetailComponent from '../member/MemberDetailComponent';
 import MemberListComponent from '../member/MemberListComponent';
-import MemberUpdateComponent from '../member/MemberUpdateComponent';
-import MemberAddComponent from '../member/MemberAddComponent';
+
+
 import RepairListComponent from '../vehicle/RepairListComponent';
 import VehicleDetailComponent from '../vehicle/VehicleDetailComponent';
 import VehicleFormComponent from '../vehicle/VehicleFormComponent';
@@ -25,17 +25,7 @@ export const AdMemberList = () => (
     </AdminComponent>
 );
 
-export const AdMemberUpdate = () => (
-    <AdminComponent>
-        <MemberUpdateComponent />
-    </AdminComponent>
-);
 
-export const AdMemberAdd = () => (
-    <AdminComponent>
-        <MemberAddComponent />
-    </AdminComponent>
-);
 
 export const AdRepairList = () => (
     <AdminComponent>

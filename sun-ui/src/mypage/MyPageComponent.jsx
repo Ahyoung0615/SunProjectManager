@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import MyPageUpdateModal from './MyPageUpdateModal';
 
 const MyPageComponent = () => {
     const [employee , setEmployee] = useState(null); // 현재 로그인 사용자 정보
     const [emp , setEmp] = useState({});
     const [file, setFile] = useState(null);
     const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${emp.empImg}`);
-    const [empupdate, setEmpUpdate] = useState({
-        EmpCode: '',
-        EmpTel: '',
-        EmpEmail: '',
-        EmpAddress: '',
-    });
+    const [showModal, setShowModal] = useState(false);
+
+    const handleShow = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
     useEffect(() => {
         const value = window.sessionStorage.getItem('user');
         if (value) {
@@ -183,18 +182,18 @@ const MyPageComponent = () => {
               <tr>
                 <td>전화번호</td>
                 <td>
-                    <input type="text" value={empupdate.empTel} placeholder={emp.empTel}/>
+                {emp.empTel}
                 </td>
               </tr>
               <tr>
                 <td>이메일</td>
                 <td>
-                <input type="email" value={empupdate.empEmail} placeholder={emp.empEmail}/> 
+                {emp.empEmail}
                 </td>
               </tr>
               <tr>
                 <td>주소</td>
-                <input type="textr" value={empupdate.empAddress} placeholder={emp.empAddress}/> 
+                <td>{emp.empAddress}</td>
               </tr>
               <tr>
                 <td>입사일</td>
@@ -206,6 +205,10 @@ const MyPageComponent = () => {
               </tr>
             </tbody>
           </table>
+          <button className="btn btn-primary" onClick={handleShow} style={{position: 'absolute', right: '350px'}}>
+                사원 정보 수정
+            </button>
+            <MyPageUpdateModal show={showModal} handleClose={handleClose} empCode={employee ? employee.empcode : null} />
         </div>
       </div>
 

@@ -1,87 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 
-const MemberUpdateModal = ({ show, handleClose }) => {
-    const { empCode } = useParams();
-    const [employee, setEmployee] = useState({});
+const MemberAddModal = ({ show, handleClose }) => {
     const [emp, setEmp] = useState({
-        EmpCode: '',
+        EmpName: '',
         EmpJob: '',
         EmpDept: '',
+        Gender: '',
         EmpTel: '',
         EmpEmail: '',
         EmpAddress: '',
-        EmpStatus: '',
     });
-
-    useEffect(() => {
-        // API 호출
-        fetch(`http://localhost:8787/memberDetail/${empCode}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                setEmployee(data);
-                setEmp({
-                    EmpCode: data.empCode.toString(),
-                    EmpJob: data.jobCode.toString(),
-                    EmpDept: data.deptCode ? data.deptCode.toString() : '',
-                    EmpTel: data.empTel || '',
-                    EmpEmail: data.empEmail || '',
-                    EmpAddress: data.empAddress || '',
-                    EmpStatus: data.empStatus || '',
-                });
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
-    }, [empCode]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('EmpCode', emp.EmpCode);
-        formData.append('EmpJob', emp.EmpJob);
-        formData.append('EmpDept', emp.EmpDept);
-        formData.append('EmpTel', emp.EmpTel);
-        formData.append('EmpEmail', emp.EmpEmail);
-        formData.append('EmpAddress', emp.EmpAddress);
-        formData.append('EmpStatus', emp.EmpStatus);
-
-        try {
-            const response = await axios({
-                url: `http://localhost:8787/memberUpdate/${empCode}`,
-                method: 'POST',
-                data: formData,
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                withCredentials: true,
-            });
-            console.log(response.data);
-            alert('사원 정보 수정이 완료되었습니다.');
-            handleClose(); // 모달 닫기
-        } catch (error) {
-            console.error('사원 정보 수정 중 오류가 발생했습니다:', error);
-            alert('사원 정보 수정 중 오류가 발생했습니다.');
-        }
-    };
-
-    const getGender = (gender) => {
-        switch (gender) {
-            case 'F':
-                return '여성';
-            case 'M':
-                return '남성';
-            default:
-                return '정보 없음';
-        }
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -91,10 +21,40 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         }));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData  = new FormData();
+        formData.append('EmpName', emp.EmpName);
+        formData.append('EmpJob', emp.EmpJob);
+        formData.append('EmpDept', emp.EmpDept);
+        formData.append('Gender', emp.Gender);
+        formData.append('EmpTel', emp.EmpTel);
+        formData.append('EmpEmail', emp.EmpEmail);
+        formData.append('EmpAddress', emp.EmpAddress);
+
+        try {
+            const response = await axios({
+                url: 'http://localhost:8787/NewEmp',
+                method: 'POST',
+                data: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true, // 필요한 경우 크로스 사이트 요청 시 쿠키를 포함
+            });
+            console.log(response.data); // 서버에서 반환한 데이터를 로그로 출력합니다.
+            alert('사원 등록이 완료되었습니다.');
+            handleClose(); // 모달 닫기
+        } catch (error) {
+            console.error('사원 등록 중 오류가 발생했습니다:', error);
+            alert('사원 등록 중 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>사원 정보 수정</Modal.Title>
+                <Modal.Title>사원 등록</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
@@ -102,8 +62,10 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                         <Form.Label>이름</Form.Label>
                         <Form.Control
                             type="text"
-                            value={employee.empName || ''}
-                            readOnly
+                            name="EmpName"
+                            value={emp.EmpName}
+                            onChange={handleChange}
+                            required
                         />
                     </Form.Group>
                     <Form.Group controlId="formEmpJob">
@@ -149,10 +111,16 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                     <Form.Group controlId="formGender">
                         <Form.Label>성별</Form.Label>
                         <Form.Control
-                            type="text"
-                            value={getGender(employee.gender) || '정보 없음'}
-                            readOnly
-                        />
+                            as="select"
+                            name="Gender"
+                            value={emp.Gender}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">선택하세요</option>
+                            <option value="M">남</option>
+                            <option value="F">여</option>
+                        </Form.Control>
                     </Form.Group>
                     <Form.Group controlId="formEmpTel">
                         <Form.Label>전화번호</Form.Label>
@@ -181,26 +149,11 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Form.Group controlId="formEmpStatus">
-                        <Form.Label>근무현황</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="EmpStatus"
-                            value={emp.EmpStatus}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">선택하세요</option>
-                            <option value="Y">재직</option>
-                            <option value="N">퇴사</option>
-                            <option value="V">휴가</option>
-                        </Form.Control>
-                    </Form.Group>
                     <Button variant="secondary" onClick={handleClose}>
                         닫기
                     </Button>
                     <Button variant="primary" type="submit">
-                        수정
+                        사원 등록
                     </Button>
                 </Form>
             </Modal.Body>
@@ -208,4 +161,4 @@ const MemberUpdateModal = ({ show, handleClose }) => {
     );
 };
 
-export default MemberUpdateModal;
+export default MemberAddModal;

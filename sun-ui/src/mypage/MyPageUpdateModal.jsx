@@ -3,8 +3,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
-const MemberUpdateModal = ({ show, handleClose }) => {
-    const { empCode } = useParams();
+const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
     const [employee, setEmployee] = useState({});
     const [emp, setEmp] = useState({
         EmpCode: '',
@@ -72,14 +71,66 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         }
     };
 
-    const getGender = (gender) => {
-        switch (gender) {
-            case 'F':
-                return '여성';
-            case 'M':
-                return '남성';
+    const getJobTitle = (jobCode) => {
+        switch (jobCode) {
+            case 1:
+                return '대표';
+            case 11:
+                return '이사';
+            case 21:
+                return '부장';
+            case 31:
+                return '차장';
+            case 41:
+                return '과장';
+            case 51:
+                return '대리';
+            case 61:
+                return '주임';
+            case 71:
+                return '사원';
             default:
-                return '정보 없음';
+                return '직급 미정';
+        }
+    };
+
+    const getGender = (gender) =>{
+      switch(gender){
+        case 'F': 
+            return '여성';
+        case 'M': 
+            return '남성';
+      }
+    }
+
+    const getStatus = (empStatus) =>{
+      switch(empStatus){
+        case 'Y':
+          return '재직';
+        case 'N':
+          return '퇴사';
+        case 'V':
+          return '휴가';
+      }
+    }
+    const getDeptTitle = (deptCode) => {
+        switch (deptCode){
+            case 1:
+                return '경영총괄';
+            case 11:
+                return '경영지원';
+            case 21:
+                return '연구개발';
+            case 31:
+                return '고객지원';
+            case 41:
+                return '운송관리';
+            case 51:
+                return '품질관리';
+            case 61:
+                return '자재관리';
+            case 71:
+                return '생산제조';
         }
     };
 
@@ -109,42 +160,19 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                     <Form.Group controlId="formEmpJob">
                         <Form.Label>직무</Form.Label>
                         <Form.Control
-                            as="select"
-                            name="EmpJob"
-                            value={emp.EmpJob}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">선택하세요</option>
-                            <option value="1">대표</option>
-                            <option value="11">이사</option>
-                            <option value="21">부장</option>
-                            <option value="31">차장</option>
-                            <option value="41">과장</option>
-                            <option value="51">대리</option>
-                            <option value="61">주임</option>
-                            <option value="71">사원</option>
-                        </Form.Control>
+                            type='text'
+                            value={getJobTitle(employee.jobCode)}
+                            readOnly
+                        />
                     </Form.Group>
                     <Form.Group controlId="formEmpDept">
                         <Form.Label>부서</Form.Label>
                         <Form.Control
-                            as="select"
+                            type='text'
                             name="EmpDept"
-                            value={emp.EmpDept}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">선택하세요</option>
-                            <option value="1">경영총괄</option>
-                            <option value="11">경영지원</option>
-                            <option value="21">연구개발</option>
-                            <option value="31">고객지원</option>
-                            <option value="41">운송관리</option>
-                            <option value="51">품질관리</option>
-                            <option value="61">자재관리</option>
-                            <option value="71">생산제조</option>
-                        </Form.Control>
+                            value={getDeptTitle(employee.deptCode)}
+                            readOnly
+                        />
                     </Form.Group>
                     <Form.Group controlId="formGender">
                         <Form.Label>성별</Form.Label>
@@ -184,17 +212,11 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                     <Form.Group controlId="formEmpStatus">
                         <Form.Label>근무현황</Form.Label>
                         <Form.Control
-                            as="select"
+                            type='text'
                             name="EmpStatus"
-                            value={emp.EmpStatus}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">선택하세요</option>
-                            <option value="Y">재직</option>
-                            <option value="N">퇴사</option>
-                            <option value="V">휴가</option>
-                        </Form.Control>
+                            value={getStatus(employee.empStatus)}
+                            readOnly
+                        />
                     </Form.Group>
                     <Button variant="secondary" onClick={handleClose}>
                         닫기
@@ -208,4 +230,4 @@ const MemberUpdateModal = ({ show, handleClose }) => {
     );
 };
 
-export default MemberUpdateModal;
+export default MyPageUpdateModal;

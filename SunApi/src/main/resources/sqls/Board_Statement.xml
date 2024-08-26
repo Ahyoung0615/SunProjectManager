@@ -4,19 +4,86 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.brs.sun.model.dao.BoardDao">
 	
-	<insert id="insertBoard">
-		INSERT INTO NOTICE (
-		    NOTI_CODE,NOTI_TITLE,NOTI_CONTENT,
-		    EMP_CODE,NOTI_DATE,NOTI_STATUS
-		) VALUES (
-		    (SELECT NVL(MAX(NOTI_CODE), 0) + 1 FROM NOTICE),#{notiTitle},#{notiContent},
-		    #{empCode},SYSDATE,#{notiStatus}
-		)
-	</insert>
+	<!-- 게시글 저장 -->
+    <insert id="insertBoard">
+        INSERT INTO NOTICE (
+            NOTI_CODE, NOTI_TITLE, NOTI_CONTENT,
+            EMP_CODE, NOTI_DATE, NOTI_STATUS
+        ) VALUES (
+            (SELECT NVL(MAX(NOTI_CODE), 0) + 1 FROM NOTICE), #{notiTitle}, #{notiContent},
+            #{empCode}, SYSDATE, #{notiStatus}
+        )
+    </insert>
+
+    <!-- 게시글의 마지막 ID 가져오기 -->
+    <select id="getLastNoticeCode">
+        SELECT NVL(MAX(NOTI_CODE), 0) FROM NOTICE
+    </select>
+
+	<!-- 게시글 파일 가져오기 -->
+	<select id="getFile">
+		SELECT *
+		FROM NOTICEFILE
+		WHERE NOTI_CODE = #{notiCode}
+	</select>
+	<!-- 저장 파일 이름으로 정보가져오기 -->
+	<select id="getFileByFakename" resultType="NoticeFileVo">
+	    SELECT *
+	    FROM NOTICEFILE
+	    WHERE NFILE_FAKENAME = #{nfileFakename}
+	</select>
+    <!-- 파일 저장 -->
+    <insert id="insertNoticeFile">
+        INSERT INTO NOTICEFILE (
+            NFILE_CODE, NOTI_CODE, NFILE_ORIGINNAME, NFILE_FAKENAME,
+            NFILE_PATH, NFILE_DATE, NFILE_TYPE, NOTI_SIZE, NFILE_DELFLAG
+        ) VALUES (
+            (SELECT NVL(MAX(NFILE_CODE), 0) + 1 FROM NOTICEFILE), #{notiCode}, #{nfileOriginname}, #{nfileFakename},
+            #{nfilePath}, SYSDATE, #{nfileType}, #{notiSize}, 'N'
+        )
+    </insert>
+    <!-- 게시글 수정 파일 업데이트 -->
+    <update id="updateFile">
+    	UPDATE NOTICEFILE
+    	SET
+			NFILE_ORIGINNAME = #{nfileOriginname}, NFILE_FAKENAME = #{nfileFakename},
+			NFILE_TYPE=#{nfileType}, NOTI_SIZE=#{notiSize}
+    	WHERE
+    		NFILE_CODE= #{nfileCode}
+    </update>
+    <!-- 게시글 파일 삭제 -->
+    <delete id="deleteFile">
+	    DELETE FROM NOTICEFILE
+	    WHERE NFILE_CODE = #{nfileCode}
+	</delete>
+	<!-- 게시판 리스트 -->
 	<select id="boardList" resultType="NoticeVo">
 		SELECT *
 		FROM NOTICE
+		ORDER BY NOTI_CODE DESC
 	</select>
-	
-
+	<!-- 게시글 상세보기 -->
+	<select id="boardDetail" parameterType="String" resultType="NoticeVo">
+		SELECT *
+		FROM NOTICE
+		WHERE NOTI_CODE = #{notiCode}
+	</select>
+	<!-- 게시글 업데이트 -->
+	<update id="updateBoard">
+	    UPDATE NOTICE
+	    SET
+	        NOTI_TITLE = #{notiTitle},
+	        NOTI_CONTENT = #{notiContent},
+	        NOTI_STATUS = #{notiStatus}
+	    WHERE
+	        NOTI_CODE = #{notiCode}
+	</update>
+	<!-- 게시글 삭제 -->
+	<update id="deleteBoard">
+	    UPDATE NOTICE
+	    SET
+	        NOTI_DELFLAG = 'Y'
+	    WHERE
+	        NOTI_CODE = #{notiCode}
+	</update>
 </mapper>
