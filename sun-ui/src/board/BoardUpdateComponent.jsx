@@ -15,8 +15,7 @@ const BoardUpdateComponent = () => {
         notiStatus: '',
     });
     const [emp, setEmp] = useState([]);
-    const [existingFiles, setExistingFiles] = useState([]); // 기존 파일 목록
-    const [newFiles, setNewFiles] = useState([]); // 새로 추가된 파일 목록
+    const [files, setFiles] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,7 +36,6 @@ const BoardUpdateComponent = () => {
                     empCode: data.empCode,
                     notiStatus: data.notiStatus,
                 });
-                setExistingFiles(data.files || []); // 기존 파일 목록 설정
             } catch (error) {
                 console.error("게시글 상세보기 오류", error);
             }
@@ -64,19 +62,21 @@ const BoardUpdateComponent = () => {
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
+    
+        selectedFiles.forEach(file => {
+            console.log(`File name: ${file.name}, File size: ${file.size}`);
+        });
+    
         const validFiles = selectedFiles.filter(file => file.size <= MAX_FILE_SIZE);
         const invalidFiles = selectedFiles.filter(file => file.size > MAX_FILE_SIZE);
-
+    
         if (invalidFiles.length > 0) {
             alert('파일 크기가 5MB를 초과하는 파일이 포함되어 있습니다.');
         }
-
-        setNewFiles(validFiles);
+    
+        setFiles(prevFiles => [...prevFiles, ...validFiles]);
     };
-
-    const handleFileRemove = (index) => {
-        setExistingFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -86,14 +86,11 @@ const BoardUpdateComponent = () => {
         formData.append('empCode', emp.empcode);
         formData.append('notiStatus', notice.notiStatus);
 
-        existingFiles.forEach((file) => {
-            formData.append('existingFiles', file); // 기존 파일 유지
-        });
-
-        newFiles.forEach((file) => {
-            formData.append('newFiles', file); // 새 파일 추가
-        });
-
+        if (files.length > 0) {
+            files.forEach((file) => {
+                formData.append('files', file);
+            });
+        }
         try {
             const response = await axios.post(`http://localhost:8787/updateBoard/${notiCode}`, formData, {
                 headers: {
@@ -108,22 +105,23 @@ const BoardUpdateComponent = () => {
             alert('게시글 수정 중 오류가 발생했습니다.');
         }
     };
-
+    const handleRemoveFile = (index) => {
+        setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+    };
     const renderFilePreviews = () => {
-        return (
-            <>
-                {existingFiles.map((file, index) => (
-                    <div key={index} className="file-preview">
-                        <p>{file.name} <button type="button" onClick={() => handleFileRemove(index)}>삭제</button></p>
-                    </div>
-                ))}
-                {newFiles.map((file, index) => (
-                    <div key={index} className="file-preview">
-                        <p>{file.name} ({(file.size / 1024).toFixed(2)} KB)</p>
-                    </div>
-                ))}
-            </>
-        );
+        return files.map((file, index) => (
+            <div key={index} className="file-preview">
+                <p>{file.name} ({(file.size / 1024).toFixed(2)} KB) <button 
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleRemoveFile(index)}
+                        style={{ marginLeft: '10px'}}
+                    >
+                        제거
+                    </button></p>
+                
+            </div>
+        ));
     };
 
     return (

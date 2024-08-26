@@ -66,6 +66,8 @@ const LoginComponent = () => {
                     empcode: response.data.empcode,
                     authorities: response.data.authorities,
                     empName: response.data.empName,
+                    deptCode: response.data.deptCode,
+                    jobCode: response.data.jobCode
                 };
                 window.sessionStorage.setItem("user", JSON.stringify(userData));
                 connectWebSocket(response.data.empcode);

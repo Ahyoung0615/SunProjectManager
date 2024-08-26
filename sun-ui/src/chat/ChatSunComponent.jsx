@@ -44,13 +44,17 @@ const ChatSunComponent = () => {
                     const fetchEmployeeData = async () => {
                         const data = {};
                         for (const code of empCodes) {
-                            const empResponse = await fetch(`http://localhost:8787/api/employee/${code}`);
-                            if (empResponse.ok) {
-                                const empData = await empResponse.json();
-                                data[code] = {
-                                    empName: empData.empName,
-                                    empDept: empData.deptCode
-                                };
+                            try {
+                                const empResponse = await fetch(`http://localhost:8787/api/employee/${code}`);
+                                if (empResponse.ok) {
+                                    const empData = await empResponse.json();
+                                    data[code] = {
+                                        empName: empData.empName,
+                                        empDept: empData.deptCode
+                                    };
+                                }
+                            } catch (error) {
+                                console.error(`Error fetching employee data for code ${code}:`, error);
                             }
                         }
                         setEmployeeData(data); // 사원 정보 상태에 저장
@@ -157,9 +161,7 @@ const ChatSunComponent = () => {
                         lastMessages[item.chatroomCode] = message;
                     }
                 }
-                if (JSON.stringify(lastMessages) !== JSON.stringify(lastMessage)) {
-                    setLastMessage(lastMessages); // 마지막 메시지 상태에 저장
-                }
+                setLastMessage(lastMessages); // 마지막 메시지 상태에 저장
             } catch (error) {
                 console.error('Error fetching last messages:', error); // 오류가 발생하면 콘솔에 출력
             }
@@ -168,7 +170,7 @@ const ChatSunComponent = () => {
         if (chat.length > 0) {
             fetchLastMessages();
         }
-    }, [chat, lastMessage] ); // `chat`이 변경될 때마다 마지막 메시지 가져오기
+    }, [chat]); // `chat`이 변경될 때마다 마지막 메시지 가져오기
 
     return (
         <div>
