@@ -67,7 +67,7 @@
 	        #{empName},'$2a$10$DDBV.BAmuu5WMchtQLLadu9Cdx/vjuxBfZFnTKx73FGLhSqLcqXEy',#{deptCode},
 	        #{jobCode},#{empTel},#{empEmail},
 			#{empAddress},#{gender},SYSDATE,
-	        'Y','U'
+	        'Y',#{empAuth}
 	    )
     </insert>
 	

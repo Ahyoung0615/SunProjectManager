@@ -41,45 +41,34 @@ public class BoardService {
         // 게시글 ID 가져오기
         Integer notiCode = dao.getLastNoticeCode(); // 가장 최근의 게시글 ID를 가져옵니다.
 
-        if (notiCode == null) {
-            throw new RuntimeException("게시글 ID를 가져오는 데 실패했습니다.");
-        }
-
         // 파일 저장 및 데이터베이스에 파일 정보 저장
         if (files != null && !files.isEmpty()) {
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
-                    try {
-                        // 파일 저장
-                        String originalFilename = file.getOriginalFilename();
-                        String fileName = System.currentTimeMillis() + "_" + originalFilename;
-                        Path path = Paths.get(uploadDir, fileName);
-
-                        // 파일을 지정된 경로에 저장
-                        Files.write(path, file.getBytes());
-
-                        // 파일 정보 데이터베이스에 저장
-                        NoticeFileVo noticeFileVo = new NoticeFileVo();
-                        noticeFileVo.setNotiCode(notiCode);
-                        noticeFileVo.setNfileOriginname(originalFilename);
-                        noticeFileVo.setNfileFakename(fileName);
-                        noticeFileVo.setNfilePath(path.toString());
-                        noticeFileVo.setNfileType(file.getContentType());
-                        noticeFileVo.setNotiSize(file.getSize());
-
-                        dao.insertNoticeFile(noticeFileVo);
-                        log.info("File uploaded successfully: " + fileName);
-                    } catch (IOException e) {
-                        log.error("Error saving file: " + file.getOriginalFilename(), e);
-                        throw new IOException("Failed to save file: " + file.getOriginalFilename(), e);
-                    }
+                    saveFile(file, notiCode);
                 }
             }
-        } else {
-            log.info("No files selected for upload.");
         }
     }
 
+	public void updateBoard(NoticeVo noticeVo, List<MultipartFile> files) throws IOException {
+		//게시글 저장
+		dao.updateBoard(noticeVo);
+		
+        
+        dao.deleteFile(noticeVo.getNotiCode());
+        
+        // 새 파일 저장
+        if (files != null && !files.isEmpty()) {
+            Integer notiCode = noticeVo.getNotiCode();
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    saveFile(file, notiCode);
+                }
+            }
+        }
+	}
+	
 	public NoticeFileVo getFileByFakename(String nfileFakename) {
         return dao.getFileByFakename(nfileFakename); // 파일 정보를 데이터베이스에서 가져오는 메소드
     }
@@ -92,9 +81,6 @@ public class BoardService {
 		dao.insertBoard(noticeVo);
 	}
 	
-	public void deleteFile(String notiCode) {
-		dao.deleteFile(notiCode);
-	}
 	
 	public List<NoticeVo> boardList(){
 		return dao.boardList();
@@ -103,11 +89,25 @@ public class BoardService {
 	public NoticeVo boardDetail(String notiCode) {
 		return dao.boardDetail(notiCode);
 	}
+	private void saveFile(MultipartFile file, Integer notiCode) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        String fileName = System.currentTimeMillis() + "_" + originalFilename;
+        Path path = Paths.get(uploadDir, fileName);
+
+        Files.write(path, file.getBytes());
+
+        NoticeFileVo noticeFileVo = new NoticeFileVo();
+        noticeFileVo.setNotiCode(notiCode);
+        noticeFileVo.setNfileOriginname(originalFilename);
+        noticeFileVo.setNfileFakename(fileName);
+        noticeFileVo.setNfilePath(path.toString());
+        noticeFileVo.setNfileType(file.getContentType());
+        noticeFileVo.setNotiSize(file.getSize());
+
+        dao.insertNoticeFile(noticeFileVo);
+        log.info("File uploaded successfully: " + fileName);
+    }
 	
-	public int updateBoard(NoticeVo noticeVo) {
-		int result = dao.updateBoard(noticeVo);
-		return result > 0? 1:0;
-	}
 	
 	public int deleteBoard(NoticeVo noticeVo) {
 		int result = dao.deleteBoard(noticeVo);

@@ -28,5 +28,5 @@ public interface BoardDao {
 	
 	void insertNoticeFile(NoticeFileVo noticeFileVo);
 	
-	void deleteFile(String nfileCode);
+	void deleteFile(int notiCode);
 }
