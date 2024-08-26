@@ -91,9 +91,9 @@ const DocumentTempListComponent = () => {
                         {
                             filteredDocList.map((doc, index) =>
                                 <tr key={index}>
-                                    <td><Link to={`/documentTempDetail/${doc.edtempCode}`} >{doc.edtempCode}</Link></td>
-                                    <td>{doc.edtempTitle}</td>
-                                    <td>{doc.edtempDate}</td>
+                                    <td><Link to={`/documentTempDetail/${doc.edocCode}`} >{doc.edocCode}</Link></td>
+                                    <td>{doc.edocTitle}</td>
+                                    <td>{doc.edocDate}</td>
                                 </tr>
                             )}
                     </tbody>

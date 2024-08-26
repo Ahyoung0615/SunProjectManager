@@ -1,6 +1,6 @@
 package com.brs.sun.dto.response;
 
-public class JsTreeResponse {
+public class JsTreeResponseDTO {
 	
 	private final int id;
 	
@@ -10,7 +10,7 @@ public class JsTreeResponse {
 	
 	private final String icon;
 	
-	public JsTreeResponse(int id, String text, String parent, String icon) {
+	public JsTreeResponseDTO(int id, String text, String parent, String icon) {
 		this.id = id;
 		this.text = text;
 		this.parent = parent;

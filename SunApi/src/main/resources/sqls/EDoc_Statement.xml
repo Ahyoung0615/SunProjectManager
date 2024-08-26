@@ -31,6 +31,25 @@
 <!-- 		WHERE EDOC_TYPE = #{edocType} -->
 <!-- 	</select> -->
 	
+	<!-- 임시저장 업데이트 -->
+	<update id="updateTempEDoc">
+		UPDATE EDOC
+		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}
+		WHERE EDOC_CODE=#{edocCode}
+	</update>
+	
+	<!-- 회수 문서 재기안 업데이트 -->
+	<update id="updateEDoc">
+		UPDATE EDOC
+		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}
+		WHERE EDOC_CODE=#{edocCode}
+	</update>
+	
+	<!-- 기존 설정되어있던 결재라인 삭제 -->
+	<delete id="deleteAppList">
+		DELETE FROM EDOCLINE e WHERE EDOC_CODE = #{edocCode}
+	</delete>
+	
 	<!-- 결재 문서 기안 -->
 	<insert id="insertEDoc" parameterType="com.brs.sun.vo.EDocVo">
 		<selectKey keyProperty="edocCode" resultType="java.lang.Integer" order="BEFORE">
@@ -47,7 +66,7 @@
 		</selectKey>
 		INSERT INTO EDOC
 		(EDOC_CODE, EDOC_TYPE, EDOC_TITLE, EDOC_CONTENT, EMP_CODE, EDOC_DATE, EDOC_STATUS)
-		VALUES(#{edocCode}, #{edocType}, #{edocTitle}, #{edocContent}, #{empCode}, #{edocDate}, 'A')
+		VALUES(#{edocCode}, #{edocType}, #{edocTitle}, #{edocContent}, #{empCode}, #{edocDate}, #{edocStatus})
 	</insert>
 	
 	<!-- 결재라인 insert -->
@@ -56,11 +75,20 @@
 			(EDCL_CODE, EDOC_CODE, EMP_CODE, EDCL_STATUS)
 			<foreach collection="list" item="edocLine" index="index" separator=" UNION ALL ">
 				SELECT (SELECT NVL(MAX(EDCL_CODE), 0) + #{index} + 1 FROM EDOCLINE), 
-				#{edocLine.edocCode}, #{edocLine.empCode}, 'F'
+				#{edocLine.edocCode}, #{edocLine.empCode}, 'A'
 				FROM DUAL
 			</foreach>
 	</insert>
-		
+	
+	<!-- 나의 결재 상태 업데이트 -->
+	<update id="updateMyAppStatus">
+		UPDATE EDOCLINE 
+		SET EDCL_STATUS = 'S'
+		WHERE EDOC_CODE = #{edocCode}
+		AND EMP_CODE = #{empCode}
+	</update>
+	
+	<!-- 해당 문서의 결재자 찾기 -->
 	<select id="selectAppEmp" resultType="EDocVo">
 		SELECT *
 		FROM (
@@ -75,4 +103,91 @@
 		WHERE ch.EMP_CODE = #{edocCode}
 		AND ch.RN = 1 <!-- 첫 번째 결재자 (현재 결재 차례인 사람) -->
 	</select>
+	
+	<!-- 기안 문서 상세보기 -->
+	<select id="selectDocDetail" resultType="EDocVo">
+		SELECT *
+		FROM EDOC e
+		WHERE EDOC_CODE = #{edocCode}
+	</select>
+
+	<!-- 임시저장 상세보기 -->
+	<select id="selectTempDocDetail" resultType="EDocVo">
+		SELECT *
+		FROM EDOC e
+		WHERE EDOC_CODE = #{edocCode}
+	</select>
+	
+	<!-- 수신함 상세보기 -->
+	<select id="selectAppDocDetail" resultType="EDocVo">
+		SELECT *
+		FROM EDOC e
+		WHERE EDOC_CODE = #{edocCode}
+	</select>
+	
+	<!-- 저장된 결재선 불러오기 -->
+	<resultMap id="EDocLineResponseMap" type="com.brs.sun.dto.response.EDocLineResponseDTO">
+	    <result property="empCode" column="empCode"/>
+	    <result property="empName" column="empName"/>
+	    <result property="jobName" column="jobName"/>
+	    <result property="edclStatus" column="edclStatus"/>
+	    <result property="deptName" column="deptName"/>
+	</resultMap>
+
+	<select id="selectEDocLine" resultMap="EDocLineResponseMap">
+	    SELECT 
+	        el.EMP_CODE AS empCode,
+	        ep.EMP_NAME AS empName,
+	        j.JOB_NAME AS jobName,
+	        el.EDCL_STATUS AS edclStatus,
+	        d.DEPT_NAME AS deptName
+	    FROM EDOCLINE el
+	    JOIN EDOC e ON el.EDOC_CODE = e.EDOC_CODE 
+	    JOIN EMPLOYEE ep ON el.EMP_CODE = ep.EMP_CODE 
+	    JOIN JOB j ON ep.JOB_CODE = j.JOB_CODE 
+	    JOIN DEPARTMENT d ON ep.DEPT_CODE = d.DEPT_CODE
+	    WHERE e.EDOC_CODE = #{edocCode}
+	    ORDER BY el.EDCL_CODE
+	</select>
+
+	<!-- 결재 승인 -->
+	<update id="appSuccess">
+		UPDATE EDOCLINE 
+		SET EDCL_STATUS = 'S'
+		WHERE EDOC_CODE = #{edocCode}
+		AND EMP_CODE = #{empCode}
+	</update>
+	
+	<!-- 결재 반려 -->
+	<update id="appRejecct">
+		UPDATE EDOCLINE 
+		SET EDCL_STATUS = 'R'
+		WHERE EDOC_CODE = #{edocCode}
+		AND EMP_CODE = #{empCode}
+	</update>
+	
+	<!-- 전체 결재자 수 -->
+	<select id="appTotalCount" resultType="java.lang.Integer">
+		SELECT COUNT(EDCL_STATUS) AS TOTAL_COUNT
+		FROM EDOCLINE e 
+		WHERE EDOC_CODE = #{edocCode}
+	</select>
+	
+	<!-- 남은 결재자 -->
+	<select id="appRemCount" resultType="java.lang.Integer">
+		SELECT COUNT(EDCL_STATUS) AS REM_COUNT
+		FROM EDOCLINE e 
+		WHERE EDOC_CODE = #{edocCode}
+		AND EDCL_STATUS = 'S'
+	</select>
+	
+	<!-- 문서 상태 승인 변경 -->
+	<update id="updateSuccessDocStatus">
+		UPDATE EDOC SET EDOC_STATUS = 'S' WHERE EDOC_CODE = #{edocCode}
+	</update>
+	
+	<!-- 문서 상태 회수 변경 -->
+	<update id="updateCancelDocStatus">
+		UPDATE EDOC SET EDOC_STATUS = 'C' WHERE EDOC_CODE = #{edocCode}
+	</update>
 </mapper>

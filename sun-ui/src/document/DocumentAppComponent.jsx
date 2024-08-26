@@ -8,11 +8,11 @@ const DocumentAppComponent = () => {
 
     const [docList, setDocList] = useState([]);
     const [filteredDocList, setFilteredDocList] = useState([]);
-    const [status, setStatus] = useState("A");
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
+    const [empInfo, setEmpInfo] = useState(null);
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
@@ -20,7 +20,6 @@ const DocumentAppComponent = () => {
             try {
                 const user = JSON.parse(sessionStorageInfo);
                 setSessionEmpCode(user.empcode);
-                console.log(user.empcode);
             } catch (error) {
                 console.error("Failed to parse session storage item 'user':", error);
             }
@@ -31,9 +30,9 @@ const DocumentAppComponent = () => {
 
     useEffect(() => {
         if (sessionEmpCode !== null) {
-            selectDocList(currentPage, status);
+            selectDocList(currentPage);
         }
-    }, [currentPage, status, sessionEmpCode]);
+    }, [currentPage, sessionEmpCode]);
 
     useEffect(() => {
         if (searchTerm === "") {
@@ -61,6 +60,7 @@ const DocumentAppComponent = () => {
             setDocList(response.data.content);
             setFilteredDocList(response.data.content);
             setTotalPages(response.data.totalPages);
+            console.log("server Data: ", response.data);
         } catch (error) {
             console.error("Error fetching users:", error);
         }
@@ -68,10 +68,6 @@ const DocumentAppComponent = () => {
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
-    };
-
-    const handleStatusChange = (statusValue) => {
-        setStatus(statusValue.target.value);
     };
 
     const isEmpty = docList.length === 0;
@@ -105,7 +101,7 @@ const DocumentAppComponent = () => {
                                     <td><Link to={`/documentAppDetail/${doc.edocCode}`} >{doc.edocCode}</Link></td>
                                     <td>{doc.edocTitle}</td>
                                     <td>{doc.edocDate}</td>
-                                    <td></td>
+                                    <td>{doc.empName}</td>
                                 </tr>
                             )}
                     </tbody>

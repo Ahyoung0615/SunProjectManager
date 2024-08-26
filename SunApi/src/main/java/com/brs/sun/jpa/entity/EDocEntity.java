@@ -4,9 +4,12 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -46,8 +49,8 @@ public class EDocEntity {
     private String eDocContent;
 
     // 기안자 사번
-    @Column(name = "EMP_CODE")
-    private Integer empCode;
+    // @Column(name = "EMP_CODE")
+    // private Integer empCode;
 
     // 기안 날짜
     @Column(name = "EDOC_DATE")
@@ -57,5 +60,8 @@ public class EDocEntity {
     @Column(name = "EDOC_STATUS")
     private String eDocStatus;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "EMP_CODE", referencedColumnName = "EMP_CODE")
+    private EmployeeEntity employee;
     
 }

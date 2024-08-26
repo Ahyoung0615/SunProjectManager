@@ -99,12 +99,6 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- 웹소켓 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-
 		<!-- gson JSON 변환 라이브러리 -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
