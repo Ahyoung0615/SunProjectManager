@@ -208,7 +208,7 @@ const DocumentTempDetailComponent = () => {
 
     console.log("Submitting data:", data); // 데이터 확인
 
-    axios.post("http://localhost:8787/api/edoc/tempDocUpdate", data)
+    axios.post("http://localhost:8787/api/edoc/docUpdate", data)
         .then((response) => {
             console.log("Response:", response); // 서버 응답 확인
             navigate('/documentList');

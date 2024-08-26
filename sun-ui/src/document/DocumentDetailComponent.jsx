@@ -69,12 +69,10 @@ const DocumentTempDetailComponent = () => {
     }, [weekdayCount, dayOffLeft]);
 
     useEffect(() => {
-        console.log(edocCode);
         if (edocCode) {
             axios.get("http://localhost:8787/api/edoc/docDetail", { params: { edocCode } })
                 .then((res) => {
                     const tempJsonData = JSON.parse(res.data.edocContent);
-                    console.log(res.data.edocContent);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
@@ -83,7 +81,6 @@ const DocumentTempDetailComponent = () => {
                     const serverDocDate = new Date(res.data.edocDate);
                     const formattedDate =  `${serverDocDate.getFullYear()}년 ${String(serverDocDate.getMonth() + 1).padStart(2, '0')}월 ${String(serverDocDate.getDate()).padStart(2, '0')}일`;
                     setCurrentDate(formattedDate);
-                    // setIsEditMode(res.data.edocStatus === 'C');
                 })
                 .catch((error) => console.log(error));
 
@@ -91,7 +88,6 @@ const DocumentTempDetailComponent = () => {
                 .then((res) => {
                     const approvers = res.data;
                     if (sessionEmpCode) {
-                        // Add session employee info at the start of the approvers list
                         const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
                         const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
                         setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
@@ -110,7 +106,6 @@ const DocumentTempDetailComponent = () => {
             const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff", { params: { empCode } });
             const empData = response.data;
             const dayOff = dayOffData.data;
-            console.log("dayOff:", dayOff);
             setDayOffLeft(dayOff);
             setEmpInfo(empData);
             setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
@@ -185,22 +180,54 @@ const DocumentTempDetailComponent = () => {
             if (b.empCode == sessionEmpCode) return 1;
             return 0;
         });
+        console.log(sortedApprovers);
         setSelectedApprovers(sortedApprovers);
     };
 
     const handleSubmit = () => {
-        const data = {
-            edocStatus : 'C',
-            edocCode : edocCode
-        };
+        if (isEditMode) {
+            // 수정 모드일 때는 "기안" 버튼 클릭 시 제출 처리
+            if (!startDate || !endDate || !reason || !docTitle || !selectedApprovers.length || !weekdayCount || balanceError) {
+                alert("필수값을 모두 입력해 주세요");
+                return;
+            }
 
-        axios.post("http://localhost:8787/api/edoc/updateStatus", data)
-            .then((response) => {
-                console.log("Response:", response); // 서버 응답 확인
+            const date = new Date();
+            const serverSendDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+            const data = {
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
+                reason,
+                weekdayCount,
+                docTitle,
+                docStatus: "A",
+                docCode: edocCode,
+                uploadDate: serverSendDate,
+                empCode: sessionEmpCode,
+                approvers: selectedApprovers.map(approver => approver.empCode)
+            };
+
+            axios.post("http://localhost:8787/api/edoc/docUpdate", data)
+                .then((response) => {
+                    navigate('/documentList');
+                })
+                .catch((error) => {
+                    console.log("Error:", error);
+                });
+        } else {
+            // 비수정 모드일 때는 "재기안" 버튼 클릭 시 수정 모드로 전환
+            setIsEditMode(true);
+        }
+    };
+
+    const handleCancel = () => {
+        axios.post(`http://localhost:8787/api/edoc/docCancel?edocCode=${edocCode}`)
+            .then(() => {
                 navigate('/documentList');
             })
             .catch((error) => {
-                console.log("Error:", error); // 오류 확인
+                console.log("Error:", error);
             });
     };
 
@@ -212,11 +239,6 @@ const DocumentTempDetailComponent = () => {
         return '';
     };
 
-    const toggleEditMode = () => {
-        setIsEditMode(prevMode => !prevMode);
-    };
-
-    // Count approvers with edclStatus 'S'
     const countApproversWithStatusS = () => {
         return selectedApprovers.filter(approver => approver.edclStatus === 'S').length;
     };
@@ -249,7 +271,7 @@ const DocumentTempDetailComponent = () => {
                         <tr>
                             {selectedApprovers.map((approver) => (
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                    {approver.edclStatus == 'S' ? (
+                                    {approver.edclStatus === 'S' ? (
                                         <img
                                             src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png'
                                             alt='싸인'
@@ -351,20 +373,30 @@ const DocumentTempDetailComponent = () => {
             <div
                 className={styles.buttonContainer}
                 style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
-                {countApproversWithStatusS() < 2 && (
+                {countApproversWithStatusS() < 2 && edocStatus === 'A' && (
                     <input
                         type='button'
                         value="회수"
-                        onClick={handleSubmit}
+                        onClick={handleCancel}
                         className={styles.vacationDocSubmitButton}
                         style={{ marginLeft: '10px', backgroundColor: '#FF6F6F', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }} />
                 )}
-                {edocStatus == 'C' && (
-                    <input type='button'
-                    value="재기안"
-                    onClick={handleSubmit}
-                    className={styles.vacationDocSubmitButton}
-                    style={{ marginLeft: '10px', backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}/>
+                {isEditMode ? (
+                    <input
+                        type='button'
+                        value="기안"
+                        onClick={handleSubmit}
+                        className={styles.vacationDocSubmitButton}
+                        style={{ marginLeft: '10px', backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }} />
+                ) : (
+                    edocStatus === 'C' && (
+                        <input
+                            type='button'
+                            value="수정"
+                            onClick={handleSubmit}
+                            className={styles.vacationDocSubmitButton}
+                            style={{ marginLeft: '10px', backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }} />
+                    )
                 )}
             </div>
         </div>

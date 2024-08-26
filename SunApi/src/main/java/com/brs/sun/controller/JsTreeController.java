@@ -62,8 +62,15 @@ public class JsTreeController {
 	 */
 	@PostMapping("/empList")
 	public List<EmployeeVo> getApprovers(@RequestBody List<String> choiceList) {
-		log.info("choiceArr: {}", choiceList);
-		List<EmployeeVo> approverList = service.getApprovers(choiceList);
-		return approverList;
+	    log.info("choiceArr: {}", choiceList);
+	    
+	    // Approver 리스트를 가져옵니다.
+	    List<EmployeeVo> approverList = service.getApprovers(choiceList);
+	    
+	    // jobCode에 따라 내림차순으로 정렬합니다.
+	    approverList.sort((e1, e2) -> Integer.compare(e2.getJobCode(), e1.getJobCode()));
+	    
+	    return approverList;
 	}
+
 }

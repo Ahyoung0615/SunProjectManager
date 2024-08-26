@@ -1,135 +1,149 @@
-import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import Login from './login/LoginComponent';
-import AccessComponent from './login/AccessComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-import MainContentComponent from './maincontent/MainContentComponent';
-import MyPageComponent from './mypage/MyPageComponent';
-import AttendenceComponent from './attendence/AttendenceComponent';
-import VacationListComponent from './vacation/VacationListComponent';
-import TimeTableListComponent from './timetable/TimeTableListComponent';
-import ReservationFormComponent from './reservation/ReservationFormComponent';
-import BTripListComponent from './btrip/BTripListComponent';
-import BTripFormComponent from './btrip/BTripFormComponent';
-import FDeliveryRsvFormComponent from './fdelivery/FDeliveryRsvFormComponent';
-import DocumentListComponent from './document/DocumentListComponent';
-import DocumentDetailComponent from './document/DocumentDetailComponent';
-import DocumentAppComponent from './document/DocumentAppComponent';
-import DocumentAppDetailComponent from './document/DocumentAppDetailComponent';
-import DocumentInsertComponent from './document/DocumentInsertComponent';
-import MemberListComponent from './member/MemberListComponent';
-import MemberDetailComponent from './member/MemberDetailComponent';
-import MemberUpdateComponent from './member/MemberUpdateComponent';
-import MemberAddComponent from './member/MemberAddComponent';
-import NewEmp from './member/NewEmp';
-import VehicleListComponent from './vehicle/VehicleListComponent';
-import BoardListComponent from './board/BoardListComponent';
-import ChatSunComponent from './chat/ChatSunComponent';
 import HeaderTopComponent from './layout/HeaderTopComponent';
 import HeaderSideComponent from './layout/HeaderSideComponent';
 import FooterComponent from './layout/FooterComponent';
-import FDeliveryRsvListComponent from './fdelivery/FDeliveryRsvListComponent';
-import FDeliveryListComponent from './fdelivery/FDeliveryListComponent';
-import FDeliveryNowDetailComponent from './fdelivery/FDeliveryNowDetailComponent';
-import FVehicleListComponent from './fvehicle/FVehicleListComponent';
-import FVehicleFormComponent from './fvehicle/FVehicleFormComponent';
-import FDeliveryDetailComponent from './fdelivery/FDeliveryDetailComponent';
 import RenderingScrollTopComponent from './commodule/RenderingScrollTopComponent';
-import VehicleDetailComponent from './vehicle/VehicleDetailComponent';
-import BTripDetailComponent from './btrip/BTripDetailComponent';
-import VehicleRentDetailComponent from './vehicle/VehicleRentDetailComponent';
-import VehicleRentListComponent from './vehicle/VehicleRentListComponent';
-import VehicleFormComponent from './vehicle/VehicleFormComponent';
-import FVehicleDetailComponent from './fvehicle/FVehicleDetailComponent';
 import Error404Component from './error/Error404Component';
 
+// Admin Protected Components
+import {
+    AdMemberDetail,
+    AdMemberList,
+    AdMemberUpdate,
+    AdMemberAdd,
+    AdRepairList,
+    AdVehicleDetail,
+    AdVehicleForm,
+    AdVehicleList,
+    AdVehicleRentDetail,
+    AdVehicleRentForm,
+    AdVehicleRentList,
+    AdVehicleRepairForm
+} from './access/AdminProtectedComponent';
 
-import FileUploadTest from './document/FileUploadTest';
-import DocumentTempListComponent from './document/DocumentTempListComponent';
-import DocumentTempDetailComponent from './document/DocumentTempDetailComponent';
+// User Protected Components
+import {
+    AUAttendence,
+    AUBoardList,
+    AUBTripDetail,
+    AUBTripForm,
+    AUBTripList,
+    AUChatSun,
+    AUChatRoom,
+    AUCalendar,
+    AUDateTime,
+    AUNowTime,
+    AUModal,
+    AUOrgChart,
+    AUPagination,
+    AUCoWork,
+    AUCoWorkMap,
+    AUDocumentApp,
+    AUDocumentDetail,
+    AUDocumentAppDetail,
+    AUDocumentInsert,
+    AUDocumentList,
+    AUDocumentTempDetail,
+    AUDocumentTempList,
+    AUExpenseApproval,
+    AUFileUploadTest,
+    AUVacationDoc,
+    AUFDeliveryCalRsvList,
+    AUFDeliveryDetail,
+    AUFDeliveryList,
+    AUFDeliveryNowDetail,
+    AUFDeliveryNowList,
+    AUFDeliveryRsvForm,
+    AUFDeliveryRsvList,
+    AUFVehicleDetail,
+    AUFVehicleForm,
+    AUFVehicleList,
+    AUMainContent,
+    AUMyPage,
+    AUTimeTableList,
+    AUVacationList
+} from './access/AccessUserProtectedComponent';
 
 function App() {
-    const [sessionAccess, setSessionAccess] = useState(false);
-
-    useEffect(() => {
-        const value = sessionStorage.getItem('user');
-        setSessionAccess(value !== null);
-    }, []);
-
-    const renderComponent = (Component) => {
-        return sessionAccess ? <Component /> : <Error404Component />;
-
-    };
-
-    const sessionComponent = (Component) => {
-        return sessionAccess ? <Component /> : <Login />;
-    }
 
     return (
         <Router>
             <RenderingScrollTopComponent />
             <div className="sb-nav-fixed">
-                <HeaderTopComponent />
+            <HeaderTopComponent />
                 <div id="layoutSidenav">
                     <div id="layoutSidenav_nav">
                         <HeaderSideComponent />
-
                     </div>
                     <div id="layoutSidenav_content">
                         <main>
                             <Routes>
-                                <Route path="/" element={<Login />} />
-                                <Route path="/access" element={<AccessComponent />} />
-                                <Route path="/home" element={sessionComponent(MainContentComponent)} />
-                                <Route path="/myPage" element={renderComponent(MyPageComponent)} />
+                                {/* Public Routes */}
+                                <Route path="/" element={<Login/>} />
 
-                                <Route path="/attendence" element={renderComponent(AttendenceComponent)} />
-                                <Route path="/vacationList" element={renderComponent(VacationListComponent)} />
-                                <Route path="/timeTableList" element={renderComponent(TimeTableListComponent)} />
-                                <Route path="/reservationForm" element={renderComponent(ReservationFormComponent)} />
+                                {/* User Protected Routes */}
+                                <Route path="/home" element={<AUMainContent />} />
+                                <Route path="/myPage" element={<AUMyPage />} />
+                                <Route path="/attendence" element={<AUAttendence />} />
+                                <Route path="/vacationList" element={<AUVacationList />} />
+                                <Route path="/timeTableList" element={<AUTimeTableList />} />
 
-                                <Route path="/bTripList" element={renderComponent(BTripListComponent)} />
-                                <Route path="/bTripForm" element={renderComponent(BTripFormComponent)} />
-                                <Route path="/bTripDetail/:btripCode" element={renderComponent(BTripDetailComponent)} />
+                                {/* Admin Protected Routes */}
+                                <Route path="/memberList" element={<AdMemberList />} />
+                                <Route path="/memberDetail/:empCode" element={<AdMemberDetail />} />
+                                <Route path="/memberUpdate/:empCode" element={<AdMemberUpdate />} />
+                                <Route path="/memberAdd" element={<AdMemberAdd />} />
+                                <Route path="/vehicleList" element={<AdVehicleList />} />
+                                <Route path="/vehicleDetail/:vehicleCode" element={<AdVehicleDetail />} />
+                                <Route path="/vehicleRentList" element={<AdVehicleRentList />} />
+                                <Route path="/vehicleRentDetail/:vrentCode" element={<AdVehicleRentDetail />} />
+                                <Route path="/vehicleForm" element={<AdVehicleForm />} />
+                                <Route path="/vehicleRepairForm" element={<AdVehicleRepairForm />} />
+                                <Route path="/repairList" element={<AdRepairList />} />
 
-                                <Route path="/fDeliveryList" element={renderComponent(FDeliveryListComponent)} />
-                                <Route path="/fDeliveryNowDetail/:fdelcode" element={renderComponent(FDeliveryNowDetailComponent)} />
-                                <Route path="/fDeliveryDetail/:fdelcode" element={renderComponent(FDeliveryDetailComponent)} />
-                                <Route path="/fDeliveryRsvList" element={renderComponent(FDeliveryRsvListComponent)} />
-                                <Route path="/fDeliveryRsvForm" element={renderComponent(FDeliveryRsvFormComponent)} />
+                                {/* User Protected Routes Continued */}
+                                <Route path="/boardList" element={<AUBoardList />} />
+                                <Route path="/chatSun" element={<AUChatSun />} />
+                                <Route path="/chatRoom/:chatroomCode" element={<AUChatRoom/>} />
+                                <Route path="/bTripList" element={<AUBTripList />} />
+                                <Route path="/bTripForm" element={<AUBTripForm />} />
+                                <Route path="/bTripDetail/:btripCode" element={<AUBTripDetail />} />
+                                <Route path="/calendar" element={<AUCalendar />} />
+                                <Route path="/dateTime" element={<AUDateTime />} />
+                                <Route path="/nowTime" element={<AUNowTime />} />
+                                <Route path="/modal" element={<AUModal />} />
+                                <Route path="/orgChart" element={<AUOrgChart />} />
+                                <Route path="/pagination" element={<AUPagination />} />
+                                <Route path="/coWork" element={<AUCoWork />} />
+                                <Route path="/coWorkMap" element={<AUCoWorkMap />} />
+                                <Route path="/documentAppList" element={<AUDocumentApp />} />
+                                <Route path="/documentDetail/:edocCode" element={<AUDocumentDetail />} />
+                                <Route path="/documentAppDetail/:edocCode" element={<AUDocumentAppDetail />} />
+                                <Route path="/documentInsert" element={<AUDocumentInsert />} />
+                                <Route path="/documentList" element={<AUDocumentList />} />
+                                <Route path="/documentTempDetail/:edtempCode" element={<AUDocumentTempDetail />} />
+                                <Route path="/documentTempList" element={<AUDocumentTempList />} />
+                                <Route path="/expenseApproval" element={<AUExpenseApproval />} />
+                                <Route path="/fileUploadTest" element={<AUFileUploadTest />} />
+                                <Route path="/vacationDoc" element={<AUVacationDoc />} />
+                                <Route path="/fDeliveryCalRsvList" element={<AUFDeliveryCalRsvList />} />
+                                <Route path="/fDeliveryDetail/:fdelcode" element={<AUFDeliveryDetail />} />
+                                <Route path="/fDeliveryList" element={<AUFDeliveryList />} />
+                                <Route path="/fDeliveryNowDetail/:fdelcode" element={<AUFDeliveryNowDetail />} />
+                                <Route path="/fDeliveryNowList" element={<AUFDeliveryNowList />} />
+                                <Route path="/fDeliveryRsvForm" element={<AUFDeliveryRsvForm />} />
+                                <Route path="/fDeliveryRsvList" element={<AUFDeliveryRsvList />} />
+                                <Route path="/fVehicleDetail/:fvehiclecode" element={<AUFVehicleDetail />} />
+                                <Route path="/fVehicleForm" element={<AUFVehicleForm />} />
+                                <Route path="/fVehicleList" element={<AUFVehicleList />} />
 
-                                <Route path="/documentList" element={renderComponent(DocumentListComponent)} />
-                                <Route path="/documentDetail/:edocCode" element={renderComponent(DocumentDetailComponent)} />
-                                <Route path="/documentAppList" element={renderComponent(DocumentAppComponent)} />
-                                <Route path="/documentAppDetail" element={renderComponent(DocumentAppDetailComponent)} />
-                                <Route path='/documentTempList' element={renderComponent(DocumentTempListComponent)} />
-                                <Route path='/documentTempDetail/:edtempCode' element={renderComponent(DocumentTempDetailComponent)} />
-                                <Route path="/documentInsertForm" element={renderComponent(DocumentInsertComponent)} />
-
-                                <Route path="/memberList" element={renderComponent(MemberListComponent)} />
-                                <Route path="/memberDetail/:empCode" element={renderComponent(MemberDetailComponent)} />
-                                <Route path="/memberUpdate/:empCode" element={renderComponent(MemberUpdateComponent)} />
-                                <Route path="/memberAdd" element={renderComponent(MemberAddComponent)} />
-                                <Route path="/NewEmp" element={renderComponent(NewEmp)} />
-
-                                <Route path="/vehicleList" element={renderComponent(VehicleListComponent)} />
-                                <Route path="/vehicleDetail/:vehicleCode" element={renderComponent(VehicleDetailComponent)} />
-                                <Route path="/vehicleRentList" element={renderComponent(VehicleRentListComponent)} />
-                                <Route path="/vehicleRentDetail/:vrentCode" element={renderComponent(VehicleRentDetailComponent)} />
-                                <Route path="/vehicleForm" element={renderComponent(VehicleFormComponent)} />
-
-                                <Route path="/fVehicleList" element={renderComponent(FVehicleListComponent)} />
-                                <Route path="/fVehicleForm" element={renderComponent(FVehicleFormComponent)} />
-                                <Route path="/fVehicleDetail/:fvehiclecode" element={renderComponent(FVehicleDetailComponent)} />
-
-                                <Route path="/boardList" element={renderComponent(BoardListComponent)} />
-                                <Route path="/chatSun" element={renderComponent(ChatSunComponent)} />
-
-                                {/* fileUpload Test */}
-                                <Route path='/fileTest' element={FileUploadTest} />
-
+                                {/* Fallback Route */}
                                 <Route path="/*" element={<Error404Component />} />
                             </Routes>
                         </main>

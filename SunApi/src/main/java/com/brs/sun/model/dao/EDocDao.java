@@ -17,7 +17,7 @@ public interface EDocDao {
 	
 	boolean updateMyAppStatus(EDocVo vo);
 	
-	boolean updateTempEDoc(EDocVo vo);
+	boolean updateEDoc(EDocVo vo);
 	
 	boolean deleteAppList(EDocVo vo);
 	
@@ -29,7 +29,11 @@ public interface EDocDao {
 	
 	boolean appSuccess(Map<String, Object> map);
 	
+	boolean appRejecct(Map<String, Object> map);
+	
 	boolean updateSuccessDocStatus(int edocCode);
+	
+	boolean updateCancelDocStatus(int edocCode);
 	
 	// 전체 결재자 수
 	int appTotalCount (int edocCode);

@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import styles from '../css/VacationDocComponent.module.css';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import OrgChartComponent from '../commodule/OrgChartComponent';
 import { useNavigate, useParams } from 'react-router-dom';
+import ModalComponent from '../commodule/ModalComponent';
+import styles from '../css/VacationDocComponent.module.css';
 
 const DocumentAppDetailComponent = () => {
     const navigate = useNavigate();
@@ -12,7 +10,6 @@ const DocumentAppDetailComponent = () => {
 
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
-    const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
     const [currentDate, setCurrentDate] = useState('');
     const [weekdayCount, setWeekdayCount] = useState(null);
     const [selectedApprovers, setSelectedApprovers] = useState([]);
@@ -22,6 +19,8 @@ const DocumentAppDetailComponent = () => {
     const [docTitle, setDocTitle] = useState('');
     const [docCode, setDocCode] = useState();
     const [edocStatus, setEdocStatus] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [rejectReason, setRejectReason] = useState('');
 
     useEffect(() => {
         const today = new Date();
@@ -43,28 +42,23 @@ const DocumentAppDetailComponent = () => {
     }, []);
 
     useEffect(() => {
-        console.log(edocCode);
         if (edocCode) {
             axios.get("http://localhost:8787/api/edoc/docDetail", { params: { edocCode } })
                 .then((res) => {
                     setEdocStatus(res.data.edocStatus);
                     const tempJsonData = JSON.parse(res.data.edocContent);
-                    console.log(res.data.edocContent);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
                     setDocTitle(res.data.edocTitle);
-                    // setIsEditMode(res.data.edocStatus === 'C');
                 })
                 .catch((error) => console.log(error));
 
             axios.get("http://localhost:8787/api/edoc/getEDocAppList", { params: { edocCode } })
                 .then((res) => {
                     const approvers = res.data;
-                    console.log(res.data);
                     setEmpInfo(res.data[0]);
                     if (sessionEmpCode) {
-                        // Add session employee info at the start of the approvers list
                         const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
                         const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
                         setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
@@ -84,23 +78,61 @@ const DocumentAppDetailComponent = () => {
         };
 
         axios.post("http://localhost:8787/api/edoc/appSuccess", data)
-            .then((response) => {
-                console.log("Response:", response); // 서버 응답 확인
-                navigate('/documentAppList');
-            })
-            .catch((error) => {
-                console.log("Error:", error); // 오류 확인
-            });
+            .then(() => navigate('/documentAppList'))
+            .catch((error) => console.error("Error:", error));
     };
 
     const handleReject = () => {
-        console.log("반려");
+        setShowModal(true); // 반려 버튼 클릭 시 모달을 띄웁니다
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const handleRejectSubmit = () => {
+        const data = {
+            edocCode: edocCode,
+            empCode: sessionEmpCode,
+            empName: empInfo.empName,
+            jobName: empInfo.jobName,
+            deptName: empInfo.deptName,
+            reason: rejectReason,
+            rejectDate: currentDate
+        };
+
+        axios.post("http://localhost:8787/api/edoc/appReject", data)
+            .then(() => {
+                closeModal();
+                navigate('/documentAppList');
+            })
+            .catch((error) => console.error("Error:", error));
     };
 
     return (
         <div className={styles.vacationDocContainer}>
+            <ModalComponent
+                open={showModal}
+                close={closeModal}
+                title="반려 사유 입력"
+                body={
+                    <div>
+                        <p>반려 사유를 입력해주세요:</p>
+                        <textarea
+                            rows="4"
+                            cols="50"
+                            placeholder="반려 사유를 입력하세요..."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                        />
+                        <div style={{ marginTop: '10px', textAlign: 'right' }}>
+                            <button onClick={handleRejectSubmit} style={{ marginRight: '10px' }}>확인</button>
+                        </div>
+                    </div>
+                }
+                size="lg"
+            />
             <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
-
             <form>
                 <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
                     <thead>
@@ -116,7 +148,7 @@ const DocumentAppDetailComponent = () => {
                         <tr>
                             {selectedApprovers.map((approver) => (
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                    {approver.edclStatus == 'S' ? (
+                                    {approver.edclStatus === 'S' ? (
                                         <img
                                             src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png'
                                             alt='싸인'
@@ -178,7 +210,7 @@ const DocumentAppDetailComponent = () => {
                 className={styles.buttonContainer}
                 style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
 
-                {/* 반려 버튼 추가 */}
+                {/* 반려 버튼 */}
                 <input
                     type='button'
                     value="반려"
@@ -213,7 +245,6 @@ const DocumentAppDetailComponent = () => {
                     }}
                 />
             </div>
-
         </div>
     );
 };
