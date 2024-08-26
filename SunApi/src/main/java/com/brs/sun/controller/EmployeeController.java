@@ -111,9 +111,14 @@ public class EmployeeController {
 		    int empDeptStr = Integer.parseInt(empDept);
 		 // EmployeeVo 객체 생성
 		    EmployeeVo employeeVo = new EmployeeVo();
+		    if(empDept.equals("1") || empDept.equals("11")) {
+		    	employeeVo.setEmpAuth("A");
+		    }else {
+		    	employeeVo.setEmpAuth("U");
+		    }
 		    employeeVo.setEmpName(empName);
-		    employeeVo.setDeptCode(empJobStr);
-		    employeeVo.setJobCode(empDeptStr);
+		    employeeVo.setDeptCode(empDeptStr);
+		    employeeVo.setJobCode(empJobStr);
 		    employeeVo.setGender(gender);
 		    employeeVo.setEmpTel(empTel);
 		    employeeVo.setEmpEmail(empEmail);

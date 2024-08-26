@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.MediaType;
@@ -48,7 +49,9 @@ public class BoardController {
 			@RequestParam("notiContent") String notiContent, @RequestParam("empCode") String empCode,
 			@RequestParam("notiStatus") String notiStatus,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
-
+		if (files == null) {
+		    files = new ArrayList<>();
+		}
 		
 		// 파일 크기 검토
 	    for (MultipartFile file : files) {
@@ -56,14 +59,12 @@ public class BoardController {
 	            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("파일 크기가 너무 큽니다. 최대 크기는 5MB입니다.");
 	        }
 	    }
-		
 		int empCodeInt = Integer.parseInt(empCode);
 		NoticeVo vo = new NoticeVo();
 		vo.setNotiTitle(notiTitle);
 		vo.setNotiContent(notiContent);
 		vo.setEmpCode(empCodeInt);
 		vo.setNotiStatus(notiStatus);
-		
 		try {
 			service.insertBoard(vo, files);
 			return ResponseEntity.ok("게시글 및 파일 업로드가 완료되었습니다.");
@@ -86,7 +87,6 @@ public class BoardController {
 				if (contentType == null) {
 					contentType = "application/octet-stream"; // 기본 MIME 타입 설정
 				}
-
 				return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 						.header(HttpHeaders.CONTENT_DISPOSITION,
 								"attachment; filename=\"" + resource.getFilename() + "\"")
@@ -113,15 +113,27 @@ public class BoardController {
 	@PostMapping("updateBoard/{notiCode}")
 	public ResponseEntity<String> updateBoard(@PathVariable String notiCode,
 			@RequestParam("notiTitle") String notiTitle, @RequestParam("notiContent") String notiContent,
-			@RequestParam("notiStatus") String notiStatus) {
-
+			@RequestParam("notiStatus") String notiStatus,
+			@RequestParam(value = "files", required = false) List<MultipartFile> files) throws IOException {
+		
+		if (files == null) {
+		    files = new ArrayList<>();
+		}
+		
+		// 파일 크기 검토
+	    for (MultipartFile file : files) {
+	        if (file.getSize() > 5 * 1024 * 1024) { // 5MB
+	            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("파일 크기가 너무 큽니다. 최대 크기는 5MB입니다.");
+	        }
+	    }
+		
 		int notiCodeStr = Integer.parseInt(notiCode);
 		NoticeVo vo = new NoticeVo();
 		vo.setNotiTitle(notiTitle);
 		vo.setNotiContent(notiContent);
 		vo.setNotiStatus(notiStatus);
 		vo.setNotiCode(notiCodeStr);
-		service.updateBoard(vo);
+		service.updateBoard(vo, files);
 		return ResponseEntity.ok("게시글이 수정 되었습니다");
 	}
 

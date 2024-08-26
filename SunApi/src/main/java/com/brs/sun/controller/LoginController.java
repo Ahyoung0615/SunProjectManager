@@ -43,10 +43,15 @@ public class LoginController {
 		String authorities = authentication.getAuthorities().toString();
 		EmployeeVo vo = employeeService.getOneMember(empcode);
 		String empName = vo.getEmpName();
+		int jobCodeInt = vo.getJobCode(); 
+		int deptCodeInt = vo.getDeptCode(); 
+		String jobCode = String.valueOf(jobCodeInt);
+		String deptCode = String.valueOf(deptCodeInt);
 		log.info("로그인한 유저 아이디:" + empcode);
         log.info("유저 권한:" + authentication.getAuthorities());
+        
 
-        Map<String, String> login = createUserInfo(empcode, authorities, empName);
+        Map<String, String> login = createUserInfo(empcode, authorities, empName, jobCode , deptCode);
 
         messagingTemplate.convertAndSend("/topic/login", login);
 		
@@ -85,11 +90,13 @@ public class LoginController {
         log.info("로그아웃 완료 {}", cookie);
         return ResponseEntity.ok().build();
     }
-	private Map<String, String> createUserInfo(String empcode, String authorities, String empName) {
+	private Map<String, String> createUserInfo(String empcode, String authorities, String empName, String jobCode, String deptCode) {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("empcode", empcode);
         userInfo.put("authorities", authorities);
         userInfo.put("empName", empName);
+        userInfo.put("jobCode", jobCode);
+        userInfo.put("deptCode", deptCode);
         return userInfo;
     }
 	
@@ -108,8 +115,14 @@ public class LoginController {
                         String empcode = authentication.getName();
                         EmployeeVo vo = employeeService.getOneMember(empcode);
                 		String empName = vo.getEmpName();
+                		int jobCodeInt = vo.getJobCode(); 
+                		int deptCodeInt = vo.getDeptCode(); 
+                		String jobCode = String.valueOf(jobCodeInt);
+                		String deptCode = String.valueOf(deptCodeInt);
                         response.put("empcode", empcode);
                         response.put("empName", empName); // 사용자 이름 등 추가 정보
+                        response.put("jobCode", jobCode);
+                        response.put("deptCode", deptCode);
                         response.put("authorities", authentication.getAuthorities().toString());
                         return ResponseEntity.ok(response);
                     }

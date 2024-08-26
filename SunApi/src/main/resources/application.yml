@@ -16,11 +16,11 @@ spring:
         format_sql: true
   web:
     websocket:
-      enabled: true 
-#      spring.jpa.properties.hibernate.format_sql=true
-# WebSocket 설정
-
-      
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 15MB
           
 server:
   servlet:
@@ -31,6 +31,9 @@ server:
     session:
       timeout: 1h
   port: 8787
+  tomcat:
+    max-http-form-post-size: 52428800 # 50MB
+    max-swallow-size: 104857600  # 100MB
   
 mybatis:
   type-aliases-package: com.brs.sun.vo

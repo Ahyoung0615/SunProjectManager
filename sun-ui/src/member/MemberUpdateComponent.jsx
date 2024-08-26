@@ -196,12 +196,14 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                             <option value="V">휴가</option>
                         </Form.Control>
                     </Form.Group>
+                    <div>
                     <Button variant="secondary" onClick={handleClose}>
                         닫기
                     </Button>
                     <Button variant="primary" type="submit">
                         수정
                     </Button>
+                    </div>
                 </Form>
             </Modal.Body>
         </Modal>

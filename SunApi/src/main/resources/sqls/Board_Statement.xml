@@ -24,13 +24,13 @@
 	<select id="getFile">
 		SELECT *
 		FROM NOTICEFILE
-		WHERE NOTI_CODE = #{notiCode}
+		WHERE NOTI_CODE = #{notiCode} AND NFILE_DELFLAG = 'N'
 	</select>
 	<!-- 저장 파일 이름으로 정보가져오기 -->
 	<select id="getFileByFakename" resultType="NoticeFileVo">
 	    SELECT *
 	    FROM NOTICEFILE
-	    WHERE NFILE_FAKENAME = #{nfileFakename}
+	    WHERE NFILE_FAKENAME = #{nfileFakename} AND NFILE_DELFLAG = 'N'
 	</select>
     <!-- 파일 저장 -->
     <insert id="insertNoticeFile">
@@ -52,10 +52,13 @@
     		NFILE_CODE= #{nfileCode}
     </update>
     <!-- 게시글 파일 삭제 -->
-    <delete id="deleteFile">
-	    DELETE FROM NOTICEFILE
-	    WHERE NFILE_CODE = #{nfileCode}
-	</delete>
+    <update id="deleteFile">
+	    UPDATE NOTICEFILE
+    	SET
+			NFILE_DELFLAG = 'Y' 
+    	WHERE
+    		NOTI_CODE = #{notiCode} AND NFILE_DELFLAG = 'N'
+	</update>
 	<!-- 게시판 리스트 -->
 	<select id="boardList" resultType="NoticeVo">
 		SELECT *

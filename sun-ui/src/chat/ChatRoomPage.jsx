@@ -56,10 +56,12 @@ const ChatRoomComponent = () => {
                 client.subscribe(`/topic/chatRoom/${chatroomCode}`, (message) => {
                     try {
                         const parsedMessage = JSON.parse(message.body);
-                        // 메시지가 중복되지 않도록 조건을 추가
-                        if (!messages.find(msg => msg.chatCode === parsedMessage.chatCode)) {
-                            setMessages((prevMessages) => [...prevMessages, parsedMessage]);
-                        }
+                        setMessages((prevMessages) => {
+                            if (!prevMessages.some(msg => msg.chatCode === parsedMessage.chatCode)) {
+                                return [...prevMessages, parsedMessage];
+                            }
+                            return prevMessages;
+                        });
                     } catch (error) {
                         console.error('Error parsing message:', error);
                     }
@@ -84,7 +86,7 @@ const ChatRoomComponent = () => {
                 client.deactivate();
             }
         };
-    }, [chatroomCode, messages]);
+    }, [chatroomCode]);
 
     const handleSendMessage = () => {
         if (stompClient && isConnected && inputMessage.trim() !== '') {
@@ -97,12 +99,6 @@ const ChatRoomComponent = () => {
                 chatSender: emp?.empName || 'Anonymous',
                 chatTime: chatTime // ISO 문자열로 설정
             };
-
-            // 클라이언트에서 메시지 상태를 추가하여 즉시 렌더링
-            // setMessages((prevMessages) => [
-            //     ...prevMessages,
-            //     chatMessage // 전송 직후, 한국 시간 포함
-            // ]);
 
             stompClient.publish({
                 destination: `/app/chat.sendMessage/${chatroomCode}`,
