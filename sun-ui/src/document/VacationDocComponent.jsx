@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // datepicker 스타일
 import styles from '../css/VacationDocComponent.module.css';
@@ -6,13 +6,38 @@ import axios from 'axios';
 import OrgChartComponent from '../commodule/OrgChartComponent';
 import { useNavigate } from 'react-router-dom';
 
+// 날짜 포맷 함수
+const formatLocalDate = (date) => {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// 날짜를 로컬 시작 시간으로 조정
+const adjustDateToLocalStart = (date) => {
+    if (!date) return new Date();
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    return adjustedDate;
+};
+
+// 날짜를 로컬 종료 시간으로 조정
+const adjustDateToLocalEnd = (date) => {
+    if (!date) return new Date();
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(23, 59, 59, 999); // 시간을 23:59:59.999로 설정
+    return adjustedDate;
+};
+
 const VacationDocComponent = () => {
     const navigate = useNavigate();
 
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
     const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
-    const [currentDate, setCurrentData] = useState('');
+    const [currentDate, setCurrentDate] = useState('');
     const [weekdayCount, setWeekdayCount] = useState(null);
     const [dateError, setDateError] = useState('');
     const [selectedApprovers, setSelectedApprovers] = useState([]);
@@ -26,11 +51,10 @@ const VacationDocComponent = () => {
 
     useEffect(() => {
         const today = new Date();
-        const formattedDate = `${today.getFullYear()}년 ${String(today.getMonth() + 1).padStart(2, '0')}월 ${String(today.getDate()).padStart(2, '0')}일`;
-        setCurrentData(formattedDate);
+        const formattedDate = formatLocalDate(today);
+        setCurrentDate(formattedDate);
     }, []);
     
-
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
         if (sessionStorageInfo) {
@@ -57,7 +81,6 @@ const VacationDocComponent = () => {
         }
     }, [startDate, endDate]);
 
-    // weekdayCount 변경될 때마다 잔여 연차 계산 및 오류 처리
     useEffect(() => {
         if (weekdayCount !== null && dayOffLeft !== null) {
             const remaining = dayOffLeft - weekdayCount;
@@ -83,16 +106,26 @@ const VacationDocComponent = () => {
         } catch (error) {
             console.error("Error fetching employee info:", error);
         }
+        
+        
     };
 
-    const validateDates = (start, end) => {
-        if (new Date(start) > new Date(end)) {
-            setDateError('종료일이 시작일보다 이전일 수 없습니다.');
-            setWeekdayCount(null);
-        } else {
-            setDateError('');
-            calcDate(start, end);
-        }
+    const koreanHolidays = useMemo(() => {
+        const year = new Date().getFullYear();
+        return [
+            new Date(year, 0, 1),   // 신정
+            new Date(year, 2, 1),   // 삼일절
+            new Date(year, 4, 5),   // 어린이날
+            new Date(year, 5, 6),   // 현충일
+            new Date(year, 7, 15),  // 광복절
+            new Date(year, 9, 3),   // 개천절
+            new Date(year, 9, 9),   // 한글날
+            new Date(year, 11, 25)  // 성탄절
+        ];
+    }, []);
+
+    const isHoliday = (date) => {
+        return koreanHolidays.some(holiday => holiday.getTime() === date.getTime());
     };
 
     const calcDate = (start, end) => {
@@ -103,13 +136,32 @@ const VacationDocComponent = () => {
         let tempDate = new Date(date1);
 
         while (tempDate <= date2) {
-            if (tempDate.getDay() !== 0 && tempDate.getDay() !== 6) {
+            const day = tempDate.getDay();
+            if (day !== 0 && day !== 6 && !isHoliday(tempDate)) {
                 count++;
             }
             tempDate.setDate(tempDate.getDate() + 1);
         }
 
         setWeekdayCount(count);
+    };
+
+    const getDayClassName = (date) => {
+        const day = date.getDay();
+        if (day === 0 || day === 6 || isHoliday(date)) {
+            return styles.redDay;
+        }
+        return '';
+    };
+
+    const validateDates = (start, end) => {
+        if (adjustDateToLocalStart(start) > adjustDateToLocalEnd(end)) {
+            setDateError('종료일이 시작일보다 이전일 수 없습니다.');
+            setWeekdayCount(null);
+        } else {
+            setDateError('');
+            calcDate(start, end);
+        }
     };
 
     const deptCodeToText = (deptCode) => {
@@ -143,17 +195,17 @@ const VacationDocComponent = () => {
         }
         
         const date = new Date();
-        const serverSendDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const serverSendDate = formatLocalDate(date);
 
         // JSON 데이터 생성
         const data = {
-            // toISOString() -> YYYY-MM-DDTHH:MM:SS.sssZ 형태로 형변환
-            startDate: startDate.toISOString().split('T')[0], // YYYY-MM-DD 형식
-            endDate: endDate.toISOString().split('T')[0],   // YYYY-MM-DD 형식
+            startDate: formatLocalDate(adjustDateToLocalStart(startDate)),
+            endDate: formatLocalDate(adjustDateToLocalEnd(endDate)),
             reason,
             weekdayCount,
             docType: "V",
             docTitle,
+            docStatus: "A",
             uploadDate: serverSendDate,
             empCode: sessionEmpCode,
             approvers: selectedApprovers.map(approver => approver.empCode) // 결재자 목록
@@ -161,6 +213,33 @@ const VacationDocComponent = () => {
 
         axios.post("http://localhost:8787/api/edoc/insertVacation", data)
             .then((res) => navigate('/documentList'))
+            .catch((error) => console.log(error));
+    };
+
+    const tempDocWrite = () => {
+        if (!startDate || !endDate || !reason || !docTitle || !selectedApprovers.length || !weekdayCount || balanceError) {
+            alert("필수값을 모두 입력해 주세요");
+            return;
+        }
+
+        const date = new Date();
+        const tempDocServerSendDate = formatLocalDate(date);
+
+        const data = {
+            startDate: formatLocalDate(adjustDateToLocalStart(startDate)),
+            endDate: formatLocalDate(adjustDateToLocalEnd(endDate)),
+            reason,
+            weekdayCount,
+            docType: "V",
+            docTitle,
+            docStatus: "T",
+            uploadDate: tempDocServerSendDate,
+            empCode: sessionEmpCode,
+            approvers: selectedApprovers.map(approver => approver.empCode)
+        };
+
+        axios.post("http://localhost:8787/api/edoc/insertTempVacation", data)
+            .then(() => navigate('/documentTempList'))
             .catch((error) => console.log(error));
     };
 
@@ -237,6 +316,7 @@ const VacationDocComponent = () => {
                                         dateFormat="yyyy-MM-dd"
                                         className={styles.dateInput}
                                         placeholderText="시작일"
+                                        dayClassName={getDayClassName}
                                     />
                                     <span className={styles.dateSeparator}>~</span>
                                     <DatePicker
@@ -245,6 +325,7 @@ const VacationDocComponent = () => {
                                         dateFormat="yyyy-MM-dd"
                                         className={styles.dateInput}
                                         placeholderText="종료일"
+                                        dayClassName={getDayClassName}
                                     />
                                 </div>
                                 {dateError && <p className={styles.dateError}>{dateError}</p>}
@@ -278,8 +359,10 @@ const VacationDocComponent = () => {
                 <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
                 <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
             </div>
-
-            <input type='button' value="기안" onClick={handleSubmit} className={styles.vacationDocSubmitButton} />
+            <div className={styles.buttonContainer}>
+                <input type='button' value="임시저장" onClick={tempDocWrite} className={styles.vacationDocSubmitButton} />
+                <input type='button' value="기안" onClick={handleSubmit} className={styles.vacationDocSubmitButton} />
+            </div>
         </div>
     );
 };

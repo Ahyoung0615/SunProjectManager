@@ -8,15 +8,14 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class VacationRequestDTO {
-	
+public class TempVacationRequestDTO {
+
 	private int empCode;
 	private String startDate;
 	private String endDate;
 	private String reason;
 	private String docType;
-	private String docTitle;
-	private String docStatus;
+	private String edtempTitle;
 	private LocalDate uploadDate;
 	private Integer weekdayCount;
 	private List<Integer> approvers;

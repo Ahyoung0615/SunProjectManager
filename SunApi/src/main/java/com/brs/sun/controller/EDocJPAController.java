@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.dto.response.AppEDocListResponseDTO;
+import com.brs.sun.dto.response.EDocDetailResponseDTO;
+import com.brs.sun.dto.response.EmployeeInfoResponseDTO;
 import com.brs.sun.jpa.entity.EDocEntity;
-import com.brs.sun.jpa.entity.EDocTempEntity;
-import com.brs.sun.jpa.entity.EmployeeEntity;
 import com.brs.sun.jpa.service.EDocJpaService;
 import com.brs.sun.model.service.EDocService;
 import com.brs.sun.vo.EDocVo;
@@ -45,17 +46,12 @@ public class EDocJPAController {
 	    return jpaService.docSelect(status, empCode, page, size);
 	}
 	
-	@GetMapping("/eDocDetail")
-	public EDocEntity selectEdocDetail(@RequestParam Integer eDocCode) {
-		return jpaService.selectEDocDetail(eDocCode);
-	}
-
 	@GetMapping("/appDocList")
-	public Page<EDocEntity> appEdocList(@RequestParam int empCode,
+	public Page<AppEDocListResponseDTO> appEdocList(@RequestParam int empCode,
 										@RequestParam(defaultValue = "0") int page,
 			   							@RequestParam(defaultValue = "10") int size){
 		List<Integer> filteredEdocCodeIds = new ArrayList<Integer>();
-		List<EDocVo> edocCodeList = docService.selectAppEmp(empCode);
+		List<EDocVo> edocCodeList = docService.selectAppEmp(empCode);// 내가 결제할 코드
 		for (EDocVo eDocVo : edocCodeList) {
 			filteredEdocCodeIds.add(eDocVo.getEdocCode());
 		}
@@ -65,10 +61,8 @@ public class EDocJPAController {
 		return jpaService.edocAppList(empCode, filteredEdocCodeIds, page, size);
 	}
 	
-	
-	
 	@GetMapping("/eDocTempList")
-	public Page<EDocTempEntity> selectEDocTemp(@RequestParam Integer empCode,
+	public Page<EDocEntity> selectEDocTemp(@RequestParam Integer empCode,
 											   @RequestParam(defaultValue = "0") int page,
 											   @RequestParam(defaultValue = "10") int size){
 		if (page < 0) {
@@ -78,7 +72,7 @@ public class EDocJPAController {
 	}
 	
 	@GetMapping("/employeeInfo")
-	public EmployeeEntity employeeInfo(@RequestParam Integer empCode) {
+	public EmployeeInfoResponseDTO employeeInfo(@RequestParam Integer empCode) {
 		return jpaService.employeeInfo(empCode);
 	}
 }

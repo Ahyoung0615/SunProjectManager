@@ -1,31 +1,27 @@
 package com.brs.sun.test;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.brs.sun.jpa.service.EDocJpaService;
+import com.brs.sun.dto.response.AppEDocListResponseDTO;
+import com.brs.sun.jpa.repository.EDocRepository;
 import com.brs.sun.model.dao.DayOffDao;
-import com.brs.sun.model.dao.DayOffDaoImpl;
 import com.brs.sun.model.dao.EDocDao;
 import com.brs.sun.model.service.DayOffService;
 import com.brs.sun.model.service.EDocService;
 import com.brs.sun.model.service.JsTreeService;
-import com.brs.sun.vo.DayOffVo;
-import com.brs.sun.vo.DepartmentVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -52,6 +48,40 @@ class EDocTest {
 	@Autowired
 	private EDocDao eDocDao;
 	
+	@Autowired
+	private EDocRepository docRepository;
+	
+	// 결재자 수 확인 테스트
+//	@Test
+	void appCountTest() {
+//		int total = template.selectOne("com.brs.sun.model.dao.EDocDao.appTotalCount", 102);
+//		int rem = template.selectOne("com.brs.sun.model.dao.EDocDao.appRemCount", 102);
+//		int my = total - rem;
+		
+//		System.out.println("total " + total + "\n rem " + rem + "\n total - rem " + my);
+//		assertNotNull(total);
+		
+//		int test = docService.chkApp(102);
+//		System.out.println("test : " + test);
+	}
+	
+	
+	// nativeQuery Test
+//	@Test
+//	void repository() {
+//		List<Object[]> results =  docRepository.findAllEDocWithEmployee();
+//		List<AppEDocListResponseDTO>  dtos = results.stream()
+//        .map(result -> new AppEDocListResponseDTO(
+//            ((Number) result[0]).longValue(),   // eDocCode
+//            (String) result[1],                // eDocTitle
+//            ((Timestamp) result[2]).toLocalDateTime().toLocalDate(),             // eDocDate
+//            (String) result[3]                 // empName
+//        ))
+//        .collect(Collectors.toList());
+//		System.out.println(dtos);
+//	}
+	
+	// jsTree 결재선 테스트
 //	@Test
 	void jsTreetest() {
 //		List<DepartmentVo> deptList = jsTreeService.getDept();
@@ -64,6 +94,7 @@ class EDocTest {
 		assertNotNull(empList);
 	}
 	
+	//	jsonObject 변환 테스트
 //	@Test
 	void jsonTest() {
 		JsonObject json = new JsonObject();
@@ -75,6 +106,7 @@ class EDocTest {
 		System.out.println(json.getClass().getName());
 	}
 	
+	// 남은 연차 조회 및 업데이트
 //	@Test
 	void chkDayOff() {
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -93,13 +125,15 @@ class EDocTest {
 		
 	}
 	
-	@Test
+	// 결재자 테스트
+//	@Test
 	void selectEmp() {
 		List<EDocVo> vo = docService.selectAppEmp(20081001);
 		System.out.println("test Vo: " + vo.toString() + "\n vo size: " + vo.size());
 		assertNotNull(vo);
 	}
 	
+	// 문서 작성 테스트
 //	@Test
 	void chkInsertDoc() {
 		String date = String.valueOf("2024-08-21");
@@ -127,6 +161,7 @@ class EDocTest {
 		System.out.println("voTest: " + vo);
 	}
 	
+	// 문서 작성 테스트
 //	@Test
 //	void chkInsertDoc() {
 //	    String date = "2024-08-21";

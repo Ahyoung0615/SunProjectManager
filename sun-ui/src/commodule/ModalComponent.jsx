@@ -12,7 +12,7 @@ const ModalComponent = ({ open, close, title, body, size }) => {
       <Modal.Body>{body}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={close}>
-          Close
+          닫기
         </Button>
       </Modal.Footer>
     </Modal>

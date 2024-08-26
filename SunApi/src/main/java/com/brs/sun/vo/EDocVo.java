@@ -29,7 +29,7 @@ public class EDocVo {
 	private int empCode;
 	// 기안 일자
 	private LocalDate edocDate;
-	// 결재 상태 (결재 대기중 A, 결재 완료(승인) S, 반려 R, 회수 C)
+	// 결재 상태 (결재 대기중 A, 결재 완료(승인) S, 반려 R, 회수 C, 임시저장 T)
 	private String edocStatus;
 	// 반려 사유
 	private String edocReply;

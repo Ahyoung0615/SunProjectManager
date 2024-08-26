@@ -62,6 +62,7 @@ const DocumentListComponent = () => {
             setDocList(response.data.content);
             setFilteredDocList(response.data.content);
             setTotalPages(response.data.totalPages);
+            console.log(response.data);
         } catch (error) {
             console.error("Error fetching users:", error);
         }
@@ -90,7 +91,6 @@ const DocumentListComponent = () => {
 
     return (
         <div>
-            <a href='/fileTest'>파일 테스트</a>
             <div className="container" style={{ marginTop: 30 }}>
                 <br></br>
                 <h4>발신함</h4>
