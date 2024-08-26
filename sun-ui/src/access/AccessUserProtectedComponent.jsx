@@ -178,12 +178,6 @@ export const AUExpenseApproval = () => (
     </AccessUserComponent>
 );
 
-export const AUFileUploadTest = () => (
-    <AccessUserComponent>
-        <FileUploadTest />
-    </AccessUserComponent>
-);
-
 export const AUVacationDoc = () => (
     <AccessUserComponent>
         <VacationDocComponent />
