@@ -1,5 +1,8 @@
 import AttendenceComponent from '../attendence/AttendenceComponent';
 import BoardListComponent from '../board/BoardListComponent';
+import BoardInsertComponent from '../board/BoardInsertComponent';
+import BoardDetailComponent from '../board/BoardDetailComponent';
+import BoardUpdateComponent from '../board/BoardUpdateComponent';
 import BTripDetailComponent from '../btrip/BTripDetailComponent';
 import BTripFormComponent from '../btrip/BTripFormComponent';
 import BTripListComponent from '../btrip/BTripListComponent';
@@ -51,6 +54,25 @@ export const AUBoardList = () => (
         <BoardListComponent />
     </AccessUserComponent>
 );
+
+export const AUBoardInsert = () => (
+    <AccessUserComponent>
+        <BoardInsertComponent />
+    </AccessUserComponent>
+);
+
+export const AUBoardDetail = () => (
+    <AccessUserComponent>
+        <BoardDetailComponent />
+    </AccessUserComponent>
+);
+
+export const AUBoardUpdate = () => (
+    <AccessUserComponent>
+        <BoardUpdateComponent />
+    </AccessUserComponent>
+);
+
 
 export const AUBTripDetail = () => (
     <AccessUserComponent>

@@ -1,15 +1,18 @@
 package com.brs.sun.vo;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @Builder
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,7 +35,7 @@ public class NoticeFileVo {
 	// 파일 타입
 	private String nfileType;
 	// 파일 사이즈
-	private int notiSize;
+	private Long notiSize;
 	// 삭제 여부
 	private String nfileDelflag;
 }

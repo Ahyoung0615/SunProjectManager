@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import MemberAddModal from './MemberAddModal';
 
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
@@ -11,6 +12,7 @@ const MemberListComponent = () => {
     const [employeesPerPage] = useState(10); // 페이지 당 사원 수
     const [pageGroupSize] = useState(5); // 페이지 그룹 크기
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         // 선택된 상태에 따라 API 호출
@@ -179,7 +181,10 @@ const MemberListComponent = () => {
             </button>
         );
     }
+    
 
+    const handleShow = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
     // 이전/다음 페이지 그룹 버튼
     const showPrevGroup = currentGroupStart > 1;
     const showNextGroup = currentGroupEnd < totalPages;
@@ -259,9 +264,10 @@ const MemberListComponent = () => {
                     </button>
                 )}
             </div>
-            <button className="btn btn-primary" onClick={handleNewEmp} style={{ position: 'absolute', right: '190px' }}>
-                신규사원 등록
+            <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '190px' }}>
+                사원 등록
             </button>
+            <MemberAddModal show={showModal} handleClose={handleClose} />
         </div>
     );
 };
