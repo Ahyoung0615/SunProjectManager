@@ -134,7 +134,7 @@ const BTripFormComponent = () => {
     }));
 
     if (name === 'group1' && value === 'option1') {
-      const newAddress = { areaAddress: '서울시', townAddress: '구로구 가산동' };
+      const newAddress = { areaAddress: '서울특별시', townAddress: '서울특별시 금천구 가산디지털2로 95' };
       setBtripInfo(prevState => ({
         ...prevState,
         departureAddress: newAddress
@@ -154,10 +154,11 @@ const BTripFormComponent = () => {
     const newStartDate = event.target.value;
     setBtripInfo(prevState => ({
       ...prevState,
-      startDate: newStartDate
+      startDate: newStartDate,
+      endDate: newStartDate // 시작일을 변경하면 종료일도 동일하게 설정
     }));
   };
-
+  
   const handleEndDateChange = (event) => {
     const newEndDate = event.target.value;
     if (newEndDate < btripInfo.startDate) {
@@ -169,6 +170,7 @@ const BTripFormComponent = () => {
       endDate: newEndDate
     }));
   };
+  
 
   const openModal = (target) => {
     setModalTarget(target);
@@ -321,7 +323,7 @@ const BTripFormComponent = () => {
                       onChange={handleOptionChange}
                       style={{ marginLeft: 10 }}
                     />
-                    SUN 본사 위치(서울시 구로구 가산동)
+                    SUN 본사 위치(서울특별시 금천구 가산디지털2로 95)
                   </label>
 
                   <div style={{ marginTop: 10 }}>
