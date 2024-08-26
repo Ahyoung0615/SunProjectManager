@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.brs.sun.dto.request.BTripRequestDTO;
+import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.model.dao.BTripDao;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -80,7 +81,7 @@ public class BTripServiceImpl implements BTripService {
 
 
 	@Override
-	public List<VehicleReservationVo> getAllVehicleRsv(int first, int last, String startDate, String endDate) {
+	public List<VehicleRentDTO> getAllVehicleRsv(int first, int last, String startDate, String endDate) {
 		return dao.getAllVehicleRsv(first, last, startDate, endDate);
 	}
 
@@ -102,6 +103,21 @@ public class BTripServiceImpl implements BTripService {
 	@Override
 	public List<Map<String, Object>> getAvailableVehicles(String startDate, String endDate) {
 		return dao.getAvailableVehicles(startDate, endDate);
+	}
+
+	@Override
+	public int updateVehicleRsrvYes(String vrsvCode) {
+		return dao.updateVehicleRsrvYes(vrsvCode);
+	}
+
+	@Override
+	public int updateVehicleRsrvNo(String vrsvCode, String vrsvReply) {
+		return dao.updateVehicleRsrvNo(vrsvCode, vrsvReply);
+	}
+
+	@Override
+	public VehicleReservationVo getOneVehicleRsv(String vrsvCode) {
+		return dao.getOneVehicleRsv(vrsvCode);
 	}
 
 }

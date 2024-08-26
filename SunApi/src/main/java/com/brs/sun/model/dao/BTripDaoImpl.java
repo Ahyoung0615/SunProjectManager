@@ -7,6 +7,7 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
 import com.brs.sun.vo.VehicleReservationVo;
@@ -53,7 +54,7 @@ public class BTripDaoImpl implements BTripDao {
 	}
 
 	@Override
-	public List<VehicleReservationVo> getAllVehicleRsv(int first, int last, String startDate, String endDate) {
+	public List<VehicleRentDTO> getAllVehicleRsv(int first, int last, String startDate, String endDate) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("first", first);
 		params.put("last", last);
@@ -96,7 +97,23 @@ public class BTripDaoImpl implements BTripDao {
 	    return template.selectList(NS + "getAvailableVehicles", params);
 	}
 
+	@Override
+	public int updateVehicleRsrvYes(String vrsvCode) {
+		return template.update(NS + "updateVehicleRsrvYes", vrsvCode);
+	}
 
+	@Override
+	public int updateVehicleRsrvNo(String vrsvCode, String vrsvReply) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("startDate", vrsvCode);
+	    params.put("endDate", vrsvReply);
+	    return template.update(NS + "updateVehicleRsrvNo", params);
+	}
+
+	@Override
+	public VehicleReservationVo getOneVehicleRsv(String vrsvCode) {
+		return template.selectOne(NS + "getOneVehicleRsv", vrsvCode);
+	}
 
 
 }
