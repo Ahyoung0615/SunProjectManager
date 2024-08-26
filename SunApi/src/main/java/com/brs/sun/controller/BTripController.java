@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brs.sun.dto.request.BTripRequestDTO;
+import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.model.service.BTripService;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -76,19 +77,31 @@ public class BTripController {
 	}
 	
 	@GetMapping("/getAllVehicleRsv")
-	public PagingVo<VehicleReservationVo> getAllVehicleRsv(
-			@RequestParam(defaultValue = "1") int page,
-		    @RequestParam(defaultValue = "50") int countList,
-		    @RequestParam(required = false) String startDate,
-		    @RequestParam(required = false) String endDate ){
-		log.info("startDate : {}",startDate);
-		log.info("endDate : {}",endDate);
-		int totalCount = service.countVehicleRsv(startDate, endDate);
-		 PagingVo<VehicleReservationVo> paging = new PagingVo<>(page, countList, totalCount, 10);
-		List<VehicleReservationVo> results = service.getAllVehicleRsv((page - 1) * countList + 1, page * countList, startDate, endDate);
-		  paging.setContent(results);
-		return paging;
+	public PagingVo<VehicleRentDTO> getAllVehicleRsv(
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "50") int countList,
+	        @RequestParam(required = false) String startDate,
+	        @RequestParam(required = false) String endDate) {
+
+	    log.info("startDate : {}", startDate);
+	    log.info("endDate : {}", endDate);
+
+	    // startDate나 endDate가 null 또는 빈 문자열일 경우 null로 처리
+	    if (startDate != null && startDate.trim().isEmpty()) {
+	        startDate = null;
+	    }
+	    if (endDate != null && endDate.trim().isEmpty()) {
+	        endDate = null;
+	    }
+
+	    int totalCount = service.countVehicleRsv(startDate, endDate);
+	    PagingVo<VehicleRentDTO> paging = new PagingVo<>(page, countList, totalCount, 10);
+	    List<VehicleRentDTO> results = service.getAllVehicleRsv((page - 1) * countList + 1, page * countList, startDate, endDate);
+	    paging.setContent(results);
+
+	    return paging;
 	}
+
 	
 	@GetMapping("/availableVehicle")
 	public List<Map<String, Object>> getAvailableVehicles(
@@ -104,6 +117,23 @@ public class BTripController {
 		log.info("requestDto:{}", requestDto);
 	    return service.insertBTripVRsv(requestDto);
 	}
+	
+	@PostMapping("/approveVRent")
+	public int updateVehicleRsrvYes(@RequestParam String vrsvCode) {
+		log.info("승인한 배차신청서 코드 : {}",vrsvCode);
+		return service.updateVehicleRsrvYes(vrsvCode);
+	}
 
+	@PostMapping("/rejectVRent")
+	public int updateVehicleRsrvNo(@RequestParam String vrsvCode, @RequestParam String vrsvReply) {
+		log.info("반려한 배차신청서 코드 : {}",vrsvCode);
+		return service.updateVehicleRsrvNo(vrsvCode, vrsvReply);
+	}
+	
+	@GetMapping("/vrentDetail/{vrsvCode}")
+	public VehicleReservationVo getOneVehicleRsv(@PathVariable("vrsvCode") String vrsvCode) {
+		log.info("getOneVehicleRsv 요청 vrsvCode : {}", vrsvCode);
+	    return service.getOneVehicleRsv(vrsvCode);
+	}
 
 }

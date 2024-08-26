@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.brs.sun.dto.request.BTripRequestDTO;
+import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
 import com.brs.sun.vo.VehicleReservationVo;
@@ -63,7 +64,7 @@ public interface BTripService {
 	 * @param endDate
 	 * @return List<VehicleReservationVo>
 	 */
-	public List<VehicleReservationVo> getAllVehicleRsv(int first, int last, String startDate, String endDate);
+	public List<VehicleRentDTO> getAllVehicleRsv(int first, int last, String startDate, String endDate);
 	
 	/**
 	 * 협력사 전체조회/검색조회(이름, 주소)
@@ -100,4 +101,26 @@ public interface BTripService {
 	 * @return VehicleReservationVo
 	 */
 	public List<Map<String, Object>>getAvailableVehicles(String startDate, String endDate);
+	
+	/**
+	 * 배차 신청 허용
+	 * @param vrsvCode
+	 * @return 0 또는 1
+	 */
+	public int updateVehicleRsrvYes(String vrsvCode);
+	
+	/**
+	 * 배차 신청 반려
+	 * @param vrsvCode
+	 * @param vrsvReply
+	 * @return 0 또는 1
+	 */
+	public int updateVehicleRsrvNo(String vrsvCode, String vrsvReply);
+	
+	/**
+	 * 배차 신청 상세조회
+	 * @param vrsvCode
+	 * @return VehicleReservationVo
+	 */
+	public VehicleReservationVo getOneVehicleRsv(String vrsvCode);
 }

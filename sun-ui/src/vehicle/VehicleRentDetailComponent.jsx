@@ -1,12 +1,27 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Alert } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
 const VehicleRentDetailComponent = () => {
-  const {vehicleCode} = useParams();
+  const {vrsvCode} = useParams();
+  const [vehicleRentDetail, setVehicleRentDetail] = useState('');
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+
+  const getVehicleRentDetail = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8787/api/vrentDetail/${vrsvCode}`);
+      setVehicleRentDetail(response.data);
+    } catch (error) {
+      console.error("배차 신청서 상세 출력 불가", error);
+    }
+  };
+
+  useEffect(() => {
+    getVehicleRentDetail();
+  }, [vrsvCode]);
 
   const handleApproval = () => {
     setShowAlert(true);
@@ -20,6 +35,8 @@ const VehicleRentDetailComponent = () => {
   const handleAlertClose = () => {
     setShowAlert(false);
   };
+
+
 
   return (
     <div className="container" style={{ marginTop: 30 }}>
