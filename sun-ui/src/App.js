@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import Login from './login/LoginComponent';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -15,8 +13,6 @@ import Error404Component from './error/Error404Component';
 import {
     AdMemberDetail,
     AdMemberList,
-    AdMemberUpdate,
-    AdMemberAdd,
     AdRepairList,
     AdVehicleDetail,
     AdVehicleForm,
@@ -52,7 +48,6 @@ import {
     AUDocumentTempDetail,
     AUDocumentTempList,
     AUExpenseApproval,
-    AUFileUploadTest,
     AUVacationDoc,
     AUFDeliveryCalRsvList,
     AUFDeliveryDetail,
@@ -67,7 +62,10 @@ import {
     AUMainContent,
     AUMyPage,
     AUTimeTableList,
-    AUVacationList
+    AUVacationList,
+    AUBoardDetail,
+    AUBoardInsert,
+    AUBoardUpdate
 } from './access/AccessUserProtectedComponent';
 
 function App() {
@@ -97,8 +95,6 @@ function App() {
                                 {/* Admin Protected Routes */}
                                 <Route path="/memberList" element={<AdMemberList />} />
                                 <Route path="/memberDetail/:empCode" element={<AdMemberDetail />} />
-                                <Route path="/memberUpdate/:empCode" element={<AdMemberUpdate />} />
-                                <Route path="/memberAdd" element={<AdMemberAdd />} />
                                 <Route path="/vehicleList" element={<AdVehicleList />} />
                                 <Route path="/vehicleDetail/:vehicleCode" element={<AdVehicleDetail />} />
                                 <Route path="/vehicleRentList" element={<AdVehicleRentList />} />
@@ -109,6 +105,9 @@ function App() {
 
                                 {/* User Protected Routes Continued */}
                                 <Route path="/boardList" element={<AUBoardList />} />
+                                <Route path="/boardInsert" element={<AUBoardInsert />} />
+                                <Route path="/boardDetail/:notiCode" element={<AUBoardDetail />} />
+                                <Route path="/boardUpdate/:notiCode" element={<AUBoardUpdate />} />
                                 <Route path="/chatSun" element={<AUChatSun />} />
                                 <Route path="/chatRoom/:chatroomCode" element={<AUChatRoom/>} />
                                 <Route path="/bTripList" element={<AUBTripList />} />
@@ -130,7 +129,6 @@ function App() {
                                 <Route path="/documentTempDetail/:edtempCode" element={<AUDocumentTempDetail />} />
                                 <Route path="/documentTempList" element={<AUDocumentTempList />} />
                                 <Route path="/expenseApproval" element={<AUExpenseApproval />} />
-                                <Route path="/fileUploadTest" element={<AUFileUploadTest />} />
                                 <Route path="/vacationDoc" element={<AUVacationDoc />} />
                                 <Route path="/fDeliveryCalRsvList" element={<AUFDeliveryCalRsvList />} />
                                 <Route path="/fDeliveryDetail/:fdelcode" element={<AUFDeliveryDetail />} />
