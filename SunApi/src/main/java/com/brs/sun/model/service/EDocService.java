@@ -15,7 +15,7 @@ public interface EDocService {
 	
 	boolean insertTransaction(EDocVo vo, List<EDocLineVo> edocLineList);
 	
-	boolean updateTempEDoc(EDocVo vo, List<EDocLineVo> edocLineList);
+	boolean updateEDoc(EDocVo vo, List<EDocLineVo> edocLineList);
 	
 	boolean updateMyAppStatus(EDocVo vo);
 
@@ -27,7 +27,11 @@ public interface EDocService {
 	
 	boolean appSuccess(Map<String, Object> map);
 	
+	boolean appRejecct(Map<String, Object> map);
+	
 	boolean updateSuccessDocStatus(int edocCode);
+	
+	boolean updateCancelDocStatus(int edocCode);
 	
 	int chkApp(int edocCode);
 }

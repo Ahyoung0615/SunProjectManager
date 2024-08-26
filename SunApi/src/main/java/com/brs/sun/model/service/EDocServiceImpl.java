@@ -48,21 +48,21 @@ public class EDocServiceImpl implements EDocService {
 	
 	@Override
 	@Transactional
-    public boolean updateTempEDoc(EDocVo vo, List<EDocLineVo> edocLineList) {
-        // 문서를 업데이트합니다.
-        if (!dao.updateTempEDoc(vo)) {
+    public boolean updateEDoc(EDocVo vo, List<EDocLineVo> edocLineList) {
+        // 문서를 업데이트
+        if (!dao.updateEDoc(vo)) {
             return false;
         }
 
-        // 각 edocLine에 edocCode를 설정합니다.
+        // 각 edocLine에 edocCode를 설정
         edocLineList.forEach(eDocLineVo -> eDocLineVo.setEdocCode(vo.getEdocCode()));
 
-        // 기존 결재 라인을 삭제합니다. 실패 시 false 반환
+        // 기존 결재 라인을 삭제. 실패 시 false 반환
         if (!dao.deleteAppList(vo)) {
             return false;
         }
 
-        // 새로운 결재 라인을 삽입하고 결과를 반환합니다.
+        // 새로운 결재 라인을 삽입하고 결과를 반환.
         return dao.insertEDocLine(edocLineList);
     }
 	
@@ -87,8 +87,18 @@ public class EDocServiceImpl implements EDocService {
 	}
 	
 	@Override
+	public boolean appRejecct(Map<String, Object> map) {
+		return dao.appRejecct(map);
+	}
+	
+	@Override
 	public boolean updateSuccessDocStatus(int edocCode) {
 		return dao.updateSuccessDocStatus(edocCode);
+	}
+	
+	@Override
+	public boolean updateCancelDocStatus(int edocCode) {
+		return dao.updateCancelDocStatus(edocCode);
 	}
 	
 	@Override

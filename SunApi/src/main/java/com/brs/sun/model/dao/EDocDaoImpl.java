@@ -31,8 +31,8 @@ public class EDocDaoImpl implements EDocDao {
 	}
 	
 	@Override
-	public boolean updateTempEDoc(EDocVo vo) {
-		return (template.update(NS + "updateTempEDoc", vo) > 0) ? true : false;
+	public boolean updateEDoc(EDocVo vo) {
+		return (template.update(NS + "updateEDoc", vo) > 0) ? true : false;
 	}
 	
 	@Override
@@ -71,8 +71,18 @@ public class EDocDaoImpl implements EDocDao {
 	}
 	
 	@Override
+	public boolean appRejecct(Map<String, Object> map) {
+		return (template.update(NS + "appRejecct", map) > 0) ? true : false;
+	}
+	
+	@Override
 	public boolean updateSuccessDocStatus(int edocCode) {
 		return (template.update(NS + "updateSuccessDocStatus", edocCode) > 0) ? true : false;
+	}
+	
+	@Override
+	public boolean updateCancelDocStatus(int edocCode) {
+		return (template.update(NS + "updateCancelDocStatus", edocCode) > 0) ? true : false;
 	}
 	
 	@Override

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.dto.request.EDocRejectRequestDTO;
 import com.brs.sun.dto.request.TempEDocUpdateRequestDTO;
 import com.brs.sun.dto.request.VacationRequestDTO;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
@@ -39,37 +40,49 @@ public class EDocController {
 	
 	// 결재 승인
 	@PostMapping("/appSuccess")
-	public String updateDocStatus(@RequestBody Map<String, Object> map) {
-	    log.info("Received request with map: {}", map);
-
+	public String updateSuccessDocStatus(@RequestBody Map<String, Object> map) {
 	    int edocCode;
 	    try {
 	        edocCode = Integer.parseInt(String.valueOf(map.get("edocCode")));
 	    } catch (NumberFormatException e) {
-	        log.error("Invalid edocCode: {}", map.get("edocCode"), e);
+	    	e.printStackTrace();
 	        return "Invalid edocCode";
 	    }
 
 	    if (!docService.appSuccess(map)) {
-	        log.warn("Document approval status update failed for edocCode: {}", edocCode);
 	        return "상태 변경 오류";
 	    }
 
 	    int remainingApprovals = docService.chkApp(edocCode);
 	    if (remainingApprovals == 0) {
 	        if (docService.updateSuccessDocStatus(edocCode)) {
-	            log.info("Document approval completed successfully for edocCode: {}", edocCode);
 	            return "문서 결재완료 변경";
 	        } else {
-	            log.error("Failed to update document status to success for edocCode: {}", edocCode);
 	            return "문서 변경 오류";
 	        }
 	    }
 
-	    log.info("Document status updated, pending approvals remain for edocCode: {}", edocCode);
 	    return "문서 상태 변경";
 	}
+	
+	@PostMapping("/appReject")
+	public String updateDocReply(@RequestBody EDocRejectRequestDTO dto) {
+		log.info("map data: {}", dto);
+		return "";
+	}
 
+	@PostMapping("/docCancel")
+	public String updateCancelDocStatus(@RequestParam int edocCode) {
+	    final String SUCCESS = "success";
+	    final String FAIL = "fail";
+	    
+	    try {
+	        return docService.updateCancelDocStatus(edocCode) ? SUCCESS : FAIL;
+	    } catch (Exception e) {
+	         log.error("update 실패" + edocCode, e);
+	        return FAIL;
+	    }
+	}
 
 	// 임시저장 상세
 	@GetMapping("/tempDetail")
@@ -204,7 +217,7 @@ public class EDocController {
 	}
 	
 	// 임시저장 문서 업데이트
-	@PostMapping("/tempDocUpdate")
+	@PostMapping("/docUpdate")
 	public String updateTempEDoc(@RequestBody TempEDocUpdateRequestDTO docData) {
 		log.info("tempData: {}", docData);
 		
@@ -243,7 +256,7 @@ public class EDocController {
 				ev.setEmpCode(approvers.get(i));
 				edocLine.add(ev);
 			}
-			docService.updateTempEDoc(vo, edocLine);
+			docService.updateEDoc(vo, edocLine);
 			docService.updateMyAppStatus(vo);
 		}
 		return "ok";

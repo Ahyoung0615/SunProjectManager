@@ -32,13 +32,6 @@
 <!-- 	</select> -->
 	
 	<!-- 임시저장 업데이트 -->
-	<update id="updateTempEDoc">
-		UPDATE EDOC
-		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}
-		WHERE EDOC_CODE=#{edocCode}
-	</update>
-	
-	<!-- 회수 문서 재기안 업데이트 -->
 	<update id="updateEDoc">
 		UPDATE EDOC
 		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}
@@ -164,6 +157,11 @@
 		SET EDCL_STATUS = 'R'
 		WHERE EDOC_CODE = #{edocCode}
 		AND EMP_CODE = #{empCode}
+	</update>
+	
+	<!-- 반려 사유 업데이트 -->
+	<update id="updateDocReply">
+		UPDATE EDOC SET EDOC_REPLY = #{edocReply} WHERE EDOC_CODE = #{edocCode}
 	</update>
 	
 	<!-- 전체 결재자 수 -->

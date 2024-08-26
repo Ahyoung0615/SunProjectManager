@@ -16,7 +16,7 @@
 	</select>
 	
 	<select id="selectApprovers" resultType="EmployeeVo">
-		SELECT EMP_CODE , EMP_NAME , d.DEPT_NAME , j.JOB_NAME
+		SELECT *
 		FROM EMPLOYEE e JOIN DEPARTMENT d 
 		ON e.DEPT_CODE = d.DEPT_CODE 
 	    JOIN JOB j 
