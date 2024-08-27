@@ -7,14 +7,14 @@ import BTripAddressComponent from "./BTripAddressComponent";
 import axios from 'axios';
 
 const BTripFormComponent = () => {
-  const nanigator = useNavigate();
+  const navigator = useNavigate();
   const [info, setInfo] = useState({
     rentStartDate: "",
     rentEndDate: "",
     vehicleCode: 0,
     vrsvDetail: ""
   });
-  
+
   const [btripInfo, setBtripInfo] = useState({
     empCode: "",
     startDate: "",
@@ -23,7 +23,7 @@ const BTripFormComponent = () => {
     departureAddress: { areaAddress: '', townAddress: '' },
     destinationAddress: { areaAddress: '', townAddress: '' }
   });
-  
+
   const [isVehicleRequest, setIsVehicleRequest] = useState(false);
   const [options, setOptions] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -253,7 +253,7 @@ const BTripFormComponent = () => {
       console.log('Response:', response.data);
       if(response.data>1000){
         alert('신청서 등록 완료');
-        nanigator('/btripList');
+        navigator('/btripList');
       }
     } catch (error) {
       console.error('전송 실패:', error);
@@ -273,23 +273,29 @@ const BTripFormComponent = () => {
       <br />
       <h4>출장 신청서 작성</h4>
       <div style={{ marginTop: 30, marginLeft: 20, marginRight: 20 }}>
-        <h5>출장자 정보</h5>
+        <h5>출장지 정보</h5>
         <table className="table table-bordered" style={{ lineHeight: '2.5' }}>
+          <thead style={{ backgroundColor: '#f2f2f2', textAlign: 'center' }}>
+            <tr>
+              <th style={{ width: '20%', textAlign: 'center' }}>항목</th>
+              <th style={{ width: '80%' }}>내용</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <th>이름*</th>
+              <th style={{ textAlign: 'center' }}>이름*</th>
               <td>{userName}</td>
             </tr>
             <tr>
-              <th>직급*</th>
+              <th style={{ textAlign: 'center' }}>직급*</th>
               <td>{userJob}</td>
             </tr>
             <tr>
-              <th>부서*</th>
+              <th style={{ textAlign: 'center' }}>부서*</th>
               <td>{userDept}</td>
             </tr>
             <tr>
-              <th>시작일자</th>
+              <th style={{ textAlign: 'center' }}>시작일자</th>
               <td>
                 <input
                   type="date"
@@ -300,7 +306,7 @@ const BTripFormComponent = () => {
               </td>
             </tr>
             <tr>
-              <th>종료일자</th>
+              <th style={{ textAlign: 'center' }}>종료일자</th>
               <td>
                 <input
                   type="date"
@@ -311,7 +317,7 @@ const BTripFormComponent = () => {
               </td>
             </tr>
             <tr>
-              <th>출발지</th>
+              <th style={{ textAlign: 'center' }}>출발지</th>
               <td>
                 <div>
                   <label>
@@ -370,7 +376,7 @@ const BTripFormComponent = () => {
               </td>
             </tr>
             <tr>
-              <th>도착지</th>
+              <th style={{ textAlign: 'center' }}>도착지</th>
               <td>
                 <div>
                   <label>
@@ -429,7 +435,7 @@ const BTripFormComponent = () => {
               </td>
             </tr>
             <tr>
-              <th>사유</th>
+              <th style={{ textAlign: 'center' }}>사유</th>
               <td>
                 <textarea
                   className="form-control"

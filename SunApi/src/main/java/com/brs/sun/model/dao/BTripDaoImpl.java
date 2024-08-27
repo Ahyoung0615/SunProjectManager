@@ -7,6 +7,7 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -105,14 +106,19 @@ public class BTripDaoImpl implements BTripDao {
 	@Override
 	public int updateVehicleRsrvNo(String vrsvCode, String vrsvReply) {
 	    Map<String, Object> params = new HashMap<>();
-	    params.put("startDate", vrsvCode);
-	    params.put("endDate", vrsvReply);
+	    params.put("vrsvCode", vrsvCode);
+	    params.put("vrsvReply", vrsvReply);
 	    return template.update(NS + "updateVehicleRsrvNo", params);
 	}
 
 	@Override
-	public VehicleReservationVo getOneVehicleRsv(String vrsvCode) {
+	public VehicleRentDTO getOneVehicleRsv(String vrsvCode) {
 		return template.selectOne(NS + "getOneVehicleRsv", vrsvCode);
+	}
+
+	@Override
+	public int insertReVehicleRsc(VehicleRentDTO requestDto) {
+		return template.update(NS + "insertReVehicleRsc", requestDto);
 	}
 
 

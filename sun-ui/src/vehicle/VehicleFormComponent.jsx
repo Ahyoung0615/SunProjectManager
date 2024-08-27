@@ -21,8 +21,20 @@ const VehicleFormComponent = () => {
         }
     };
 
+    const validateForm = () => {
+        if (!vehicleNumber || !vehicleModel || !vehicleType || !vehicleSize || !vfile || !vehicleRegDate) {
+            alert("모든 필드를 입력해주세요.");
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) {
+            return;
+        }
+
         const formData = new FormData();
     
         const vehicleData = {
@@ -46,8 +58,6 @@ const VehicleFormComponent = () => {
             console.error('등록실패:', error);
         }
     };
-    
-    
 
     const handleCancel = () => {
         alert("등록이 취소되었습니다.");
@@ -61,20 +71,26 @@ const VehicleFormComponent = () => {
             <br></br>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20, gap: "20px" }}>
                 {/* 차량 이미지 섹션 */}
-                <div style={{ width: "320px", height: "320px", backgroundColor: "#ccc", marginLeft: 120 }}>
+                <div style={{ width: "480px", height: "320px", backgroundColor: "#ccc", marginLeft: 50 }}>
                     {image ? (
-                        <img src={image} alt="차량 이미지" style={{ width: "100%", height: "100%" }} />
+                        <img src={image} alt="차량 이미지" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
-                        <div>이미지 선택</div>
+                        <div style={{ textAlign: "center", lineHeight: "320px", color: "#777" }}>이미지 선택</div>
                     )}
-                    <input type="file" onChange={handleImageUpload} style={{ marginTop: 10}} />
+                    <input type="file" onChange={handleImageUpload} style={{ marginTop: 10 }} />
                 </div>
 
                 {/* 차량 정보 입력 테이블 */}
-                <table className="table table-bordered" style={{ width: "50%", marginRight: 100, marginTop: 20 }}>
+                <table className="table table-bordered" style={{ width: "60%", marginRight: 50, marginTop: 20 }}>
+                    <thead style={{ backgroundColor: '#f2f2f2', textAlign: 'center' }}>
+                        <tr>
+                            <th style={{ width: '30%', textAlign: 'center' }}>항목</th>
+                            <th style={{ width: '70%' }}>내용</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
-                            <td>차량번호</td>
+                            <th style={{ textAlign: 'center' }}>차량번호</th>
                             <td>
                                 <input
                                     type="text"
@@ -86,7 +102,7 @@ const VehicleFormComponent = () => {
                             </td>
                         </tr>
                         <tr>
-                            <td>차종</td>
+                            <th style={{ textAlign: 'center' }}>차종</th>
                             <td>
                                 <input
                                     type="text"
@@ -98,7 +114,7 @@ const VehicleFormComponent = () => {
                             </td>
                         </tr>
                         <tr>
-                            <td>구분</td>
+                            <th style={{ textAlign: 'center' }}>구분</th>
                             <td>
                                 <select
                                     value={vehicleType}
@@ -113,7 +129,7 @@ const VehicleFormComponent = () => {
                             </td>
                         </tr>
                         <tr>
-                            <td>인승/용량(t)</td>
+                            <th style={{ textAlign: 'center' }}>인승/용량(t)</th>
                             <td>
                                 <input
                                     type="number"
@@ -125,7 +141,7 @@ const VehicleFormComponent = () => {
                             </td>
                         </tr>
                         <tr>
-                            <td>등록일자</td>
+                            <th style={{ textAlign: 'center' }}>등록일자</th>
                             <td>
                                 <DateTimeComponent
                                     selectedDate={vehicleRegDate}

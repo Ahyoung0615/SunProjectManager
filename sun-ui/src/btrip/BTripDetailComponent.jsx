@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CoWorkMapComponent from "../cowork/CoWorkMapComponent";
+import ModalComponent from "../commodule/ModalComponent";
+import VehicleRentModalComponent from "../vehicle/VehicleRentModalComponent";
 
 const BTripDetailComponent = () => {
   const { btripCode } = useParams();
@@ -88,10 +90,10 @@ const BTripDetailComponent = () => {
               type="button"
               className="btn btn-warning"
               style={{
-                marginLeft: 10, // 주소와 버튼 간의 간격
-                padding: '5px 10px', // 버튼 내부 패딩을 줄여 크기 조정
-                fontSize: '0.9rem', // 글꼴 크기를 줄여 버튼 크기 축소
-                lineHeight: 1, // 버튼 내 텍스트의 줄 간격을 줄임
+                marginLeft: 10,
+                padding: '5px 10px',
+                fontSize: '0.9rem',
+                lineHeight: 1,
               }}
               onClick={handleRouteClick}
             >
@@ -101,53 +103,55 @@ const BTripDetailComponent = () => {
         </div>
 
         <div style={{ flex: 2, marginRight: 20 }}>
-          <h4>출장 세부 현황</h4>
+          <h5>출장 세부 현황</h5>
           <table className="table table-bordered">
             <tbody>
               <tr>
-                <th>출장번호</th>
-                <td>{btripDetail.btripCode}</td>
-                <th>출장목적</th>
-                <td>{btripDetail.btripDetail}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>출장번호</th>
+                <td style={{ textAlign: "center" }}>{btripDetail.btripCode}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>출장목적</th>
+                <td style={{ textAlign: "center" }}>{btripDetail.btripDetail}</td>
               </tr>
               <tr>
-                <th>출발지</th>
-                <td>{btripDetail.btripDepart}</td>
-                <th>출장지</th>
-                <td>{btripDetail.btripArrival}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>출발지</th>
+                <td style={{ textAlign: "center" }}>{btripDetail.btripDepart}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>출장지</th>
+                <td style={{ textAlign: "center" }}>{btripDetail.btripArrival}</td>
               </tr>
               <tr>
-                <th>시작일자</th>
-                <td>{new Date(btripDetail.btripStartDate).toLocaleDateString()}</td>
-                <th>종료일자</th>
-                <td>{new Date(btripDetail.btripEndDate).toLocaleDateString()}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>시작일자</th>
+                <td style={{ textAlign: "center" }}>{new Date(btripDetail.btripStartDate).toLocaleDateString()}</td>
+                <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>종료일자</th>
+                <td style={{ textAlign: "center" }}>{new Date(btripDetail.btripEndDate).toLocaleDateString()}</td>
               </tr>
             </tbody>
           </table>
-              <div style={{ marginTop: 50 }}>
-          <h4>여비 상세 구분</h4><p style={{ marginLeft: 360, fontSize: 13, marginTop: -30 }}>여비 신청은 지출결의서를 통해 청구할 수 있습니다</p>
-          <table className="table table-bordered">
-            <tbody>
-              <tr>
-                <th>교통비</th>
-                <td>-</td>
-                <th>유류비</th>
-                <td>52,000</td>
-              </tr>
-              <tr>
-                <th>식비</th>
-                <td>12,000</td>
-                <th>숙박비</th>
-                <td>-</td>
-              </tr>
-              <tr>
-                <th>영업비</th>
-                <td>-</td>
-                <th>기타 경비</th>
-                <td>-</td>
-              </tr>
-            </tbody>
-          </table>
+
+          <div style={{ marginTop: 50 }}>
+            <h5>여비 상세 구분</h5>
+            <p style={{ textAlign: "right", fontSize: 13, marginTop: -30 }}>여비 신청은 지출결의서를 통해 청구할 수 있습니다</p>
+            <table className="table table-bordered">
+              <tbody>
+                <tr>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>교통비</th>
+                  <td style={{ textAlign: "center" }}>-</td>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>유류비</th>
+                  <td style={{ textAlign: "center" }}>52,000</td>
+                </tr>
+                <tr>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>식비</th>
+                  <td style={{ textAlign: "center" }}>12,000</td>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>숙박비</th>
+                  <td style={{ textAlign: "center" }}>-</td>
+                </tr>
+                <tr>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>영업비</th>
+                  <td style={{ textAlign: "center" }}>-</td>
+                  <th style={{ backgroundColor: "#f2f2f2", textAlign: "center" }}>기타 경비</th>
+                  <td style={{ textAlign: "center" }}>-</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -157,22 +161,41 @@ const BTripDetailComponent = () => {
         <table className="table table-bordered">
           <thead>
             <tr style={{ backgroundColor: '#f2f2f2' }}>
-              <th>배차신청코드</th>
-              <th>차량코드</th>
-              <th>배차사유</th>
-              <th>배차승인여부</th>
-              <th>반려사유</th>
+              <th style={{ textAlign: "center" }}>배차신청코드</th>
+              <th style={{ textAlign: "center" }}>차량코드</th>
+              <th style={{ textAlign: "center" }}>배차사유</th>
+              <th style={{ textAlign: "center" }}>배차승인여부</th>
+              <th style={{ textAlign: "center" }}>반려사유</th>
+              <th style={{ textAlign: "center" }}>비고</th>
             </tr>
           </thead>
           <tbody>
             {vrsvDetail && vrsvDetail.length > 0 ? (
               vrsvDetail.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.vrsvCode}</td>
-                  <td>{item.vehicleCode}</td>
-                  <td>{item.vrsvDetail}</td>
-                  <td>{item.vrsvStatus === 'W' ? "승인대기중" : (item.vrsvStatus === 'Y' ? "승인" : "반려")}</td>
-                  <td>{item.vrsvReply === null ? "-" : item.vrsvReply}</td>
+                   <td style={{ textAlign: "center" }}>{item.vrsvCode}</td>
+  <td style={{ textAlign: "center" }}>{item.vehicleCode}</td>
+  <td style={{ textAlign: "center" }}>{item.vrsvDetail}</td>
+  <td style={{ textAlign: "center" }}>
+    {item.vrsvStatus === 'W' ? "승인대기중" :
+      item.vrsvStatus === 'Y' ? "승인" :
+        <>
+          반려
+        </>
+    }
+  </td>
+  <td style={{ textAlign: "center" }}>{item.vrsvReply === null ? "-" : item.vrsvReply}</td>
+  <td style={{ textAlign: "center" }}>  {/* 중앙 정렬을 위한 스타일 추가 */}
+    {item.vrsvStatus === 'N' && (
+      <button
+        type="button"
+        className="btn btn-warning"
+        style={{ padding: '3px 8px', transform: 'scale(0.8)' }}
+        onClick={openModal}
+      >
+        재신청
+      </button>
+                          )}</td>
                 </tr>
               ))
             ) : (
@@ -184,8 +207,18 @@ const BTripDetailComponent = () => {
         </table>
       </div>
 
-      <div style={{ marginTop: 20, marginLeft: 500, marginBottom: 50 }}>
-        <Link to="/bTripList"><button className="btn btn-primary">목록</button></Link>
+      <ModalComponent
+        open={isModalOpen}
+        close={closeModal}
+        title="배차 신청서 작성"
+        body={<VehicleRentModalComponent btripCode={btripCode} />}
+        size="lg"
+      />
+
+      <div style={{ marginTop: 20, textAlign: "center", marginBottom: 50 }}>
+        <Link to="/bTripList">
+          <button className="btn btn-primary">목록</button>
+        </Link>
       </div>
     </div>
   );

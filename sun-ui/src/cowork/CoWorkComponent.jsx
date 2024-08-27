@@ -1,8 +1,8 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CoWorkMapComponent from './CoWorkMapComponent';
 
-const CoWorkComponent = ({onSelect}) => {
+const CoWorkComponent = ({ onSelect }) => {
     const [coworkList, setCoworkList] = useState([]);
     const [searchType, setSearchType] = useState("cowName");
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -19,8 +19,8 @@ const CoWorkComponent = ({onSelect}) => {
         try {
             const response = await axios.get("http://localhost:8787/api/cowork", {
                 params: {
-                    page: page + 1,  // 페이지는 1부터 시작하므로 +1
-                    size: 5,        // 페이지당 10개의 항목
+                    page: page + 1,
+                    size: 5,
                     [searchType]: searchKeyword
                 }
             });
@@ -36,15 +36,14 @@ const CoWorkComponent = ({onSelect}) => {
     };
 
     const handleSearch = () => {
-        setCurrentPage(0);  // 검색 시 첫 페이지로 이동
-        fetchCoWorkList(0); // 검색 버튼 클릭 시 조회
+        setCurrentPage(0);
+        fetchCoWorkList(0);
     };
 
     const getcowOneAddress = (cowAddress) => {
-        console.log("Selected Address:", cowAddress);
         setSelectedAddress(cowAddress);
         if (onSelect) {
-            onSelect(cowAddress);  // 상위 컴포넌트에 선택된 주소를 전달
+            onSelect(cowAddress);
         }
     };
 
@@ -62,18 +61,24 @@ const CoWorkComponent = ({onSelect}) => {
     const displayTotalPages = totalPages > 0 ? totalPages : 1;
 
     return (
-        <div>
-            <h4 style={{marginTop:30}}>협력사 정보</h4>
-            <div style={{ display: 'flex', marginTop: 50 }}>
+        <div className="container" style={{ marginTop: 30 }}>
+            <h4 style={{ marginBottom: '20px', textAlign: 'center' }}>협력사 정보</h4>
+            <div style={{ display: 'flex' }}>
+                <div style={{ flex: 1, marginRight: '20px' }}>
+                    <CoWorkMapComponent selectedAddress={selectedAddress} />
+                </div>
 
-                <CoWorkMapComponent selectedAddress={selectedAddress} />
-
-                <div style={{ marginLeft: '20px', width: '50%' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', marginLeft: 70 }}>
+                <div style={{ flex: 2 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', justifyContent: 'center' }}>
                         <select
                             value={searchType}
                             onChange={(e) => setSearchType(e.target.value)}
-                            style={{ height: 40, width: 80 }}
+                            style={{
+                                height: '40px',
+                                width: '100px',
+                                borderRadius: '5px',
+                                border: '1px solid #ccc'
+                            }}
                         >
                             <option value="cowName">이름</option>
                             <option value="cowAddress">주소</option>
@@ -83,28 +88,37 @@ const CoWorkComponent = ({onSelect}) => {
                             placeholder="검색어를 입력해주세요"
                             value={searchKeyword}
                             onChange={(e) => setSearchKeyword(e.target.value)}
-                            style={{ height: 40, width: '60%', padding: '10px', border: '1px solid #ddd' }}
+                            style={{
+                                height: '40px',
+                                width: '40%', // 검색어 창 크기를 줄입니다
+                                padding: '10px',
+                                borderRadius: '5px',
+                                border: '1px solid #ccc'
+                            }}
                         />
                         <button
-                            onClick={handleSearch}  // 검색 버튼 클릭 시 조회
+                            onClick={handleSearch}
                             style={{
-                                height: 40,
-                                padding: 10,
+                                height: '40px',
+                                padding: '0 20px',
                                 cursor: 'pointer',
-                                border: '1px solid #ddd',
-                                backgroundColor: '#f2f2f2'
+                                borderRadius: '5px',
+                                marginRight: '2px',
+                                border: '1px solid #007bff',
+                                backgroundColor: '#007bff',
+                                color: '#fff'
                             }}
                         >
-                            <i className="fas fa-search"></i>
+                            검색
                         </button>
                     </div>
-                    <table className="table table-bordered">
+                    <table className="table table-bordered" style={{ textAlign: 'center', width: '100%' }}>
                         <thead>
-                            <tr style={{ backgroundColor: '#f2f2f2' }}>
-                                <th>협력사번</th>
-                                <th>사명</th>
-                                <th>주소</th>
-                                <th>번호</th>
+                            <tr style={{ backgroundColor: '#f8f9fa' }}>
+                                <th style={{ width: '14%' }}>코드</th>
+                                <th style={{ width: '16%' }}>사명</th>
+                                <th style={{ width: '54%' }}>주소</th>
+                                <th style={{ width: '16%' }}>번호</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -118,7 +132,7 @@ const CoWorkComponent = ({onSelect}) => {
                                         <td>{item.cowCode}</td>
                                         <td>{item.cowName}</td>
                                         <td>
-                                            <button type="button" className="btn btn-link" style={{ margin: -7 }} onClick={() => getcowOneAddress(item.cowAddress)}>
+                                            <button type="button" className="btn btn-link" style={{ padding: 0 }} onClick={() => getcowOneAddress(item.cowAddress)}>
                                                 {item.cowAddress}
                                             </button>
                                         </td>
@@ -138,6 +152,7 @@ const CoWorkComponent = ({onSelect}) => {
                                 margin: '0 5px',
                                 padding: '5px 10px',
                                 cursor: 'pointer',
+                                borderRadius: '5px',
                                 border: '1px solid #ddd',
                                 backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
                                 color: currentPage === 0 ? '#000' : '#fff'
@@ -152,6 +167,7 @@ const CoWorkComponent = ({onSelect}) => {
                                 margin: '0 5px',
                                 padding: '5px 10px',
                                 cursor: 'pointer',
+                                borderRadius: '5px',
                                 border: '1px solid #ddd',
                                 backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
                                 color: currentPage === 0 ? '#000' : '#fff'
@@ -159,7 +175,7 @@ const CoWorkComponent = ({onSelect}) => {
                         >
                             이전
                         </button>
-                        <span>페이지 {currentPage + 1} / {displayTotalPages}</span>
+                        <span style={{ alignSelf: 'center', margin: '0 15px' }}>페이지 {currentPage + 1} / {displayTotalPages}</span>
                         <button
                             onClick={() => handlePageChange(currentPage + 1)}
                             disabled={currentPage + 1 >= totalPages || isEmpty}
@@ -167,6 +183,7 @@ const CoWorkComponent = ({onSelect}) => {
                                 margin: '0 5px',
                                 padding: '5px 10px',
                                 cursor: 'pointer',
+                                borderRadius: '5px',
                                 border: '1px solid #ddd',
                                 backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
                                 color: currentPage + 1 >= totalPages ? '#000' : '#fff'
@@ -181,6 +198,7 @@ const CoWorkComponent = ({onSelect}) => {
                                 margin: '0 5px',
                                 padding: '5px 10px',
                                 cursor: 'pointer',
+                                borderRadius: '5px',
                                 border: '1px solid #ddd',
                                 backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
                                 color: currentPage + 1 >= totalPages ? '#000' : '#fff'

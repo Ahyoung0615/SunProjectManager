@@ -65,7 +65,8 @@ import {
     AUVacationList,
     AUBoardDetail,
     AUBoardInsert,
-    AUBoardUpdate
+    AUBoardUpdate,
+    AUMeetingSummary
 } from './access/AccessUserProtectedComponent';
 
 function App() {
@@ -126,7 +127,7 @@ function App() {
                                 <Route path="/documentAppDetail/:edocCode" element={<AUDocumentAppDetail />} />
                                 <Route path="/documentInsert" element={<AUDocumentInsert />} />
                                 <Route path="/documentList" element={<AUDocumentList />} />
-                                <Route path="/documentTempDetail/:edtempCode" element={<AUDocumentTempDetail />} />
+                                <Route path="/documentTempDetail/:edocCode" element={<AUDocumentTempDetail />} />
                                 <Route path="/documentTempList" element={<AUDocumentTempList />} />
                                 <Route path="/expenseApproval" element={<AUExpenseApproval />} />
                                 <Route path="/vacationDoc" element={<AUVacationDoc />} />
@@ -140,7 +141,7 @@ function App() {
                                 <Route path="/fVehicleDetail/:fvehiclecode" element={<AUFVehicleDetail />} />
                                 <Route path="/fVehicleForm" element={<AUFVehicleForm />} />
                                 <Route path="/fVehicleList" element={<AUFVehicleList />} />
-
+                                <Route path="/meetingSummary" element={<AUMeetingSummary />} />
                                 {/* Fallback Route */}
                                 <Route path="/*" element={<Error404Component />} />
                             </Routes>

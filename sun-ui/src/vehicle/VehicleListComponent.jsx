@@ -56,10 +56,10 @@ const VehicleListComponent = () => {
   return (
     <div className="container" style={{ marginTop: 30 }}>
       <br></br>
-      <h4>차량 관리 현황</h4>
+      <h4 style={{ marginBottom: "30px" }}>차량 관리 현황</h4>
 
       {/* 차량 타입 설정 드랍다운 */}
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginRight:6}}>
         <DropdownButton
           id="vTypeDropdown"
           title={vehicleType ? (vehicleType === "C" ? "영업차량" : "화물차량") : "전체차량"}
@@ -72,8 +72,8 @@ const VehicleListComponent = () => {
       </div>
 
       {/* 차량 관리 테이블 */}
-      <table className="table table-bordered">
-        <thead>
+      <table className="table table-bordered table-hover" style={{ textAlign: "center" }}>
+        <thead style={{ backgroundColor: "#f2f2f2" }}>
           <tr>
             <th>차량등록번호</th>
             <th>차량번호</th>
@@ -87,14 +87,19 @@ const VehicleListComponent = () => {
           {vehiclelist.map((item, index) => (
             <tr key={index}>
               <td>
-                <Link to={`/vehicleDetail/${item.vehicleCode}`} style={{ textDecoration: "none"}}> 
-                <div >
-                {item.vehicleStatus==='R' ? <span className="badge badge-danger">수리</span> :
-                (item.vehicleStatus==='I' ? <span className="badge badge-primary">보관</span> :
-                  <span className="badge badge-success">출차</span>)}{'\u00A0'}{'\u00A0'}
-                  {item.vehicleCode}
+                <Link to={`/vehicleDetail/${item.vehicleCode}`} style={{ textDecoration: "none", color: "#007bff" }}>
+                  <div>
+                    {item.vehicleStatus === 'R' ? (
+                      <span className="badge badge-danger">수리</span>
+                    ) : item.vehicleStatus === 'I' ? (
+                      <span className="badge badge-primary">보관</span>
+                    ) : (
+                      <span className="badge badge-success">출차</span>
+                    )}
+                    {'\u00A0'}{'\u00A0'}
+                    {item.vehicleCode}
                   </div>
-                  </Link>
+                </Link>
               </td>
               <td>{item.vehicleNo}</td>
               <td>{item.vehicleModel}</td>
@@ -117,7 +122,8 @@ const VehicleListComponent = () => {
             cursor: 'pointer',
             border: '1px solid #ddd',
             backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-            color: currentPage === 0 ? '#000' : '#fff'
+            color: currentPage === 0 ? '#000' : '#fff',
+            borderRadius: "4px"
           }}
         >
           처음
@@ -131,12 +137,15 @@ const VehicleListComponent = () => {
             cursor: 'pointer',
             border: '1px solid #ddd',
             backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-            color: currentPage === 0 ? '#000' : '#fff'
+            color: currentPage === 0 ? '#000' : '#fff',
+            borderRadius: "4px"
           }}
         >
           이전
         </button>
-        <span>페이지 {currentPage + 1} / {displayTotalPages}</span>
+        <span style={{ alignSelf: "center", margin: "0 10px" }}>
+          페이지 {currentPage + 1} / {displayTotalPages}
+        </span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage + 1 >= totalPages || isEmpty}
@@ -146,7 +155,8 @@ const VehicleListComponent = () => {
             cursor: 'pointer',
             border: '1px solid #ddd',
             backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-            color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+            color: currentPage + 1 >= totalPages ? '#000' : '#fff',
+            borderRadius: "4px"
           }}
         >
           다음
@@ -160,7 +170,8 @@ const VehicleListComponent = () => {
             cursor: 'pointer',
             border: '1px solid #ddd',
             backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-            color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+            color: currentPage + 1 >= totalPages ? '#000' : '#fff',
+            borderRadius: "4px"
           }}
         >
           마지막
@@ -168,10 +179,12 @@ const VehicleListComponent = () => {
       </div>
 
       {/* 차량 등록 버튼 */}
-      <div
-        style={{ display: "flex", marginTop: 50, justifyContent: "center", marginBottom: 20 }}
-      >
-        <Link to='/vehicleForm'><button className="btn btn-secondary">차량 등록</button></Link>
+      <div style={{ display: "flex", marginTop: 50, justifyContent: "center", marginBottom: 20 }}>
+        <Link to='/vehicleForm'>
+          <button className="btn btn-secondary">
+            차량 등록
+          </button>
+        </Link>
       </div>
     </div>
   );

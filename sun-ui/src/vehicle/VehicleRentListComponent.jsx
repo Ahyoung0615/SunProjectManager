@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
 import VehicleRentDetailComponent from './VehicleRentDetailComponent';
 import axios from 'axios';
 
@@ -12,108 +11,131 @@ const VehicleRentListComponent = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-    const [vrentlist, setVrentlist] = useState([{
-        vrsvCode: '',
-        empName: '',
-        jobName: '',
-        deptName: '',
-        startDate: '',
-        endDate: '',
-        vrsvStatus: ''
-    }]);
+    const [vrentlist, setVrentlist] = useState([]);
+    const [filteredList, setFilteredList] = useState([]);
+    const [refresh, setRefresh] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSelect = (eventKey) => {
-        console.log("선택된 배차 현황:", eventKey);
-        setStatusFilter(eventKey);
-        getVehicleRentList(currentPage, startDate, endDate, eventKey);
-    };
-
-    const getVehicleRentList = async (page = 0, startDate, endDate, statusFilter) => {
-        console.log("getVehicleRentList 호출됨", { page, startDate, endDate, statusFilter });
-
-        if (page < 0) {
-            console.error("Page index must not be less than zero");
-            page = 0;
-        }
-
+    const getVehicleRentList = async () => {
         try {
             const response = await axios.get("http://localhost:8787/api/getAllVehicleRsv", {
                 params: {
-                    page: page + 1,
-                    size: 10,
-                    startDate: startDate || '2024-08-13',
-                    endDate: endDate || '2024-08-13',
-                    status: statusFilter
+                    startDate: startDate || '2020-08-13',
+                    endDate: endDate || '2025-08-13',
                 },
             });
 
             const data = response.data;
-            console.log("응답 데이터:", data);
-            setVrentlist(data.content);  // setVehiclelist를 setVrentlist로 수정
-            setTotalPages(data.totalPage || 1);
-            setCurrentPage(page);
-
+            setVrentlist(data.content);
+            setFilteredList(data.content); // 초기에는 전체 데이터를 필터된 리스트로 설정
+            setTotalPages(Math.ceil(data.content.length / 10));
+            setCurrentPage(0);  // 페이지를 처음으로 초기화
         } catch (error) {
             console.error("배차신청서 목록 조회 실패 : ", error);
         }
     };
 
-    useEffect(() => {
-        console.log("useEffect 실행됨", { startDate, endDate });
-        getVehicleRentList(0, startDate, endDate);
-    }, [startDate, endDate]);
+    const handleSelect = (eventKey) => {
+        setStatusFilter(eventKey);
+        if (eventKey === '') {
+            setFilteredList(vrentlist); // "전체보기" 선택 시 전체 목록을 다시 설정
+        } else {
+            const filtered = vrentlist.filter(item => item.vrsvStatus === eventKey);
+            setFilteredList(filtered);
+            setTotalPages(Math.ceil(filtered.length / 10));
+            setCurrentPage(0);  // 페이지를 처음으로 초기화
+        }
+    };
 
-
-    const handleDetailToggle = (vrscvCode) => {
-        console.log("상세보기 토글", { vrscvCode });
-        setSelectedvrscvCode(vrscvCode);
+    const handleDetailToggle = (vrsvCode) => {
+        setSelectedvrscvCode(vrsvCode);
         setIsvrscvCodedetailopen(!isvrscvCodedetailopen);
     };
 
     const handlePageChange = (page) => {
-        console.log("페이지 변경", { page });
         if (page >= 0 && page < totalPages) {
-            getVehicleRentList(page, startDate, endDate, statusFilter);
+            setCurrentPage(page);
         }
     };
 
-    const isEmpty = vrentlist.length === 0;
+    const handleRefresh = () => {
+        setRefresh(!refresh);
+    };
+
+    const handleSearch = () => {
+        if (new Date(startDate) > new Date(endDate)) {
+            setErrorMessage('시작일자가 종료일자보다 늦을 수 없습니다.');
+            return;
+        }
+        setErrorMessage(''); // 에러 메시지 초기화
+        getVehicleRentList();
+    };
+
+    const isEmpty = filteredList.length === 0;
     const displayTotalPages = totalPages > 0 ? totalPages : 1;
+
+    useEffect(() => {
+        getVehicleRentList(); // 초기 화면에 전체 목록을 표시
+    }, [refresh]);
 
     return (
         <div className='container' style={{ marginTop: 30 }}>
-            <br></br>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                 <h4 style={{ marginBottom: 0 }}>배차 관리</h4>
-                <DropdownButton
-                    id="dropdown-basic-button"
-                    title="전체보기"
-                    onSelect={handleSelect}
-                >
-                    <Dropdown.Item eventKey="W">승인대기중</Dropdown.Item>
-                    <Dropdown.Item eventKey="N">반려</Dropdown.Item>
-                    <Dropdown.Item eventKey="Y">승인완료</Dropdown.Item>
-                </DropdownButton>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="form-control"
+                        style={{ marginRight: 10 }}
+                    /> <b> ~ </b>
+                    <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="form-control"
+                        style={{ marginLeft:10, marginRight: 2 }}
+                    />
+                    <button
+                        className="btn btn-primary"
+                        onClick={handleSearch}
+                        style={{ marginRight: 30 }}
+                    >
+                        <i className="fas fa-search"></i>
+                    </button>
+                    <DropdownButton
+                        id="dropdown-basic-button"
+                        title="전체보기"
+                        onSelect={handleSelect}
+                    >
+                        <Dropdown.Item eventKey="">전체보기</Dropdown.Item>
+                        <Dropdown.Item eventKey="W">승인대기중</Dropdown.Item>
+                        <Dropdown.Item eventKey="N">반려</Dropdown.Item>
+                        <Dropdown.Item eventKey="Y">승인완료</Dropdown.Item>
+                    </DropdownButton>
+                </div>
             </div>
-            <div style={{ marginTop: -40, marginLeft: 130 }}>
+            {errorMessage && <div style={{ color: 'red', textAlign: 'center', marginBottom: 10 }}>{errorMessage}</div>}
+            <div style={{ marginTop: -30}}>
                 <span>신청 번호를 누르면 상세보기</span>
             </div>
             {/* 배차 관리 테이블 */}
-            <table className="table table-bordered" style={{ marginTop: 20 }}>
-                <thead>
+            <table className="table table-bordered" style={{ marginTop: 20, textAlign: "center" }}>
+                <thead style={{ backgroundColor: "#f8f9fa" }}>
                     <tr>
-                        <th>배차코드</th>
-                        <th>신청자</th>
-                        <th>직급</th>
-                        <th>부서</th>
-                        <th>기간</th>
-                        <th>배차 현황</th>
+                        <th style={{ width: "15%" }}>배차코드</th>
+                        <th style={{ width: "20%" }}>신청자</th>
+                        <th style={{ width: "15%" }}>직급</th>
+                        <th style={{ width: "20%" }}>부서</th>
+                        <th style={{ width: "20%" }}>기간</th>
+                        <th style={{ width: "10%" }}>배차 현황</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {vrentlist.map((item, index) => (
-                        <tr key={index}>
-                            <td style={{ color: 'blue' }} onClick={() => handleDetailToggle(item.vrsvCode)}><b>{item.vrsvCode}</b></td>
+                    {filteredList.slice(currentPage * 10, (currentPage + 1) * 10).map((item, index) => (
+                        <tr key={index} style={{ cursor: "pointer" }}>
+                            <td style={{ color: 'blue', fontWeight: 'bold' }} onClick={() => handleDetailToggle(item.vrsvCode)}>{item.vrsvCode}</td>
                             <td>{item.empName}</td>
                             <td>{item.jobName}</td>
                             <td>{item.deptName}</td>
@@ -127,24 +149,24 @@ const VehicleRentListComponent = () => {
                                     <span className="badge badge-success">승인</span>
                                 )}
                             </td>
-
                         </tr>
                     ))}
                 </tbody>
             </table>
 
             {/* 페이지네이션 버튼 */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
                 <button
                     onClick={() => handlePageChange(0)}
                     disabled={currentPage === 0 || isEmpty}
                     style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-                        color: currentPage === 0 ? '#000' : '#fff'
+                        marginRight: 5,
+                        padding: "5px 10px",
+                        backgroundColor: currentPage === 0 || isEmpty ? "#e9ecef" : "#007bff",
+                        color: currentPage === 0 || isEmpty ? "#6c757d" : "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: currentPage === 0 || isEmpty ? "not-allowed" : "pointer"
                     }}
                 >
                     처음
@@ -153,27 +175,29 @@ const VehicleRentListComponent = () => {
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 0 || isEmpty}
                     style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-                        color: currentPage === 0 ? '#000' : '#fff'
+                        marginRight: 5,
+                        padding: "5px 10px",
+                        backgroundColor: currentPage === 0 || isEmpty ? "#e9ecef" : "#007bff",
+                        color: currentPage === 0 || isEmpty ? "#6c757d" : "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: currentPage === 0 || isEmpty ? "not-allowed" : "pointer"
                     }}
                 >
                     이전
                 </button>
-                <span>페이지 {currentPage + 1} / {displayTotalPages}</span>
+                <span style={{ marginRight: 5 }}>페이지 {currentPage + 1} / {displayTotalPages}</span>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage + 1 >= totalPages || isEmpty}
                     style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-                        color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+                        marginRight: 5,
+                        padding: "5px 10px",
+                        backgroundColor: currentPage + 1 >= totalPages || isEmpty ? "#e9ecef" : "#007bff",
+                        color: currentPage + 1 >= totalPages || isEmpty ? "#6c757d" : "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: currentPage + 1 >= totalPages || isEmpty ? "not-allowed" : "pointer"
                     }}
                 >
                     다음
@@ -182,12 +206,12 @@ const VehicleRentListComponent = () => {
                     onClick={() => handlePageChange(totalPages - 1)}
                     disabled={currentPage + 1 >= totalPages || isEmpty}
                     style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-                        color: currentPage + 1 >= totalPages ? '#000' : '#fff'
+                        padding: "5px 10px",
+                        backgroundColor: currentPage + 1 >= totalPages || isEmpty ? "#e9ecef" : "#007bff",
+                        color: currentPage + 1 >= totalPages || isEmpty ? "#6c757d" : "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: currentPage + 1 >= totalPages || isEmpty ? "not-allowed" : "pointer"
                     }}
                 >
                     마지막
@@ -195,9 +219,7 @@ const VehicleRentListComponent = () => {
             </div>
 
             {isvrscvCodedetailopen && selectedvrscvCode && (
-                <div>
-                    <VehicleRentDetailComponent vrentlist={vrentlist.find(item => item.vrentcode === selectedvrscvCode)} />
-                </div>
+                <VehicleRentDetailComponent vrsvCode={selectedvrscvCode} onApproval={handleRefresh} />
             )}
         </div>
     );
