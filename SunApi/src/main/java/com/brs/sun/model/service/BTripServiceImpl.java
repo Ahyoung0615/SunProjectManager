@@ -116,8 +116,13 @@ public class BTripServiceImpl implements BTripService {
 	}
 
 	@Override
-	public VehicleReservationVo getOneVehicleRsv(String vrsvCode) {
+	public VehicleRentDTO getOneVehicleRsv(String vrsvCode) {
 		return dao.getOneVehicleRsv(vrsvCode);
+	}
+
+	@Override
+	public int insertReVehicleRsc(VehicleRentDTO requestDto) {
+		return dao.insertReVehicleRsc(requestDto);
 	}
 
 }

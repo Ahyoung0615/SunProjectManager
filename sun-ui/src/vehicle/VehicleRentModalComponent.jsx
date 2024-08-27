@@ -1,55 +1,21 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const VehicleRentFormComponent = ({ onInfoChange, info }) => {
-  const [reason, setReason] = useState(info.vrsvDetail || ""); 
+const VehicleRentModalComponent = ({btripCode}) => {
+  const [rentStartDate, setRentStartDate] = useState("");
+  const [rentEndDate, setRentEndDate] = useState("");
+  const [reason, setReason] = useState(""); 
   const [vehicleRentList, setVehicleRentList] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState(info.vehicleCode || ""); 
+  const [selectedVehicle, setSelectedVehicle] = useState(""); 
   const [errorMessage, setErrorMessage] = useState("");
-  const [formValid, setFormValid] = useState(true); // 유효성 검사 상태 추가
-
-  useEffect(() => {
-    if (info.rentStartDate && info.rentEndDate && selectedVehicle && reason.trim() !== "") {
-      const vehicleData = {
-        vrsvDate: { start: info.rentStartDate, end: info.rentEndDate },
-        vehicleCode: selectedVehicle,
-        vrsvDetail: reason,
-      };
-
-      onInfoChange(vehicleData);
-    }
-  }, [info.rentStartDate, info.rentEndDate, selectedVehicle, reason]);
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    onInfoChange(name, value);
-  };
-
-  const handleCheckAvailability = async () => {
-    if (!info.rentStartDate || !info.rentEndDate) {
-      alert("날짜를 먼저 입력해주세요.");
-      return;
-    }
-
-    try {
-      const response = await axios.get("http://localhost:8787/api/availableVehicle", {
-        params: { startDate: info.rentStartDate, endDate: info.rentEndDate },
-      });
-
-      const data = response.data;
-      setVehicleRentList(data);
-      setSelectedVehicle("");
-    } catch (error) {
-      console.error('차량 조회 실패', error);
-    }
-  };
+  const [formValid, setFormValid] = useState(true); 
 
   const handleStartDateChange = (e) => {
     const newStartDate = e.target.value;
-    onInfoChange("rentStartDate", newStartDate);
+    setRentStartDate(newStartDate);
 
     // 유효성 검사 - 종료일자가 시작일자보다 이전인지 확인
-    if (info.rentEndDate && newStartDate > info.rentEndDate) {
+    if (rentEndDate && newStartDate > rentEndDate) {
       setErrorMessage("종료일은 시작일보다 빠른 날짜일 수 없습니다.");
       setFormValid(false);
     } else {
@@ -60,12 +26,12 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
 
   const handleEndDateChange = (e) => {
     const newEndDate = e.target.value;
-    if (newEndDate < info.rentStartDate) {
+    if (newEndDate < rentStartDate) {
       setErrorMessage("종료일은 시작일보다 빠른 날짜일 수 없습니다.");
       setFormValid(false);
-      onInfoChange("rentEndDate", ""); // 유효하지 않은 경우 종료일을 초기화
+      setRentEndDate(""); // 유효하지 않은 경우 종료일을 초기화
     } else {
-      onInfoChange("rentEndDate", newEndDate);
+      setRentEndDate(newEndDate);
       setErrorMessage("");
       setFormValid(true);
     }
@@ -74,7 +40,60 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
   const handleVehicleSelect = (e) => {
     const selectedVehicleCode = e.target.value;
     setSelectedVehicle(selectedVehicleCode);
-    onInfoChange("vehicleCode", selectedVehicleCode);
+  };
+
+  const handleCheckAvailability = async () => {
+    if (!rentStartDate || !rentEndDate) {
+      alert("날짜를 먼저 입력해주세요.");
+      return;
+    }
+
+    try {
+      const response = await axios.get("http://localhost:8787/api/availableVehicle", {
+        params: { startDate: rentStartDate, endDate: rentEndDate },
+      });
+
+      const data = response.data;
+      setVehicleRentList(data);
+      setSelectedVehicle("");
+    } catch (error) {
+      console.error('차량 조회 실패', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!rentStartDate || !rentEndDate || !selectedVehicle || reason.trim() === "") {
+      alert("모든 필드를 올바르게 입력해주세요.");
+      return;
+    }
+
+// 시작일과 종료일을 변수에 저장
+const startDate = rentStartDate; // 예: "2024-05-18"
+const endDate = rentEndDate; // 예: "2024-05-19"
+
+// JSON 형식으로 vrsvDate 생성
+const vrsvDate = JSON.stringify({ start: startDate, end: endDate });
+
+// vehicleData 객체 생성
+const vehicleData = {
+  vrsvDate: vrsvDate,
+  vehicleCode: selectedVehicle,
+  vrsvDetail: reason,
+  btripCode: btripCode,
+};
+
+// vehicleData 출력 (디버깅 용도로)
+console.log(vehicleData);
+
+
+    try {
+      const response = await axios.post("http://localhost:8787/api/reVehicleRsv", vehicleData);
+      if (response.status === 200) {
+        alert("배차 신청이 완료되었습니다.");
+      }
+    } catch (error) {
+      console.error('배차 신청 실패', error);
+    }
   };
 
   return (
@@ -97,7 +116,7 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
                   <input
                     type="date"
                     name="rentStartDate"
-                    value={info.rentStartDate || ""}
+                    value={rentStartDate || ""}
                     onChange={handleStartDateChange}
                     className="form-control"
                   />
@@ -106,7 +125,7 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
                   <input
                     type="date"
                     name="rentEndDate"
-                    value={info.rentEndDate || ""}
+                    value={rentEndDate || ""}
                     onChange={handleEndDateChange}
                     className="form-control"
                   />
@@ -152,16 +171,17 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
           placeholder="500자 이내로 내용을 입력해주세요"
           name="vrsvDetail"
           value={reason}
-          onChange={(e) => {
-            setReason(e.target.value);
-            onInfoChange("vrsvDetail", e.target.value);
-          }}
+          onChange={(e) => setReason(e.target.value)}
           maxLength="500"
           rows="4"
         ></textarea>
+      </div>
+
+      <div style={{ marginTop: 30, textAlign: "center" }}>
+        <button className="btn btn-success" onClick={handleSubmit}>신청 제출</button>
       </div>
     </div>
   );
 };
 
-export default VehicleRentFormComponent;
+export default VehicleRentModalComponent;

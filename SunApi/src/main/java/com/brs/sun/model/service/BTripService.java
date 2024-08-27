@@ -120,7 +120,14 @@ public interface BTripService {
 	/**
 	 * 배차 신청 상세조회
 	 * @param vrsvCode
-	 * @return VehicleReservationVo
+	 * @return VehicleRentDTO
 	 */
-	public VehicleReservationVo getOneVehicleRsv(String vrsvCode);
+	public VehicleRentDTO getOneVehicleRsv(String vrsvCode);
+
+	/**
+	 * 배차 신청서 재등록
+	 * @param requestDto
+	 * @return VehicleRentDTO
+	 */
+	public int insertReVehicleRsc(VehicleRentDTO requestDto);
 }

@@ -127,13 +127,28 @@ public class BTripController {
 	@PostMapping("/rejectVRent")
 	public int updateVehicleRsrvNo(@RequestParam String vrsvCode, @RequestParam String vrsvReply) {
 		log.info("반려한 배차신청서 코드 : {}",vrsvCode);
+		log.info("반려한 배차신청서 반려사유 : {}",vrsvReply);
 		return service.updateVehicleRsrvNo(vrsvCode, vrsvReply);
 	}
 	
 	@GetMapping("/vrentDetail/{vrsvCode}")
-	public VehicleReservationVo getOneVehicleRsv(@PathVariable("vrsvCode") String vrsvCode) {
+	public VehicleRentDTO getOneVehicleRsv(@PathVariable("vrsvCode") String vrsvCode) {
 		log.info("getOneVehicleRsv 요청 vrsvCode : {}", vrsvCode);
 	    return service.getOneVehicleRsv(vrsvCode);
+	}
+
+	
+	@PostMapping("/reVehicleRsv")
+	public void insertReVehicleRsc(@RequestBody Map<String, Object> requestDto) {
+		log.info("재입력한 배차 신청서 정보 : {}",requestDto);
+	    VehicleRentDTO vehicleRentDTO = VehicleRentDTO.builder()
+	            .bTripCode(Integer.parseInt((String) requestDto.get("btripCode")))
+	            .vehicleCode(Integer.parseInt((String) requestDto.get("vehicleCode")))
+	            .vrsvDetail((String) requestDto.get("vrsvDetail"))
+	            .vrsvDate((String) requestDto.get("vrsvDate"))
+	            .build();
+
+	    service.insertReVehicleRsc(vehicleRentDTO);
 	}
 
 }

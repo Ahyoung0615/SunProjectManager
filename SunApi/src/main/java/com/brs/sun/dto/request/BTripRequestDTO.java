@@ -20,7 +20,7 @@ public class BTripRequestDTO {
     private LocalDate rentEndDate;   // 차량 대여 종료 날짜를 LocalDate로 변경
     private int vehicleCode;         // 차량 코드
     private String vrsvDetail;       // 예약 상세 정보
-
+    private int bTripCode;
     // vrsvDate는 JSON 문자열로 변환되므로, 이 부분은 그대로 유지
     public String getVrsvDate() {
         JsonObject object = new JsonObject();

@@ -14,8 +14,8 @@ const VacationListComponent = () => {
     }, []);
 
     useEffect(() => {
-        if (!sessionEmp) return; 
-        
+        if (!sessionEmp) return;
+
         const getDayOff = async (empCode) => {
             try {
                 const response = await axios.get(`http://localhost:8787/api/dayOff/${empCode}`);
@@ -26,8 +26,12 @@ const VacationListComponent = () => {
         };
 
         getDayOff(sessionEmp);
-    }, [sessionEmp]); // sessionEmp가 변경될 때마다 실행
+    }, [sessionEmp]);
 
+    // sessionEmp와 dayOff가 모두 준비될 때만 렌더링
+    if (!sessionEmp || !dayOff) {
+        return null; // 로딩 중이거나 데이터가 없을 때는 아무것도 렌더링하지 않음
+    }
 
     return (
         <div>
@@ -44,9 +48,9 @@ const VacationListComponent = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{dayOff.dayOffLeft+dayOff.dayOffUsed} 일</td>
-                            <td>{dayOff ? dayOff.dayOffLeft : '로딩 중...'} 일</td>
-                            <td>{dayOff ? dayOff.dayOffUsed : '로딩 중...'} 일</td>
+                            <td>{dayOff.dayOffLeft + dayOff.dayOffUsed} 일</td>
+                            <td>{dayOff.dayOffLeft} 일</td>
+                            <td>{dayOff.dayOffUsed} 일</td>
                         </tr>
                     </tbody>
                 </table>

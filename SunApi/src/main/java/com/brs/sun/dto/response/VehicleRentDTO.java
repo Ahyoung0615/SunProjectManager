@@ -30,6 +30,10 @@ public class VehicleRentDTO {
 	private String vrsvDetail;
 	private String vrsvReply;
 	private String vrsvStatus;
+	private String bTripDepart;
+	private String bTripArrival;
+	private String vehicleModel;
+	private String vehicleSize;
 	
     private LocalDate startDate;
     private LocalDate endDate;
