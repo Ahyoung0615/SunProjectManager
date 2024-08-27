@@ -1,0 +1,76 @@
+/* ExpenseApprovalComponent.module.css */
+.expenseContainer {
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.expenseHeader {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.expenseForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.expenseField {
+    margin-bottom: 20px;
+}
+
+.expenseLabel {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.expenseDatePicker,
+.expenseInput,
+.expenseTextarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.expenseDatePicker {
+    height: 44px;
+}
+
+.expenseError {
+    color: #d9534f;
+    margin-top: 8px;
+}
+
+.expenseButtonContainer {
+    text-align: center;
+}
+
+.expenseSubmitButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.expenseSubmitButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.expenseSubmitButton:not(:disabled):hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

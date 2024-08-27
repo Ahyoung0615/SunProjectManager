@@ -87,8 +87,8 @@ public class EDocServiceImpl implements EDocService {
 	}
 	
 	@Override
-	public boolean appRejecct(Map<String, Object> map) {
-		return dao.appRejecct(map);
+	public boolean appRejecct(EDocVo vo) {
+		return dao.appRejecct(vo);
 	}
 	
 	@Override
@@ -100,6 +100,16 @@ public class EDocServiceImpl implements EDocService {
 	public boolean updateCancelDocStatus(int edocCode) {
 		return dao.updateCancelDocStatus(edocCode);
 	}
+	
+	@Override
+	@Transactional
+	public boolean updateRejectDocStatus(EDocVo vo) {
+	    // 모든 DAO 메서드의 결과가 true일 때만 true를 반환
+	    return dao.appRejecct(vo) 
+	            && dao.updateDocReply(vo) 
+	            && dao.updateRejectDocStatus(vo);
+	}
+
 	
 	@Override
 	public int chkApp(int edocCode) {

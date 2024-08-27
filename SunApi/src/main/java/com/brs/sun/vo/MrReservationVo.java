@@ -27,4 +27,20 @@ public class MrReservationVo {
 	private LocalDateTime mrrStartTime;
 	// 종료 날짜
 	private LocalDateTime mrrEndTime;
+	
+	// MeetRoom Table Join
+	// 회의실 이름
+	private String meetroomName;
+	
+	// Employee Table Join
+	// 예약 사원 이름
+	private String empName;
+	
+	// Job Table Join
+	// 예약 사원 직급
+	private String jobName;
+	
+	// Department Table Join
+	// 예약 사원 부서
+	private String deptName;
 }

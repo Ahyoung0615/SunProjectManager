@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ModalComponent = ({ open, close, title, body, size }) => {
   return (
-    <Modal show={open} onHide={close} size={size}>
+    <Modal show={open} onHide={close} size={size} style={ {top : 100} }>
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

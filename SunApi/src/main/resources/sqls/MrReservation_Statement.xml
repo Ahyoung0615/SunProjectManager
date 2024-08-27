@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.brs.sun.model.dao.MrReservationDao">
+	
+	<select id="selectReservationList" resultType="MrReservationVo">
+		SELECT *
+		FROM MRRESERVATION m JOIN MEETROOM m2 
+		ON m.MEETROOM_CODE = m2.MEETROOM_CODE
+	</select>
+	
+	<select id="selectReservationDetail" resultType="MrReservationVo">
+		SELECT *
+		FROM MRRESERVATION m JOIN MEETROOM m2 
+		ON m.MEETROOM_CODE = m2.MEETROOM_CODE 
+		JOIN EMPLOYEE e 
+		ON m.EMP_CODE = e.EMP_CODE 
+		JOIN JOB j 
+		ON e.JOB_CODE = j.JOB_CODE 
+		JOIN DEPARTMENT d 
+		ON d.DEPT_CODE = e.DEPT_CODE 
+		WHERE m.MRR_CODE = #{mrrCode}
+	</select>
+	
+</mapper>

@@ -27,11 +27,13 @@ public interface EDocService {
 	
 	boolean appSuccess(Map<String, Object> map);
 	
-	boolean appRejecct(Map<String, Object> map);
+	boolean appRejecct(EDocVo vo);
 	
 	boolean updateSuccessDocStatus(int edocCode);
 	
 	boolean updateCancelDocStatus(int edocCode);
+	
+	boolean updateRejectDocStatus(EDocVo vo);
 	
 	int chkApp(int edocCode);
 }

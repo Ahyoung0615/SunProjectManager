@@ -67,9 +67,27 @@ public class EDocController {
 	
 	@PostMapping("/appReject")
 	public String updateDocReply(@RequestBody EDocRejectRequestDTO dto) {
-		log.info("map data: {}", dto);
-		return "";
+	    log.info("map data: {}", dto);
+
+	    // JSON 객체 생성
+	    JsonObject jsonObject = new JsonObject();
+	    jsonObject.addProperty("empName", dto.getEmpName());
+	    jsonObject.addProperty("jobName", dto.getJobName());
+	    jsonObject.addProperty("deptName", dto.getDeptName());
+	    jsonObject.addProperty("reason", dto.getReason());
+	    jsonObject.addProperty("rejectDate", dto.getRejectDate());
+
+	    log.info("jsonData: {}", jsonObject);
+
+	    EDocVo vo = EDocVo.builder()
+	                      .edocCode(dto.getEdocCode())
+	                      .empCode(dto.getEmpCode())
+	                      .edocReply(jsonObject.toString())
+	                      .build();
+
+	    return docService.updateRejectDocStatus(vo) ? "success" : "";
 	}
+
 
 	@PostMapping("/docCancel")
 	public String updateCancelDocStatus(@RequestParam int edocCode) {
@@ -185,6 +203,7 @@ public class EDocController {
 		jsonContent.addProperty("endDate", docData.getEndDate());
 		jsonContent.addProperty("usedDayOff", docData.getWeekdayCount());
 		jsonContent.addProperty("reason", docData.getReason());
+		jsonContent.addProperty("weekdayCount", docData.getWeekdayCount());
 		log.info("jsonData: {}", jsonContent.toString());
 
 		List<Integer> approvers = docData.getApprovers();
@@ -229,6 +248,7 @@ public class EDocController {
 		jsonContent.addProperty("endDate", docData.getEndDate());
 		jsonContent.addProperty("usedDayOff", docData.getWeekdayCount());
 		jsonContent.addProperty("reason", docData.getReason());
+		jsonContent.addProperty("weekdayCount", docData.getWeekdayCount());
 		log.info("jsonData: {}", jsonContent.toString());
 
 		List<Integer> approvers = docData.getApprovers();

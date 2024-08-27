@@ -1,133 +1,222 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'; // datepicker 스타일
+import styles from '../css/ExpenseApprovalComponent.module.css';
 import axios from 'axios';
-import styles from '../css/VacationDocComponent.module.css'; // 동일한 스타일 사용
+import OrgChartComponent from '../commodule/OrgChartComponent';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const DocumentDetailComponent = () => {
-    const [documentData, setDocumentData] = useState({});
+// 날짜 포맷 함수
+const formatLocalDate = (date) => {
+    if (!date) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// 날짜를 로컬 시작 시간으로 조정
+const adjustDateToLocalStart = (date) => {
+    if (!date) return new Date();
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(0, 0, 0, 0); // 시간을 00:00:00으로 설정
+    return adjustedDate;
+};
+
+// 날짜를 로컬 종료 시간으로 조정
+const adjustDateToLocalEnd = (date) => {
+    if (!date) return new Date();
+    const adjustedDate = new Date(date);
+    adjustedDate.setHours(23, 59, 59, 999); // 시간을 23:59:59.999로 설정
+    return adjustedDate;
+};
+
+const ExpenseApprovalComponent = () => {
     const { edocCode } = useParams();
+    const navigate = useNavigate();
+
+    const [sessionEmpCode, setSessionEmpCode] = useState(null);
+    const [empInfo, setEmpInfo] = useState({});
+    const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
+    const [currentDate, setCurrentDate] = useState('');
+    const [dateError, setDateError] = useState('');
+    const [selectedApprovers, setSelectedApprovers] = useState([]);
+    const [expenseDate, setExpenseDate] = useState(null);
+    const [amount, setAmount] = useState('');
+    const [reason, setReason] = useState('');
+    const [docTitle, setDocTitle] = useState('');
+    const [documentData, setDocumentData] = useState({});
+    const [isEditMode, setIsEditMode] = useState(true);
 
     useEffect(() => {
-        const fetchDocumentData = async () => {
+        const today = new Date();
+        const formattedDate = formatLocalDate(today);
+        setCurrentDate(formattedDate);
+    }, []);
+
+    useEffect(() => {
+        const sessionStorageInfo = window.sessionStorage.getItem("user");
+        if (sessionStorageInfo) {
             try {
-                const response = await axios.get(`http://localhost:8787/api/document/${edocCode}`);
-                setDocumentData(response.data);
+                const user = JSON.parse(sessionStorageInfo);
+                setSessionEmpCode(user.empcode);
             } catch (error) {
-                console.error('문서 데이터를 가져오는 중 오류 발생:', error);
+                console.error("Failed to parse session storage item 'user':", error);
             }
-        };
-        fetchDocumentData();
+        } else {
+            console.error("No 'user' item found in session storage");
+        }
+    }, []);
+
+    useEffect(() => {
+        if (sessionEmpCode) {
+            employeeInfo(sessionEmpCode);
+        }
+    }, [sessionEmpCode]);
+
+    useEffect(() => {
+        if (edocCode) {
+            fetchDocumentData(edocCode);
+        }
     }, [edocCode]);
 
-    const renderContent = () => {
-        if (documentData.docType === '휴가 신청서') {
-            return (
-                <>
-                    <h1 className={styles.vacationDocHeader}>휴가 신청서 상세</h1>
-                    <table className={styles.vacationDocTable}>
-                        <tbody>
-                            <tr>
-                                <th>문서 종류</th>
-                                <td>{documentData.docType}</td>
-                            </tr>
-                            <tr>
-                                <th>사유</th>
-                                <td>{documentData.reason}</td>
-                            </tr>
-                            <tr>
-                                <th>비상 연락망</th>
-                                <td>{documentData.contact}</td>
-                            </tr>
-                            <tr>
-                                <th>기간</th>
-                                <td>{documentData.startDate} ~ {documentData.endDate}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </>
-            );
-        } else if (documentData.docType === '지출 결의서') {
-            return (
-                <>
-                    <h1 className={styles.vacationDocHeader}>지출결의서</h1>
-                    <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
-                        <thead>
-                            <tr>
-                                {/* 결재자 목록 표시 */}
-                                {documentData.approvers && documentData.approvers.map((approver) => (
-                                    <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
-                                        {approver.empName} {approver.jobName}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                {/* 결재자 서명 표시 */}
-                                {documentData.approvers && documentData.approvers.map((approver) => (
-                                    <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                        {approver.signature && (
-                                            <img
-                                                src={approver.signature}
-                                                alt='싸인'
-                                                style={{
-                                                    width: '80px',
-                                                    height: 'auto',
-                                                    objectFit: 'contain',
-                                                    minHeight: '50px',
-                                                    maxHeight: '50px'
-                                                }}
-                                            />
-                                        )}
-                                    </td>
-                                ))}
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table className={styles.vacationDocTable}>
-                        <tbody>
-                            <tr>
-                                <th>지출 제목</th>
-                                <td colSpan="3">{documentData.expenseTitle}</td>
-                            </tr>
-                            <tr>
-                                <th>결재 일자</th>
-                                <td colSpan="3">{documentData.paymentDate}</td>
-                            </tr>
-                            {documentData.expenseItems && documentData.expenseItems.map((item, index) => (
-                                <React.Fragment key={index}>
-                                    <tr>
-                                        <th>지출 항목 {index + 1}</th>
-                                        <td>{item.description}</td>
-                                        <td>{item.amount}</td>
-                                    </tr>
-                                </React.Fragment>
-                            ))}
-                        </tbody>
-                    </table>
-                </>
-            );
+    const fetchDocumentData = async (code) => {
+        try {
+            const response = await axios.get(`http://localhost:8787/api/document/${code}`);
+            setDocumentData(response.data);
+            if (response.data.docStatus !== 'A') {
+                setIsEditMode(false);
+            }
+        } catch (error) {
+            console.error('문서 데이터를 가져오는 중 오류 발생:', error);
         }
     };
 
+    const employeeInfo = async (empCode) => {
+        try {
+            const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
+            const empData = response.data;
+            setEmpInfo(empData);
+            setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
+        } catch (error) {
+            console.error("Error fetching employee info:", error);
+        }
+    };
+
+    const deptCodeToText = (deptCode) => {
+        const deptNames = {
+            1: '경영총괄',
+            11: '경영지원',
+            21: '연구개발',
+            31: '고객지원',
+            41: '운송관리',
+            51: '품질관리',
+            61: '자재관리',
+            71: '생산제조'
+        };
+        return deptNames[deptCode] || '부서 없음';
+    };
+
+    const handleApproverSelection = (approvers) => {
+        const sortedApprovers = approvers.sort((a, b) => {
+            if (a.empCode == sessionEmpCode) return -1;
+            if (b.empCode == sessionEmpCode) return 1;
+            return 0;
+        });
+        setSelectedApprovers(sortedApprovers);
+    };
+
+    const handleSubmit = () => {
+        // 필수 값이 모두 존재하는지 확인
+        if (!expenseDate || !amount || !reason || !docTitle || !selectedApprovers.length) {
+            alert("필수값을 모두 입력해 주세요");
+            return;
+        }
+        
+        const date = new Date();
+        const localStart = adjustDateToLocalStart(date);
+        const localEnd = adjustDateToLocalEnd(date);
+        
+        const data = {
+            expenseDate: formatLocalDate(expenseDate),
+            amount,
+            reason,
+            docTitle,
+            selectedApprovers,
+            createdDate: localStart,
+            updatedDate: localEnd
+        };
+        
+        axios.post('http://localhost:8787/api/document/submit', data)
+            .then(() => {
+                alert("제출 완료");
+                navigate('/document/list');
+            })
+            .catch(error => {
+                console.error('제출 중 오류 발생:', error);
+                alert("제출에 실패했습니다.");
+            });
+    };
+
     return (
-        <div className={styles.vacationDocContainer}>
-            {renderContent()}
-            <div className={styles.vacationDocSignatureSection}>
-                <p className={styles.vacationDocSignature}>
-                    {documentData.docType === '휴가 신청서' ? '위와 같이 휴가를 신청하오니 허락하여 주시기 바랍니다.' : '위 금액을 청구하오니 결재해 주시기 바랍니다.'}
-                </p>
-                <div className={styles.vacationDocDate}>
-                    <p className={styles.signature}>
-                        {new Date(documentData.uploadDate).getFullYear()}년 {new Date(documentData.uploadDate).getMonth() + 1}월 {new Date(documentData.uploadDate).getDate()}일
-                    </p>
+        <div className={styles.expenseContainer}>
+            <h1 className={styles.expenseHeader}>지출 결의서</h1>
+
+            <form className={styles.expenseForm}>
+                <div className={styles.expenseField}>
+                    <label htmlFor="expenseDate" className={styles.expenseLabel}>지출일</label>
+                    <DatePicker
+                        selected={expenseDate}
+                        onChange={(date) => setExpenseDate(date)}
+                        dateFormat="yyyy-MM-dd"
+                        minDate={new Date()}
+                        className={styles.expenseDatePicker}
+                    />
+                    {dateError && <p className={styles.expenseError}>{dateError}</p>}
                 </div>
-                <p className={styles.vacationDocSignature}>부서: {documentData.deptName}</p>
-                <p className={styles.vacationDocSignature}>성명: {documentData.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
-            </div>
+                <div className={styles.expenseField}>
+                    <label htmlFor="amount" className={styles.expenseLabel}>금액</label>
+                    <input
+                        type="number"
+                        id="amount"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className={styles.expenseInput}
+                    />
+                </div>
+                <div className={styles.expenseField}>
+                    <label htmlFor="reason" className={styles.expenseLabel}>사유</label>
+                    <textarea
+                        id="reason"
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        className={styles.expenseTextarea}
+                    />
+                </div>
+                <div className={styles.expenseField}>
+                    <label htmlFor="docTitle" className={styles.expenseLabel}>문서 제목</label>
+                    <input
+                        type="text"
+                        id="docTitle"
+                        value={docTitle}
+                        onChange={(e) => setDocTitle(e.target.value)}
+                        className={styles.expenseInput}
+                    />
+                </div>
+                <div className={styles.expenseButtonContainer}>
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        className={styles.expenseSubmitButton}
+                        disabled={!isEditMode}
+                    >
+                        제출
+                    </button>
+                </div>
+            </form>
+            <OrgChartComponent onSelectApprovers={handleApproverSelection} />
         </div>
     );
 };
 
-export default DocumentDetailComponent;
+export default ExpenseApprovalComponent;

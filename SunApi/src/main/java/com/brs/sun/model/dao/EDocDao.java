@@ -29,11 +29,15 @@ public interface EDocDao {
 	
 	boolean appSuccess(Map<String, Object> map);
 	
-	boolean appRejecct(Map<String, Object> map);
+	boolean appRejecct(EDocVo vo);
+	
+	boolean updateDocReply(EDocVo vo);
 	
 	boolean updateSuccessDocStatus(int edocCode);
 	
 	boolean updateCancelDocStatus(int edocCode);
+	
+	boolean updateRejectDocStatus(EDocVo vo);
 	
 	// 전체 결재자 수
 	int appTotalCount (int edocCode);

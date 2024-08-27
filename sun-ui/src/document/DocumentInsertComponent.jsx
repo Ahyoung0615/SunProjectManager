@@ -15,8 +15,8 @@ const DocumentInsertComponent = () => {
         <div className={styles.documentInsertContainer}>
             <div className={styles.documentControl} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <select value={selectedDoc} onChange={handleChange} className={styles.documentSelectBox}>
-                    <option value="Expense">지출결의서</option>
                     <option value="Vacation">휴가신청서</option>
+                    <option value="Expense">지출결의서</option>
                 </select>
             </div>
             <div className={styles.documentContent}>

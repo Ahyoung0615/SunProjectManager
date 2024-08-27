@@ -1,6 +1,5 @@
 package com.brs.sun.vo;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;

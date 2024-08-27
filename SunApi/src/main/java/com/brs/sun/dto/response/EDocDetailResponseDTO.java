@@ -20,8 +20,9 @@ public class EDocDetailResponseDTO {
 	private LocalDate eDocDate;
 	private String edocType;
 	private String edocStatus;
+	private String edocReply;
 	
 	public static EDocDetailResponseDTO of(EDocVo vo) {
-		return new EDocDetailResponseDTO(vo.getEdocTitle(), vo.getEdocContent(), vo.getEdocDate(), vo.getEdocType(), vo.getEdocStatus());
+		return new EDocDetailResponseDTO(vo.getEdocTitle(), vo.getEdocContent(), vo.getEdocDate(), vo.getEdocType(), vo.getEdocStatus(), vo.getEdocReply());
 	}
 }
