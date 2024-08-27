@@ -44,10 +44,6 @@ const BoardInsertComponent = () => {
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
     
-        selectedFiles.forEach(file => {
-            console.log(`File name: ${file.name}, File size: ${file.size}`);
-        });
-    
         const validFiles = selectedFiles.filter(file => file.size <= MAX_FILE_SIZE);
         const invalidFiles = selectedFiles.filter(file => file.size > MAX_FILE_SIZE);
     
@@ -86,19 +82,30 @@ const BoardInsertComponent = () => {
         } catch (error) {
             console.error('게시글 등록 중 오류가 발생했습니다:', error);
     
-            // 에러 핸들링 수정
             const errorMessage = error.response?.data?.message || '게시글 등록 중 오류가 발생했습니다.';
             alert(errorMessage);
         } finally {
             setLoading(false); // 로딩 종료
         }
     };
+
     const renderFilePreviews = () => {
         return files.map((file, index) => (
             <div key={index} className="file-preview">
-                <p>{file.name} ({(file.size / 1024).toFixed(2)} KB)</p>
+                <p>{file.name} ({(file.size / 1024).toFixed(2)} KB)<button 
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={() => handleRemoveFile(index)}
+                        style={{ marginLeft: '10px'}}
+                    >
+                        제거
+                    </button></p>
             </div>
         ));
+    };
+
+    const handleRemoveFile = (index) => {
+        setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
     };
 
     return (
@@ -122,7 +129,35 @@ const BoardInsertComponent = () => {
                         editor={ClassicEditor}
                         data={notice.notiContent}
                         onChange={handleEditorChange}
-                        config={{}}
+                        config={{
+                            ckfinder: {
+                                uploadUrl: 'http://localhost:8787/uploadImageBoard', // 이미지 업로드 서버 경로
+                            },
+                            image: {
+                                // 이미지 리사이즈 옵션 추가
+                                resizeOptions: [
+                                    {
+                                        name: 'resizeImage:resize10',
+                                        value: '10',
+                                        icon: '<svg>...</svg>' // 아이콘 추가
+                                    },
+                                    {
+                                        name: 'resizeImage:resize25',
+                                        value: '25',
+                                        icon: '<svg>...</svg>' // 아이콘 추가
+                                    },
+                                    // 추가 사이즈 옵션을 필요에 따라 추가
+                                ],
+                                toolbar: [
+                                    'imageTextAlternative', '|',
+                                    'imageStyle:full', 'imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:alignRight',
+                                    'resizeImage:resize10', 'resizeImage:resize25', 'resizeImage:resize50', 'resizeImage:resize75', 'resizeImage:resize100'
+                                ]
+                            },
+                            toolbar: [
+                                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', '|', 'undo', 'redo'
+                            ],
+                        }}
                     />
                 </div>
                 <div className="form-group">

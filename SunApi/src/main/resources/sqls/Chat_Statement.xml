@@ -26,6 +26,13 @@
     	WHERE CHATROOM_CODE = #{chatroomCode}
     	ORDER BY CHAT_CODE ASC
     </select>
+    
+    <select id="chatParti" resultType="ChatRoomVo">
+    	SELECT CHATROOM_PARTI
+    	FROM CHATROOM
+    	WHERE CHATROOM_CODE = #{chatroomCode}
+    </select>
+    
     <select id="getLastChatMessage" resultType="ChatVo">
     SELECT CHAT_CONTENT
     FROM (

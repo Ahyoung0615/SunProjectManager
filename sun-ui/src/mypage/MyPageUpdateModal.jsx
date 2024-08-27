@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 
-const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
+const MyPageUpdateModal = ({ show, handleClose, empCode, onUpdateSuccess }) => {
     const [employee, setEmployee] = useState({});
     const [emp, setEmp] = useState({
         EmpCode: '',
@@ -16,29 +15,31 @@ const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
     });
 
     useEffect(() => {
-        // API 호출
-        fetch(`http://localhost:8787/memberDetail/${empCode}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                setEmployee(data);
-                setEmp({
-                    EmpCode: data.empCode.toString(),
-                    EmpJob: data.jobCode.toString(),
-                    EmpDept: data.deptCode ? data.deptCode.toString() : '',
-                    EmpTel: data.empTel || '',
-                    EmpEmail: data.empEmail || '',
-                    EmpAddress: data.empAddress || '',
-                    EmpStatus: data.empStatus || '',
+        if (empCode) {
+            // API 호출
+            fetch(`http://localhost:8787/memberDetail/${empCode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    setEmployee(data);
+                    setEmp({
+                        EmpCode: data.empCode.toString(),
+                        EmpJob: data.jobCode.toString(),
+                        EmpDept: data.deptCode ? data.deptCode.toString() : '',
+                        EmpTel: data.empTel || '',
+                        EmpEmail: data.empEmail || '',
+                        EmpAddress: data.empAddress || '',
+                        EmpStatus: data.empStatus || '',
+                    });
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
+        }
     }, [empCode]);
 
     const handleSubmit = async (e) => {
@@ -64,6 +65,7 @@ const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
             });
             console.log(response.data);
             alert('사원 정보 수정이 완료되었습니다.');
+            onUpdateSuccess(); // 수정 완료 후 부모에게 알림
             handleClose(); // 모달 닫기
         } catch (error) {
             console.error('사원 정보 수정 중 오류가 발생했습니다:', error);
@@ -73,64 +75,46 @@ const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
 
     const getJobTitle = (jobCode) => {
         switch (jobCode) {
-            case 1:
-                return '대표';
-            case 11:
-                return '이사';
-            case 21:
-                return '부장';
-            case 31:
-                return '차장';
-            case 41:
-                return '과장';
-            case 51:
-                return '대리';
-            case 61:
-                return '주임';
-            case 71:
-                return '사원';
-            default:
-                return '직급 미정';
+            case 1: return '대표';
+            case 11: return '이사';
+            case 21: return '부장';
+            case 31: return '차장';
+            case 41: return '과장';
+            case 51: return '대리';
+            case 61: return '주임';
+            case 71: return '사원';
+            default: return '직급 미정';
         }
     };
 
-    const getGender = (gender) =>{
-      switch(gender){
-        case 'F': 
-            return '여성';
-        case 'M': 
-            return '남성';
-      }
-    }
+    const getGender = (gender) => {
+        switch (gender) {
+            case 'F': return '여성';
+            case 'M': return '남성';
+            default: return '정보 없음';
+        }
+    };
 
-    const getStatus = (empStatus) =>{
-      switch(empStatus){
-        case 'Y':
-          return '재직';
-        case 'N':
-          return '퇴사';
-        case 'V':
-          return '휴가';
-      }
-    }
+    const getStatus = (empStatus) => {
+        switch (empStatus) {
+            case 'Y': return '재직';
+            case 'N': return '퇴사';
+            case 'V': return '휴가';
+            default: return '정보 없음';
+        }
+    };
+
     const getDeptTitle = (deptCode) => {
-        switch (deptCode){
-            case 1:
-                return '경영총괄';
-            case 11:
-                return '경영지원';
-            case 21:
-                return '연구개발';
-            case 31:
-                return '고객지원';
-            case 41:
-                return '운송관리';
-            case 51:
-                return '품질관리';
-            case 61:
-                return '자재관리';
-            case 71:
-                return '생산제조';
+        switch (deptCode) {
+            case 1: return '경영총괄';
+            case 11: return '경영지원';
+            case 21: return '연구개발';
+            case 31: return '고객지원';
+            case 41: return '운송관리';
+            case 51: return '품질관리';
+            case 61: return '자재관리';
+            case 71: return '생산제조';
+            default: return '부서 미정';
         }
     };
 
@@ -218,12 +202,14 @@ const MyPageUpdateModal = ({ show, handleClose, empCode }) => {
                             readOnly
                         />
                     </Form.Group>
-                    <Button variant="secondary" onClick={handleClose}>
-                        닫기
-                    </Button>
-                    <Button variant="primary" type="submit">
-                        수정
-                    </Button>
+                    <div className="d-flex justify-content-end">
+                        <Button variant="primary" type="submit">
+                            수정
+                        </Button>
+                        <Button variant="secondary" onClick={handleClose} style={{ marginRight: '10px' }}>
+                            닫기
+                        </Button>
+                    </div>
                 </Form>
             </Modal.Body>
         </Modal>

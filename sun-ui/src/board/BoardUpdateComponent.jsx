@@ -145,7 +145,14 @@ const BoardUpdateComponent = () => {
                         editor={ClassicEditor}
                         data={notice.notiContent}
                         onChange={handleEditorChange}
-                        config={{}}
+                        config={{
+                            ckfinder: {
+                                uploadUrl: 'http://localhost:8787/uploadImageBoard', // 이미지 업로드 서버 경로
+                            },
+                            toolbar: [
+                                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', '|', 'undo', 'redo'
+                            ],
+                        }}
                     />
                 </div>
                 <div className="form-group">

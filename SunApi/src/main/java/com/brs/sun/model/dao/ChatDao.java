@@ -19,6 +19,8 @@ public interface ChatDao {
 	
 	List<ChatVo> chatList(@Param("chatroomCode") String chatroomCode);
 	
+	List<ChatRoomVo> chatParti(@Param("chatroomCode") String chatroomCode);
+	
 	ChatVo getLastChatMessage(@Param("chatroomCode") String chatroomCode);
 	
 }

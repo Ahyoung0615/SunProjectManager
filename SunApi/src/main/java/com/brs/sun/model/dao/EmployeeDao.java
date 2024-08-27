@@ -30,4 +30,6 @@ public interface EmployeeDao {
 	String generateEmpCode(String joinDate);
 
     void insertEmployee(EmployeeVo employeeVo);
+    
+    int updatePassword(String empCode, String encChangePassword);
 }

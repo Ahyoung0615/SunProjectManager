@@ -130,5 +130,16 @@ public class EmployeeController {
 		    // 성공 메시지 반환
 		    return ResponseEntity.ok("사원 등록이 완료되었습니다.");
 	    }
+	 
+	 @PostMapping("/updatePassword/{empCode}")
+	 public ResponseEntity<String> changerPassword(@PathVariable String empCode, String CurrentPassword, String ChangePassword){
+		 boolean success = employeeService.changePassword(empCode, CurrentPassword, ChangePassword);
+		 if(success) {
+			 return ResponseEntity.ok("비밀번호 변경완료");
+		 }else {
+	        	return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                    .body("비밀번호 변경 실패: 현재 비밀번호가 올바르지 않거나 사용자 정보를 찾을 수 없습니다.");
+	        }
+	 }
 	
 }

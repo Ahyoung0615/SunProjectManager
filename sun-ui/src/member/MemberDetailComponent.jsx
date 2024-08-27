@@ -4,61 +4,79 @@ import MemberUpdateModal from './MemberUpdateComponent';
 
 const MemberDetailComponent = () => {
     const { empCode } = useParams();
-    const [employee, setEmployee] = useState([]);
+    const [employee, setEmployee] = useState({});
     const [file, setFile] = useState(null);
-    const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${employee.empImg}`);
+    const [empImg, setEmpImg] = useState(null); // 초기값을 null로 설정
     const [showModal, setShowModal] = useState(false);
 
     const handleShow = () => setShowModal(true);
-    const handleClose = () => setShowModal(false);
-    useEffect(() => {
-      // API 호출
-      fetch(`http://localhost:8787/memberDetail/${empCode}`)
-          .then(response => {
-              if (!response.ok) {
-                  throw new Error('Network response was not ok');
-              }
-              return response.json();
-          })
-          .then(data => {
-              setEmployee(data);
-          })
-          .catch(error => {
-          });
-  }, [empCode]);
-  const handleUpload = () => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("empCode", empCode);
+    const handleClose = async () => {
+      setShowModal(false);
+      await fetchEmployeeData(); // 비동기 데이터 새로고침
+  };
 
-    fetch('http://localhost:8787/uploadImage', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(`Network response was not ok: ${text}`);
-            });
-        }
-        return response.text();  // 응답을 텍스트로 받아옵니다.
-    })
-    .then(text => {
+    // 사원 정보를 가져오는 useEffect
+    useEffect(() => {
+        const fetchEmployeeData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8787/memberDetail/${empCode}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setEmployee(data);
+                setEmpImg(`http://localhost:8787/memberImage/${data.empImg}`); // 이미지 URL 업데이트
+            } catch (error) {
+                console.error('Error fetching employee data:', error);
+            }
+        };
+
+        fetchEmployeeData();
+    }, [empCode]); // empCode가 변경될 때만 실행
+
+    // 파일 업로드 핸들러
+    const handleUpload = async () => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("empCode", empCode);
+
         try {
-            // 응답이 비어있을 수도 있으므로, JSON으로 파싱을 시도합니다.
+            const response = await fetch('http://localhost:8787/uploadImage', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Network response was not ok: ${text}`);
+            }
+
+            const text = await response.text();
             const data = text ? JSON.parse(text) : {};
             console.log(data);
             alert(data.message || '파일 업로드 성공');
-            setEmpImg(`http://localhost:8787/memberImage/${employee.empImg}`);
+
+            // 파일 업로드 후 사원 정보를 새로 고침
+            await fetchEmployeeData();
         } catch (error) {
-            throw new Error('Invalid JSON format');
+            console.error('Error:', error);
+            alert('파일 업로드 중 오류가 발생했습니다.');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('파일 업로드 중 오류가 발생했습니다.');
-    });
-};
+    };
+
+    const fetchEmployeeData = async () => {
+        try {
+            const response = await fetch(`http://localhost:8787/memberDetail/${empCode}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            setEmployee(data);
+            setEmpImg(`http://localhost:8787/memberImage/${data.empImg}`); // 이미지 URL 업데이트
+        } catch (error) {
+            console.error('Error fetching employee data:', error);
+        }
+    };
       const getJobTitle = (jobCode) => {
         switch (jobCode) {
             case 1:
@@ -122,110 +140,106 @@ const MemberDetailComponent = () => {
         }
     };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const handleFileChange = (e) => {
+      setFile(e.target.files[0]);
   };
-    const handlePasswordReset = () => {
-      fetch(`http://localhost:8787/resetPassword/${empCode}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();  // 비밀번호 초기화 API는 응답으로 텍스트를 보낼 것으로 예상됩니다.
-    })
-    .then(message => {
-        alert(message);  // 성공 메시지 표시
-    })
-    .catch(error => {
-        alert('비밀번호 초기화 중 오류가 발생했습니다.');
-    });
+
+  const handlePasswordReset = async () => {
+      try {
+          const response = await fetch(`http://localhost:8787/resetPassword/${empCode}`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          const message = await response.text();
+          alert(message);
+      } catch (error) {
+          alert('비밀번호 초기화 중 오류가 발생했습니다.');
+      }
   };
-  
-    return (
+
+  return (
       <div className="container" style={{ marginTop: 30 }}>
-      <h1>사원 상세</h1>
-      {/* 이미지와 사원 정보 테이블을 가로로 배치 */}
-      <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
-          {/* 사원 이미지 및 파일 업로드 */}
-          <div style={{ marginRight: 20, textAlign: "center" }}>
-              <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
-                        {employee.empImg ? (
-                                      <img src={`http://localhost:8787/memberImage/${employee.empImg}`} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
-                        ) : (
-                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
-                                이미지 없음
-                            </div>
-                        )}
+          <h1>사원 상세</h1>
+          <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
+              <div style={{ marginRight: 20, textAlign: "center" }}>
+                  <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
+                      {empImg ? (
+                          <img src={empImg} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
+                      ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
+                              이미지 없음
+                          </div>
+                      )}
+                  </div>
+                  <label>파일 업로드:</label>
+                  <input type="file" onChange={handleFileChange} />
+                  <br />
+                  <button className="btn btn-primary" onClick={handleUpload}>업로드</button>
               </div>
-              <label>파일 업로드:</label>
-              <input type="file" onChange={handleFileChange}/>
-              <br></br>
-              <button className="btn btn-primary" onClick={handleUpload}>업로드</button>
+              <div style={{ flex: 2 }}>
+                  <table className="table table-bordered">
+                      <tbody>
+                          <tr>
+                              <td>사번</td>
+                              <td>{employee.empCode}</td>
+                          </tr>
+                          <tr>
+                              <td>이름</td>
+                              <td>{employee.empName}</td>
+                          </tr>
+                          <tr>
+                              <td>직급</td>
+                              <td>{getJobTitle(employee.jobCode)}</td>
+                          </tr>
+                          <tr>
+                              <td>부서</td>
+                              <td>{getDeptTitle(employee.deptCode)}</td>
+                          </tr>
+                          <tr>
+                              <td>성별</td>
+                              <td>{getGender(employee.gender)}</td>
+                          </tr>
+                          <tr>
+                              <td>전화번호</td>
+                              <td>{employee.empTel}</td>
+                          </tr>
+                          <tr>
+                              <td>이메일</td>
+                              <td>{employee.empEmail}</td>
+                          </tr>
+                          <tr>
+                              <td>주소</td>
+                              <td>{employee.empAddress}</td>
+                          </tr>
+                          <tr>
+                              <td>입사일</td>
+                              <td>{employee.joindate}</td>
+                          </tr>
+                          <tr>
+                              <td>근무현황</td>
+                              <td>{getStatus(employee.empStatus)}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
           </div>
-        {/*  세부 정보 테이블 */}
-        <div style={{ flex: 2 }}>
-          <table className="table table-bordered">
-            <tbody>
-              <tr>
-                <td>사번</td>
-                <td>{employee.empCode}</td>
-              </tr>
-              <tr>
-                <td>이름</td>
-                <td>{employee.empName}</td>
-              </tr>
-              <tr>
-                <td>직급</td>
-                <td>{getJobTitle(employee.jobCode)}</td>
-              </tr>
-              <tr>
-                <td>부서</td>
-                <td>{getDeptTitle(employee.deptCode)}</td>
-              </tr>
-              <tr>
-                <td>성별</td>
-                <td>{getGender(employee.gender)}</td>
-              </tr>
-              <tr>
-                <td>전화번호</td>
-                <td>{employee.empTel}</td>
-              </tr>
-              <tr>
-                <td>이메일</td>
-                <td>{employee.empEmail}</td>
-              </tr>
-              <tr>
-                <td>주소</td>
-                <td>{employee.empAddress}</td>
-              </tr>
-              <tr>
-                <td>입사일</td>
-                <td>{employee.joindate}</td>
-              </tr>
-              <tr>
-                <td>근무현황</td>
-                <td>{getStatus(employee.empStatus)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '350px' }}>
+              사원 정보 수정
+          </button>
+          <MemberUpdateModal show={showModal} handleClose={handleClose} />
+
+          <button className="btn btn-primary" onClick={handlePasswordReset} style={{ position: 'absolute', right: '190px' }}>
+              비밀번호 초기화
+          </button>
       </div>
-      <button className="btn btn-primary" onClick={handleShow} style={{position: 'absolute', right: '350px'}}>
-                사원 정보 수정
-            </button>
-            <MemberUpdateModal show={showModal} handleClose={handleClose} />
-      
-      <button className="btn btn-primary" onClick={handlePasswordReset} style={{position: 'absolute', right: '190px'}}>
-            비밀번호 초기화
-      </button>
-      
-    </div>
-    );
+  );
 };
 
 export default MemberDetailComponent;
