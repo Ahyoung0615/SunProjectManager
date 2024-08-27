@@ -28,6 +28,7 @@ const DocumentTempDetailComponent = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [docCode, setDocCode] = useState();
     const [edocStatus, setEdocStatus] = useState('');
+    const [docReply, setDocReply] = useState(null);
 
     useEffect(() => {
         const today = new Date();
@@ -73,13 +74,16 @@ const DocumentTempDetailComponent = () => {
             axios.get("http://localhost:8787/api/edoc/docDetail", { params: { edocCode } })
                 .then((res) => {
                     const tempJsonData = JSON.parse(res.data.edocContent);
+                    const reply = JSON.parse(res.data.edocReply);
+                    console.log(reply);
+                    setDocReply(reply);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
-                    setDocTitle(res.data.edocTitle); 
+                    setDocTitle(res.data.edocTitle);
                     setEdocStatus(res.data.edocStatus);
                     const serverDocDate = new Date(res.data.edocDate);
-                    const formattedDate =  `${serverDocDate.getFullYear()}년 ${String(serverDocDate.getMonth() + 1).padStart(2, '0')}월 ${String(serverDocDate.getDate()).padStart(2, '0')}일`;
+                    const formattedDate = `${serverDocDate.getFullYear()}년 ${String(serverDocDate.getMonth() + 1).padStart(2, '0')}월 ${String(serverDocDate.getDate()).padStart(2, '0')}일`;
                     setCurrentDate(formattedDate);
                 })
                 .catch((error) => console.log(error));
@@ -336,12 +340,12 @@ const DocumentTempDetailComponent = () => {
                                 )}
                                 {dateError && <p className={styles.dateError}>{dateError}</p>}
                                 {weekdayCount !== null && !dateError && <p>사용일수: {weekdayCount}일</p>}
-                                {remainingDays !== null && (
+                                {remainingDays !== null && edocStatus != 'S' &&(
                                     <p className={remainingDays < 0 ? styles.balanceError : ''}>
                                         잔여 연차: {remainingDays}일
                                     </p>
                                 )}
-                                {balanceError && <p className={styles.balanceError}>{balanceError}</p>}
+                                {balanceError && edocStatus != 'S' && <p className={styles.balanceError}>{balanceError}</p>}
                             </td>
                         </tr>
                         <tr>
@@ -355,6 +359,23 @@ const DocumentTempDetailComponent = () => {
                             </td>
                         </tr>
                     </tbody>
+                    <br></br>
+                    {docReply != null && edocStatus == 'R' && (
+                        <tfoot>
+                            <tr>
+                                <th>반려자</th>
+                                <td>{docReply.deptName} {docReply.empName} {docReply.jobName}</td>
+                            </tr>
+                            <tr>
+                                <th>반려 사유</th>
+                                <td>{docReply.reason}</td>
+                            </tr>
+                            <tr>
+                                <th>반려 날짜</th>
+                                <td>{docReply.rejectDate}</td>
+                            </tr>
+                        </tfoot>
+                    )}
                 </table>
             </form>
 
@@ -373,7 +394,7 @@ const DocumentTempDetailComponent = () => {
             <div
                 className={styles.buttonContainer}
                 style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
-                {countApproversWithStatusS() < 2 && edocStatus === 'A' && (
+                {countApproversWithStatusS() < 2 && edocStatus == 'A' && (
                     <input
                         type='button'
                         value="회수"
@@ -389,7 +410,7 @@ const DocumentTempDetailComponent = () => {
                         className={styles.vacationDocSubmitButton}
                         style={{ marginLeft: '10px', backgroundColor: '#007bff', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }} />
                 ) : (
-                    edocStatus === 'C' && (
+                    (edocStatus === 'C' || edocStatus === 'R') && (
                         <input
                             type='button'
                             value="수정"

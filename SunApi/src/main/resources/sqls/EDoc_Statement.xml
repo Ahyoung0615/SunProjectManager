@@ -34,7 +34,7 @@
 	<!-- 임시저장 업데이트 -->
 	<update id="updateEDoc">
 		UPDATE EDOC
-		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}
+		SET EDOC_TITLE=#{edocTitle}, EDOC_CONTENT=#{edocContent}, EDOC_DATE=#{edocDate}, EDOC_STATUS=#{edocStatus}, EDOC_REPLY=''
 		WHERE EDOC_CODE=#{edocCode}
 	</update>
 	
@@ -152,7 +152,7 @@
 	</update>
 	
 	<!-- 결재 반려 -->
-	<update id="appRejecct">
+	<update id="appReject">
 		UPDATE EDOCLINE 
 		SET EDCL_STATUS = 'R'
 		WHERE EDOC_CODE = #{edocCode}
@@ -187,5 +187,10 @@
 	<!-- 문서 상태 회수 변경 -->
 	<update id="updateCancelDocStatus">
 		UPDATE EDOC SET EDOC_STATUS = 'C' WHERE EDOC_CODE = #{edocCode}
+	</update>
+	
+	<!-- 문서 상태 반려 변경 -->
+	<update id="updateRejectDocStatus">
+		UPDATE EDOC SET EDOC_STATUS = 'R' WHERE EDOC_CODE = #{edocCode}
 	</update>
 </mapper>

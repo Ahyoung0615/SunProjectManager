@@ -10,7 +10,6 @@ const DocumentTempDetailComponent = () => {
     const navigate = useNavigate();
     const { edocCode } = useParams();
 
-    const [tempContent, setTempContent] = useState({});
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
     const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
@@ -68,17 +67,15 @@ const DocumentTempDetailComponent = () => {
     }, [weekdayCount, dayOffLeft]);
 
     useEffect(() => {
-        console.log(edocCode);
         if (edocCode) {
-            axios.get("http://localhost:8787/api/edoc/tempDetail", { params: { edocCode } })
+            axios.get("http://localhost:8787/api/edoc/docDetail", { params: { edocCode } })
                 .then((res) => {
-                    setTempContent(res.data);
+                    console.log("data: ",res.data);
                     const tempJsonData = JSON.parse(res.data.edocContent);
-                    console.log(res.data);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
-                    setDocTitle(res.data.edocTitle); 
+                    setDocTitle(res.data.edocTitle);
                 })
                 .catch((error) => console.log(error));
 

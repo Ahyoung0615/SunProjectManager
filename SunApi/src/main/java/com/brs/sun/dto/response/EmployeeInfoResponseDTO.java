@@ -1,7 +1,6 @@
 package com.brs.sun.dto.response;
 
 import com.brs.sun.jpa.entity.EmployeeEntity;
-import com.brs.sun.vo.EmployeeVo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

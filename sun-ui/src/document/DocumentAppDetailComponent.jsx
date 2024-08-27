@@ -17,10 +17,9 @@ const DocumentAppDetailComponent = () => {
     const [endDate, setEndDate] = useState(null);
     const [reason, setReason] = useState('');
     const [docTitle, setDocTitle] = useState('');
-    const [docCode, setDocCode] = useState();
-    const [edocStatus, setEdocStatus] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
+    const [sessionEmp, setSessionEmp] = useState();
 
     useEffect(() => {
         const today = new Date();
@@ -29,9 +28,11 @@ const DocumentAppDetailComponent = () => {
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
+        console.log("session 정보: ", sessionStorageInfo);
         if (sessionStorageInfo) {
             try {
                 const user = JSON.parse(sessionStorageInfo);
+                setSessionEmp(user);
                 setSessionEmpCode(user.empcode);
             } catch (error) {
                 console.error("Failed to parse session storage item 'user':", error);
@@ -45,11 +46,12 @@ const DocumentAppDetailComponent = () => {
         if (edocCode) {
             axios.get("http://localhost:8787/api/edoc/docDetail", { params: { edocCode } })
                 .then((res) => {
-                    setEdocStatus(res.data.edocStatus);
+                    console.log(res.data);
                     const tempJsonData = JSON.parse(res.data.edocContent);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
+                    setWeekdayCount(tempJsonData.weekdayCount);
                     setDocTitle(res.data.edocTitle);
                 })
                 .catch((error) => console.log(error));
@@ -67,7 +69,6 @@ const DocumentAppDetailComponent = () => {
                     }
                 })
                 .catch((error) => console.log(error));
-            setDocCode(edocCode);
         }
     }, [edocCode, sessionEmpCode]);
 
@@ -90,17 +91,45 @@ const DocumentAppDetailComponent = () => {
         setShowModal(false);
     };
 
+    const deptCodeToText = (deptCode) => {
+        const deptNames = {
+            1: '경영총괄',
+            11: '경영지원',
+            21: '연구개발',
+            31: '고객지원',
+            41: '운송관리',
+            51: '품질관리',
+            61: '자재관리',
+            71: '생산제조'
+        };
+        return deptNames[deptCode] || '부서 없음';
+    };
+
+    const jobCodeToText = (jobCode) => {
+        const jobNames = {
+            1: '대표',
+            11: "이사",
+            21: "부장",
+            31: "차장",
+            41: "과장",
+            51: "대리",
+            61: "주임",
+            71: "사원"
+        };
+        return jobNames[jobCode] || '직급 없음';
+    }
+
     const handleRejectSubmit = () => {
         const data = {
             edocCode: edocCode,
             empCode: sessionEmpCode,
-            empName: empInfo.empName,
-            jobName: empInfo.jobName,
-            deptName: empInfo.deptName,
+            empName: sessionEmp.empName,
+            jobName: jobCodeToText(sessionEmp.jobCode),
+            deptName: deptCodeToText(sessionEmp.deptCode),
             reason: rejectReason,
             rejectDate: currentDate
         };
-
+        console.log(data);
         axios.post("http://localhost:8787/api/edoc/appReject", data)
             .then(() => {
                 closeModal();
@@ -109,15 +138,25 @@ const DocumentAppDetailComponent = () => {
             .catch((error) => console.error("Error:", error));
     };
 
+    const buttonStyle = {
+        color: 'white',
+        padding: '10px 20px',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontSize: '16px',
+        width: '120px' // 버튼의 동일한 너비 설정
+    };
+
     return (
         <div className={styles.vacationDocContainer}>
             <ModalComponent
                 open={showModal}
                 close={closeModal}
-                title="반려 사유 입력"
+                title="반려 사유"
                 body={
                     <div>
-                        <p>반려 사유를 입력해주세요:</p>
+                        <p>반려 사유를 입력해주세요</p>
                         <textarea
                             rows="4"
                             cols="50"
@@ -130,7 +169,6 @@ const DocumentAppDetailComponent = () => {
                         </div>
                     </div>
                 }
-                size="lg"
             />
             <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
             <form>
@@ -217,13 +255,8 @@ const DocumentAppDetailComponent = () => {
                     onClick={handleReject}
                     className={styles.vacationDocRejectButton}
                     style={{
+                        ...buttonStyle,
                         marginRight: '10px',
-                        color: 'white',
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '16px',
                         backgroundColor: '#ff4d4f' // 반려 버튼의 배경색
                     }}
                 />
@@ -235,13 +268,9 @@ const DocumentAppDetailComponent = () => {
                     onClick={handleSubmit}
                     className={styles.vacationDocSubmitButton}
                     style={{
+                        ...buttonStyle,
                         marginLeft: '10px',
-                        color: 'white',
-                        padding: '10px 20px',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '16px'
+                        backgroundColor: '#007bff' // 승인 버튼의 배경색 설정
                     }}
                 />
             </div>
