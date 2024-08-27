@@ -64,7 +64,7 @@ public class ChatController {
     @SendTo("/topic/chatRoom/{chatroomCode}")
     public ChatVo sendMessage(@DestinationVariable String chatroomCode, ChatVo message) {
         chatService.saveChatMessage(message);
-        return message; // Return message to be broadcasted to other clients
+        return message;
     }
     @GetMapping("/chatList")
     public ResponseEntity<List<ChatVo>> getChatList1(@RequestParam("chatroomCode") String chatroomCode) {
@@ -72,6 +72,13 @@ public class ChatController {
         List<ChatVo> chatMessages = chatService.chatList2(chatroomCode);
         log.info("Returning chat messages: {}", chatMessages);
         return ResponseEntity.ok(chatMessages);
+    }
+    @GetMapping("/chatParti")
+    public ResponseEntity<List<ChatRoomVo>> getChatParti(@RequestParam("chatroomCode") String chatroomCode) {
+        log.info("Received request to get chat list for chatroomCode: {}", chatroomCode);
+        List<ChatRoomVo> chatParti = chatService.chatParti(chatroomCode);
+        log.info("Returning chat messages: {}", chatParti);
+        return ResponseEntity.ok(chatParti);
     }
     @GetMapping("/getLastChatMessage")
     public ResponseEntity<String> getLastChatMessage(@RequestParam("chatroomCode") String chatroomCode) {

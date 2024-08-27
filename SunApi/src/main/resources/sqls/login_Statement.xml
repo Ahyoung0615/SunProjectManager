@@ -70,5 +70,9 @@
 	        'Y',#{empAuth}
 	    )
     </insert>
-	
+	<update id="updatePassword">
+		UPDATE EMPLOYEE
+		SET EMP_PW = #{encChangePassword}
+		WHERE EMP_CODE = #{empCode}
+	</update>
 </mapper>

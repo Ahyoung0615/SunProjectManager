@@ -51,6 +51,7 @@ public class SecurityConfig{
         				.requestMatchers("/ws/**").permitAll()
         				.requestMatchers("/memberList").hasRole("A")  // ADMIN 권한이 있는 사용자만 /admin/** 경로에 접근 가능
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/member").permitAll()     // 이미지 미리보기 허용
                         .anyRequest().permitAll()                      // 그 외의 모든 요청은 누구나 접근 가능
                 )

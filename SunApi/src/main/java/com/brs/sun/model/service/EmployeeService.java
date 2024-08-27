@@ -78,5 +78,22 @@ public class EmployeeService {
 	public void registerEmployee(EmployeeVo employeeVo) {
 		employeeDao.insertEmployee(employeeVo);
 	}
-	
+	public boolean changePassword(String empCode ,String CurrentPassword , String ChangePassword) {
+		EmployeeVo vo = employeeDao.Info(empCode);
+		
+		if(!bCryptPasswordEncoder.matches(CurrentPassword, vo.getEmpPw())) {
+			return false;
+		}
+		String encChangePassword = bCryptPasswordEncoder.encode(ChangePassword);
+		
+		int updateRows = employeeDao.updatePassword(empCode, encChangePassword);
+		
+		if(updateRows > 0 ) {
+			log.info("비밀번호 변경 성공: {}", encChangePassword);
+			return true;
+		}else {
+			return false;
+		}
+			
+	}
 }

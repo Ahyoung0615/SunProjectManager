@@ -1,5 +1,6 @@
 package com.brs.sun.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.brs.sun.model.dao.EmployeeDao;
 import com.brs.sun.model.service.BoardService;
@@ -44,6 +46,8 @@ public class BoardController {
 
 	private String uploadDir = "C:\\SunPj_File\\boardFile";
 
+	String uploadDir2 = "C:\\Users\\GDJ\\git\\SunProjectManager\\SunApi\\src\\main\\webapp\\memberImage\\";
+	
 	@PostMapping("/insertBoard")
 	public ResponseEntity<String> insertBoard(@RequestParam("notiTitle") String notiTitle,
 			@RequestParam("notiContent") String notiContent, @RequestParam("empCode") String empCode,
@@ -143,6 +147,7 @@ public class BoardController {
 		NoticeVo vo = new NoticeVo();
 		vo.setNotiCode(notiCodeStr);
 		service.deleteBoard(vo);
+		service.deleteFile(notiCodeStr);
 		return ResponseEntity.ok("게시글이 삭제되었습니다");
 	}
 
@@ -150,4 +155,51 @@ public class BoardController {
 	public NoticeVo boardDetail(@PathVariable String notiCode) {
 		return service.boardDetail(notiCode);
 	}
+	
+	@PostMapping("/uploadImageBoard")
+    public ResponseEntity<?> uploadImage(@RequestParam("upload") MultipartFile file) {
+        try {
+            // 고유한 파일 이름 생성
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir2 + File.separator + fileName);
+
+            // 파일 저장
+            Files.write(filePath, file.getBytes());
+
+            // 파일 접근 가능한 URL 생성
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(fileName)
+                    .toUriString();
+            System.out.println("File path: " + filePath.toString());
+            System.out.println("File URL: " + fileDownloadUri);
+            // CKEditor5에 필요한 JSON 응답 반환
+            return ResponseEntity.ok().body(new ImageUploadResponse(true, fileDownloadUri));
+
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 이미지 업로드 응답 클래스
+    public static class ImageUploadResponse {
+        private boolean uploaded;
+        private String url;
+
+        public ImageUploadResponse(boolean uploaded, String url) {
+            this.uploaded = uploaded;
+            this.url = url;
+        }
+
+        public boolean isUploaded() {
+            return uploaded;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
+	
+	
+	
 }

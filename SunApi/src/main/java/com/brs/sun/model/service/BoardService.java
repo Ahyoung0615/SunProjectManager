@@ -73,6 +73,10 @@ public class BoardService {
         return dao.getFileByFakename(nfileFakename); // 파일 정보를 데이터베이스에서 가져오는 메소드
     }
 	
+	public void deleteFile(int notiCode) {
+		dao.deleteFile(notiCode);
+	}
+	
 	public List<NoticeFileVo> getFile(int notiCode){
 		return dao.getFile(notiCode);
 	}
