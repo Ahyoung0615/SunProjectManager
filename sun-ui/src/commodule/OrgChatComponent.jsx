@@ -88,7 +88,6 @@ const OrgChatComponent = (props) => {
     };
 
     const sendDataToServer = useCallback(async () => {
-        
         // sessionStorage에서 저장된 ID를 가져오기
         const sessionData = window.sessionStorage.getItem('user');
         let sessionId = null;
@@ -112,6 +111,9 @@ const OrgChatComponent = (props) => {
                 setChoiceArr([]);
                 setServerDataArr([]);
                 closeModal();
+                if (props.onChatRoomCreated) {
+                    props.onChatRoomCreated(); // 채팅방 생성 후 콜백 호출
+                }
             } catch (error) {
                 console.log("error", error.message);
             }
@@ -119,7 +121,7 @@ const OrgChatComponent = (props) => {
             console.log("빈 요소");
             alert("최소 한 명 이상 선택해 주세요");
         }
-    }, [serverDataArr, props.mappingUrl]);
+    }, [serverDataArr, props.mappingUrl, props.onChatRoomCreated]);
 
     const openModal = () => {
         setShow(true);

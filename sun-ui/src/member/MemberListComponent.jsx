@@ -1,7 +1,10 @@
+// MemberListComponent.js
 import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MemberAddModal from './MemberAddModal';
+import MemberList from './MemberList';
+import Pagination from './Pagination';
 
 const MemberListComponent = () => {
     const [emp, setEmployee] = useState([]);
@@ -153,41 +156,14 @@ const MemberListComponent = () => {
 
     // 페이지 그룹 로직
     const totalPages = Math.ceil(emp.length / employeesPerPage);
-    const currentGroupStart = Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
-    const currentGroupEnd = Math.min(currentGroupStart + pageGroupSize - 1, totalPages);
 
     // 페이지 그룹 버튼 클릭 핸들러
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    // 페이지 그룹 버튼 생성
-    const pageButtons = [];
-    for (let page = currentGroupStart; page <= currentGroupEnd; page++) {
-        pageButtons.push(
-            <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                style={{
-                    margin: '0 5px',
-                    padding: '5px 10px',
-                    backgroundColor: currentPage === page ? '#007bff' : '#fff',
-                    color: currentPage === page ? '#fff' : '#000',
-                    border: '1px solid #007bff',
-                    borderRadius: '5px',
-                }}
-            >
-                {page}
-            </button>
-        );
-    }
-    
-
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
-    // 이전/다음 페이지 그룹 버튼
-    const showPrevGroup = currentGroupStart > 1;
-    const showNextGroup = currentGroupEnd < totalPages;
 
     return (
         <div className="container" style={{ marginTop: 30 }}>
@@ -204,66 +180,18 @@ const MemberListComponent = () => {
                     <Dropdown.Item eventKey="3">휴가</Dropdown.Item>
                 </DropdownButton>
             </div>
-            <table className="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>사번</th>
-                        <th>이름</th>
-                        <th>부서</th>
-                        <th>직급</th>
-                        <th>이메일</th>
-                        <th>근무내역</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentEmployees.map((item, index) => (
-                        <tr key={index}>
-                            <td><Link to={`/memberDetail/${item.empCode}`}>{item.empCode}</Link></td>
-                            <td>{item.empName}</td>
-                            <td>{getDeptTitle(item.deptCode)}</td>
-                            <td>{getJobTitle(item.jobCode)}</td>
-                            <td>{item.empEmail}</td>
-                            <td>{getStatus(item.empStatus)}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                {/* 이전 페이지 그룹 버튼 */}
-                {showPrevGroup && (
-                    <button
-                        onClick={() => handlePageChange(currentGroupStart - pageGroupSize)}
-                        style={{
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            backgroundColor: '#007bff',
-                            color: '#fff',
-                            border: '1px solid #007bff',
-                            borderRadius: '5px',
-                        }}
-                    >
-                        &laquo; 이전
-                    </button>
-                )}
-                {/* 페이지 버튼 */}
-                {pageButtons}
-                {/* 다음 페이지 그룹 버튼 */}
-                {showNextGroup && (
-                    <button
-                        onClick={() => handlePageChange(currentGroupEnd + 1)}
-                        style={{
-                            margin: '0 5px',
-                            padding: '5px 10px',
-                            backgroundColor: '#007bff',
-                            color: '#fff',
-                            border: '1px solid #007bff',
-                            borderRadius: '5px',
-                        }}
-                    >
-                        다음 &raquo;
-                    </button>
-                )}
-            </div>
+            <MemberList
+                employees={currentEmployees}
+                getDeptTitle={getDeptTitle}
+                getJobTitle={getJobTitle}
+                getStatus={getStatus}
+            />
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageGroupSize={pageGroupSize}
+                onPageChange={handlePageChange}
+            />
             <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '190px' }}>
                 사원 등록
             </button>

@@ -1,46 +1,108 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-const ChatRoomComponent = () => {
-    const { chatroomCode } = useParams();
+const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [stompClient, setStompClient] = useState(null);
     const [emp, setEmp] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
-
+    const [participants, setParticipants] = useState([]);
+    const [employeeData, setEmployeeData] = useState({});
+    const [opponentName, setOpponentName] = useState('');
+    const [opponentDeptTitle, setOpponentDeptTitle] = useState('');
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
         const value = window.sessionStorage.getItem('user');
         if (value) {
             setEmp(JSON.parse(value));
-            console.log('Loaded user from session storage:', JSON.parse(value));
         } else {
             console.warn('No user data found in session storage');
         }
+        fetchParticipants();
     }, []);
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                const response = await fetch(`http://localhost:8787/chatList?chatroomCode=${chatroomCode}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setMessages(data);
-            } catch (error) {
-                console.error('Error fetching chat messages:', error);
+    const fetchMessages = async () => {
+        try {
+            const response = await fetch(`http://localhost:8787/chatList?chatroomCode=${chatroomCode}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-        };
-
-        if (chatroomCode) {
-            fetchMessages();
+            const data = await response.json();
+            setMessages(data);
+        } catch (error) {
+            console.error('Error fetching chat messages:', error);
         }
-    }, [chatroomCode]);
+    };
+
+    const fetchParticipants = async () => {
+        try {
+            const chatResponse = await fetch(`http://localhost:8787/api/chatList?empCode=${emp.empcode}`);
+            if (!chatResponse.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const chatData = await chatResponse.json();
+            setParticipants(chatData);
+            const empCodes = new Set();
+            chatData.forEach(item => {
+                item.chatroomParti.split(',').forEach(code => empCodes.add(code));
+            });
+
+            const employeeData = {};
+            for (const code of empCodes) {
+                try {
+                    const empResponse = await fetch(`http://localhost:8787/api/employee/${code}`);
+                    if (empResponse.ok) {
+                        const empData = await empResponse.json();
+                        employeeData[code] = {
+                            empName: empData.empName,
+                            empDept: empData.deptCode
+                        };
+                    }
+                } catch (error) {
+                    console.error(`Error fetching employee data for code ${code}:`, error);
+                }
+            }
+            
+            if (emp?.empCode) {
+                delete employeeData[emp.empCode];
+            }
+            
+            setEmployeeData(employeeData);
+            if (Object.keys(employeeData).length > 0) {
+                const firstOpponentCode = Object.keys(employeeData)[0];
+                const opponent = employeeData[firstOpponentCode];
+                setOpponentName(opponent.empName);
+                setOpponentDeptTitle(getDeptTitle(opponent.empDept));
+            }
+        } catch (error) {
+            console.error('Error fetching chat participants:', error);
+        }
+    };
+
+    const getDeptTitle = (empDept) => {
+        switch (empDept) {
+            case 1: return '경영총괄';
+            case 11: return '경영지원';
+            case 21: return '연구개발';
+            case 31: return '고객지원';
+            case 41: return '운송관리';
+            case 51: return '품질관리';
+            case 61: return '자재관리';
+            case 71: return '생산제조';
+            default: return '부서명 없음'; 
+        }
+    };
+
+    useEffect(() => {
+        if (emp) {
+            fetchMessages();
+            fetchParticipants();
+        }
+    }, [emp]);
 
     useEffect(() => {
         const socket = new SockJS('http://localhost:8787/ws');
@@ -60,6 +122,7 @@ const ChatRoomComponent = () => {
                             if (!prevMessages.some(msg => msg.chatCode === parsedMessage.chatCode)) {
                                 return [...prevMessages, parsedMessage];
                             }
+                            fetchMessages();
                             return prevMessages;
                         });
                     } catch (error) {
@@ -91,13 +154,15 @@ const ChatRoomComponent = () => {
     const handleSendMessage = () => {
         if (stompClient && isConnected && inputMessage.trim() !== '') {
             const now = new Date();
-            const chatTime = now.toISOString(); // ISO 형식으로 저장
+            const koreaOffset = 9 * 60;
+            const koreaTime = new Date(now.getTime() + koreaOffset * 60 * 1000);
+            const chatTime = koreaTime.toISOString();
 
             const chatMessage = {
                 chatroomCode: parseInt(chatroomCode, 10),
                 chatContent: inputMessage,
                 chatSender: emp?.empName || 'Anonymous',
-                chatTime: chatTime // ISO 문자열로 설정
+                chatTime: chatTime
             };
 
             stompClient.publish({
@@ -107,6 +172,7 @@ const ChatRoomComponent = () => {
                     'content-type': 'application/json'
                 }
             });
+
             setInputMessage('');
         } else {
             console.warn('Cannot send message. STOMP client is not connected.');
@@ -115,18 +181,17 @@ const ChatRoomComponent = () => {
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault(); // 기본 Enter 동작을 방지합니다.
+            event.preventDefault();
             handleSendMessage();
         }
     };
 
     useEffect(() => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            messagesEndRef.current.scrollIntoView({ block: 'end' });
         }
     }, [messages]);
 
-    // 시간을 "오전/오후 시:분" 형식으로 변환하는 함수
     const formatTime = (chatTime) => {
         const date = new Date(chatTime);
         const hours = date.getHours();
@@ -138,60 +203,125 @@ const ChatRoomComponent = () => {
         return `${ampm} ${formattedHours}시 ${formattedMinutes}분`;
     };
 
+    const formatDate = (chatTime) => {
+        const date = new Date(chatTime);
+        return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+    };
+
     return (
-        <div>
-            <h2>Chat Room: {chatroomCode}</h2>
+        <div
+            style={{
+                position: 'fixed',
+                top: '10%',
+                right: '0',
+                width: '400px',
+                height: '80%',
+                border: '1px solid #ccc',
+                boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
+                backgroundColor: 'white',
+                zIndex: 1050, // Bootstrap modal default z-index is 1050
+                display: show ? 'block' : 'none'
+            }}
+        >
             <div
                 style={{
-                    border: '1px solid #ccc',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     padding: '10px',
-                    marginBottom: '10px',
-                    width: '80%',
-                    height: '400px',
-                    overflowY: 'scroll'
+                    borderBottom: '1px solid #ddd',
+                    backgroundColor: '#f8f9fa'
                 }}
             >
-                {messages.map((message, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            display: 'flex',
-                            justifyContent: message.chatSender === emp?.empName ? 'flex-end' : 'flex-start',
-                            marginBottom: '10px'
-                        }}
-                    >
-                        <div
-                            style={{
-                                padding: '10px',
-                                borderRadius: '10px',
-                                backgroundColor: message.chatSender === emp?.empName ? '#dcf8c6' : '#fff',
-                                boxShadow: '0px 1px 3px rgba(0,0,0,0.2)',
-                                maxWidth: '70%',
-                                textAlign: 'left'
-                            }}
-                        >
-                            <div>{message.chatContent}</div>
-                            <div style={{ fontSize: '0.8em', color: 'gray', marginTop: '5px' }}>
-                                {formatTime(message.chatTime)}
+                <span>{`[${opponentDeptTitle || '부서명 없음'}] ${opponentName || '불명'}`}</span>
+                <button
+                    onClick={handleClose}
+                    style={{
+                        border: 'none',
+                        background: 'transparent',
+                        fontSize: '20px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    &times;
+                </button>
+            </div>
+            <div
+                style={{
+                    padding: '10px',
+                    height: 'calc(100% - 80px)',
+                    overflowY: 'scroll',
+                    borderBottom: '1px solid #ddd'
+                }}
+            >
+                {messages.map((message, index) => {
+                    const showDateLabel =
+                        index === 0 || 
+                        new Date(messages[index - 1].chatTime).toDateString() !== new Date(message.chatTime).toDateString();
+
+                    return (
+                        <div key={index}>
+                            {showDateLabel && (
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        margin: '10px 0',
+                                        color: 'gray',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {formatDate(message.chatTime)}
+                                </div>
+                            )}
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: message.chatSender === emp?.empName ? 'flex-end' : 'flex-start',
+                                    marginBottom: '10px'
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        padding: '10px',
+                                        borderRadius: '10px',
+                                        backgroundColor: message.chatSender === emp?.empName ? '#dcf8c6' : '#fff',
+                                        boxShadow: '0px 1px 3px rgba(0,0,0,0.2)',
+                                        maxWidth: '70%',
+                                        textAlign: 'left'
+                                    }}
+                                >
+                                    <div>{message.chatContent}</div>
+                                    <div style={{ fontSize: '0.8em', color: 'gray', marginTop: '5px' }}>
+                                        {formatTime(message.chatTime)}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
                 <div ref={messagesEndRef} />
             </div>
-            <div>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px',
+                    borderTop: '1px solid #ddd',
+                    backgroundColor: '#f8f9fa'
+                }}
+            >
                 <input
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyDown={handleKeyDown} // onKeyDown 이벤트 핸들러 추가
-                    placeholder="Enter your message..."
-                    style={{ width: '68%', marginRight: '10px' }}
+                    onKeyDown={handleKeyDown}
+                    placeholder="메시지를 입력하세요"
+                    style={{ width: '80%', marginRight: '10px' }}
                 />
-                <button onClick={handleSendMessage}>Send</button>
+                <Button onClick={handleSendMessage}>보내기</Button>
             </div>
         </div>
     );
 };
 
-export default ChatRoomComponent;
+export default ChatRoomPage;

@@ -34,6 +34,7 @@
     "react-dom": "^18.3.1",
     "react-js-pagination": "^3.0.3",
     "react-jstree-table": "^0.0.24",
+    "react-modal": "^3.16.1",
     "react-router-dom": "^6.26.0",
     "react-scripts": "5.0.1",
     "react-simple-jstree": "^0.2.2",
