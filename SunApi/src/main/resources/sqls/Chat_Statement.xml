@@ -16,6 +16,11 @@
 	    FROM CHATROOM
 	    WHERE REGEXP_LIKE(CHATROOM_PARTI, '(^|,)' || #{empCode} || '(,|$)')
 	</select>
+	<select id="findChatParti" resultType="ChatRoomVo">
+		SELECT REGEXP_REPLACE(CHATROOM_PARTI, '^'||#{empCode}||'(,|$)|(,)'||#{empCode}||'(,|$)', '') AS CHATROOM_PARTI
+	    FROM CHATROOM
+	    WHERE CHATROOM_CODE = #{chatroomCode}
+	</select>
 	<select id="findChatRoom2" resultType="ChatRoomVo">
 	    SELECT 
 	        cr.CHATROOM_CODE,

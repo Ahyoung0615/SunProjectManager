@@ -52,6 +52,10 @@ public class ChatController {
         //log.info("Employee code: {}", empCodeString);
         return chatService.chatList(empCodeString);
     }
+    @GetMapping("/api/partiList")
+    public List<ChatRoomVo> partiList(@RequestParam("chatroomCode") String chatroomCode) {
+        return chatService.partiList(chatroomCode);
+    }
     @GetMapping("/api/chatList2")
     public List<ChatRoomVo> getChatList2(@RequestParam("empCode") String empCode) {
         EmployeeVo emp = employeeDao.Info(empCode);
@@ -71,6 +75,7 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage/{chatroomCode}")
     @SendTo("/topic/chatRoom/{chatroomCode}")
     public ChatVo sendMessage(@DestinationVariable String chatroomCode, ChatVo message) {
+    	log.info("메세지 보낸 채팅방 번호: {}",chatroomCode);
         chatService.saveChatMessage(message);
         return message;
     }

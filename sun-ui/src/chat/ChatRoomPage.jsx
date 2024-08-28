@@ -3,7 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
-const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
+const ChatRoomPage = ({ show, handleClose, chatroomCode ,onUpdateChatRoomList}) => {
     const [messages, setMessages] = useState([]);
     const [inputMessage, setInputMessage] = useState('');
     const [stompClient, setStompClient] = useState(null);
@@ -22,6 +22,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
         } else {
             console.warn('No user data found in session storage');
         }
+        console.log(chatroomCode);
         fetchParticipants();
     }, []);
 
@@ -40,7 +41,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
 
     const fetchParticipants = async () => {
         try {
-            const chatResponse = await fetch(`http://localhost:8787/api/chatList?empCode=${emp.empcode}`);
+            const chatResponse = await fetch(`http://localhost:8787/api/partiList?chatroomCode=${chatroomCode}`);
             if (!chatResponse.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -51,6 +52,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
                 item.chatroomParti.split(',').forEach(code => empCodes.add(code));
             });
 
+            console.log(empCodes);
             const employeeData = {};
             for (const code of empCodes) {
                 try {
@@ -66,17 +68,28 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
                     console.error(`Error fetching employee data for code ${code}:`, error);
                 }
             }
-            
-            if (emp?.empCode) {
-                delete employeeData[emp.empCode];
-            }
-            
+     
             setEmployeeData(employeeData);
+            console.log(employeeData);
             if (Object.keys(employeeData).length > 0) {
-                const firstOpponentCode = Object.keys(employeeData)[0];
-                const opponent = employeeData[firstOpponentCode];
-                setOpponentName(opponent.empName);
-                setOpponentDeptTitle(getDeptTitle(opponent.empDept));
+                // 현재 사용자의 empCode를 가져옵니다.
+                const currentEmpCode = emp?.empcode;
+
+                // 현재 사용자의 empCode를 제외한 나머지 직원 데이터를 필터링합니다.
+                const filteredEmployeeData = Object.keys(employeeData)
+                    .filter(empCode => empCode !== currentEmpCode) // 현재 사용자의 empCode를 제외
+                    .reduce((acc, empCode) => {
+                        acc[empCode] = employeeData[empCode];
+                        return acc;
+                    }, {});
+
+                // 필터링된 직원 목록이 비어 있지 않은 경우
+                if (Object.keys(filteredEmployeeData).length > 0) {
+                    const firstOpponentCode = Object.keys(filteredEmployeeData)[0];
+                    const opponent = filteredEmployeeData[firstOpponentCode];
+                    setOpponentName(opponent.empName);
+                    setOpponentDeptTitle(getDeptTitle(opponent.empDept));
+                }
             }
         } catch (error) {
             console.error('Error fetching chat participants:', error);
@@ -102,7 +115,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
             fetchMessages();
             fetchParticipants();
         }
-    }, [emp]);
+    }, [emp , chatroomCode]);
 
     useEffect(() => {
         const socket = new SockJS('http://localhost:8787/ws');
@@ -174,6 +187,10 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
             });
 
             setInputMessage('');
+            // 부모 컴포넌트의 콜백 함수 호출
+            if (onUpdateChatRoomList) {
+                onUpdateChatRoomList();
+            }
         } else {
             console.warn('Cannot send message. STOMP client is not connected.');
         }
@@ -215,7 +232,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
                 top: '10%',
                 right: '0',
                 width: '400px',
-                height: '80%',
+                height: '79%',
                 border: '1px solid #ccc',
                 boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
                 backgroundColor: 'white',
@@ -287,7 +304,10 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
                                         backgroundColor: message.chatSender === emp?.empName ? '#dcf8c6' : '#fff',
                                         boxShadow: '0px 1px 3px rgba(0,0,0,0.2)',
                                         maxWidth: '70%',
-                                        textAlign: 'left'
+                                        textAlign: 'left',
+                                        wordBreak: 'break-word', // 긴 단어 자동 줄 바꿈
+                                        overflowWrap: 'break-word', // 긴 단어 자동 줄 바꿈
+                                        whiteSpace: 'pre-wrap' // 줄 바꿈과 공백을 유지
                                     }}
                                 >
                                     <div>{message.chatContent}</div>
@@ -310,15 +330,27 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode }) => {
                     backgroundColor: '#f8f9fa'
                 }}
             >
-                <input
-                    type="text"
+                <textarea
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="메시지를 입력하세요"
-                    style={{ width: '80%', marginRight: '10px' }}
+                    style={{
+                        width: '80%',
+                        marginRight: '10px',
+                        resize: 'none', // 사용자가 크기를 조절할 수 없게 설정
+                        overflowY: 'auto', // 수직 스크롤을 가능하게 하되 스크롤바는 숨김
+                        overflowX: 'hidden', // 수평 스크롤 숨기기
+                        height: '30px',
+                        minHeight: '50px', // 최소 높이 설정
+                        maxHeight: '200px', // 최대 높이 설정
+                        padding: '10px', // 패딩 추가
+                        boxSizing: 'border-box', // 패딩과 테두리가 높이와 너비에 포함되도록 설정
+                        scrollbarWidth: 'none', // Firefox에서 스크롤바 숨기기
+                        msOverflowStyle: 'none' // IE 및 Edge에서 스크롤바 숨기기
+                    }}
                 />
-                <Button onClick={handleSendMessage}>보내기</Button>
+                <Button onClick={handleSendMessage}>전송</Button>
             </div>
         </div>
     );
