@@ -19,7 +19,7 @@ spring:
       enabled: true
   servlet:
     multipart:
-      max-file-size: 5MB
+      max-file-size: 20MB
       max-request-size: 15MB
           
 server:
@@ -40,3 +40,11 @@ mybatis:
   mapper-locations: sqls/*.xml
   configuration:
     map-underscore-to-camel-case: true
+    
+naver:
+  service:
+    url: "https://1wspclol7b.apigw.ntruss.com/custom/v1/33862/5eea60a9e31c041965276f764964e129d267fe46b1e43ebfcb7f1dd0e0f2d8e9/general"
+    secretKey: "cWtLVWNzWnhPamJSZWxlTWVZY1ZTdG10SEF1d2pabkM="
+
+
+    
