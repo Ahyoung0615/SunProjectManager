@@ -133,7 +133,7 @@ const OrgChatComponent = (props) => {
 
     return (
         <div>
-            <button onClick={openModal}>{props.buttonName}</button>
+            <button  className="btn btn-info" style={{ margin: '3px'}} onClick={openModal}>{props.buttonName}</button>
             <ModalComponent
                 open={show}
                 close={closeModal}

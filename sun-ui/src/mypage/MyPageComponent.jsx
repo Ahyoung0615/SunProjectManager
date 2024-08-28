@@ -183,7 +183,7 @@ const MyPageComponent = () => {
                     <label>파일 업로드:</label>
                     <input type="file" onChange={handleFileChange} />
                     <br />
-                    <button className="btn btn-primary" onClick={handleUpload} style={{ position: 'absolute', right: '1190px' }}>업로드</button>
+                    <button className="btn btn-primary" onClick={handleUpload} style={{alignItems: "center"}}>업로드</button>
                 </div>
                 <div style={{ flex: 2 }}>
                     <table className="table table-bordered">

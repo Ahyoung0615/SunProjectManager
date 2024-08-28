@@ -25,7 +25,10 @@ public class ChatService {
 		return chatDao.findChatRoom2(empCode);
 	}
 	
-	
+	public List<ChatRoomVo> partiList(String chatroomCode){
+		return chatDao.chatParti(chatroomCode);
+	}
+
     public ChatService(ChatDao chatDao) {
         this.chatDao = chatDao;
     }
