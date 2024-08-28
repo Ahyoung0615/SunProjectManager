@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import OrgChatComponent from '../commodule/OrgChatComponent';
-import ChatRoomComponent from './ChatRoomPage';  // ChatRoomComponent import
+import ChatRoomComponent from './ChatRoomPage'; // ChatRoomComponent import
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 
 const SOCKET_URL = 'ws://localhost:8787/socket';
 
@@ -10,7 +11,7 @@ const ChatSunComponent = () => {
     const [employeeData, setEmployeeData] = useState({});
     const [lastMessage, setLastMessage] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedChatroomCode, setSelectedChatroomCode] = useState(null);  // 선택된 채팅방 코드
+    const [selectedChatroomCode, setSelectedChatroomCode] = useState(null); // 선택된 채팅방 코드
     const [socket, setSocket] = useState(null);
 
     // 사용자 정보 가져오기
@@ -73,7 +74,7 @@ const ChatSunComponent = () => {
     const handleChatRoomCreated = async () => {
         if (emp && emp.empcode) {
             try {
-                const chatResponse = await fetch(`http://localhost:8787/api/chatList?empCode=${emp.empcode}`);
+                const chatResponse = await fetch(`http://localhost:8787/api/chatList2?empCode=${emp.empcode}`);
                 if (!chatResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -117,7 +118,7 @@ const ChatSunComponent = () => {
     // 모달 닫기
     const closeModal = () => {
         setIsModalOpen(false);
-        handleChatRoomCreated();  // 모달 닫힐 때 채팅 목록 갱신
+        handleChatRoomCreated(); // 모달 닫힐 때 채팅 목록 갱신
     };
 
     // 부서명 반환 함수
@@ -131,7 +132,7 @@ const ChatSunComponent = () => {
             case 51: return '품질관리';
             case 61: return '자재관리';
             case 71: return '생산제조';
-            default: return '부서명 없음'; 
+            default: return '부서명 없음';
         }
     };
 
@@ -166,43 +167,36 @@ const ChatSunComponent = () => {
                 onChatRoomCreated={handleChatRoomCreated} 
                 onClose={closeModal}
             />
-            <div>
-                <table className="table table-bordered" style={{ backgroundColor: 'gray', width: '500px', height: 'flex' }}>
-                    <thead>
-                        <tr>
-                            <th>참여자</th>
-                            <th>내용</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chat.map((item, index) => (
-                            <tr key={index}>
-                                <td style={{ width: '200px', height: '100px' }}>
-                                    {item.chatroomParti.split(',').map((code, idx) => (
-                                        <div key={idx} style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
-                                            <span
-                                                onClick={() => handleChatRoomClick(item.chatroomCode)}  // 클릭 시 모달 열기
-                                                style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                            >
-                                                {' [' + getDeptTitle(employeeData[code]?.empDept) + ']'}
-                                                {employeeData[code]?.empName || code}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </td>
-                                <td>
-                                    {lastMessage[item.chatroomCode] || '최근 메시지가 없습니다.'}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="list-group" style={{ height: '600px'}}>
+                {chat.map((item, index) => (
+                    <button
+                        key={index}
+                        type="button"
+                        className={`list-group-item list-group-item-action ${index === 0 ? '' : ''}`}
+                        onClick={() => handleChatRoomClick(item.chatroomCode)}
+                    >
+                        <div className="d-flex w-100 justify-content-between">
+                            <h5 className="mb-1">
+                                {item.chatroomParti.split(',').map((code, idx) => (
+                                    <span key={idx}>
+                                        {' [' + getDeptTitle(employeeData[code]?.empDept) + '] '}
+                                        {employeeData[code]?.empName || code}
+                                    </span>
+                                ))}
+                            </h5>
+                            <small>{item.chatTime}</small>
+                        </div>
+                        <p className="mb-1">
+                            {lastMessage[item.chatroomCode] || '최근 메시지가 없습니다.'}
+                        </p>
+                    </button>
+                ))}
             </div>
             {isModalOpen && (
                 <ChatRoomComponent 
                     show={isModalOpen} 
                     handleClose={closeModal} 
-                    chatroomCode={selectedChatroomCode}  // 선택된 채팅방 코드 전달
+                    chatroomCode={selectedChatroomCode} // 선택된 채팅방 코드 전달
                 />
             )}
         </div>

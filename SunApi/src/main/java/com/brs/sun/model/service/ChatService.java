@@ -21,6 +21,11 @@ public class ChatService {
 		return chatDao.findChatRoom(empCode);
 	}
 	
+	public List<ChatRoomVo> chatingList(String empCode){
+		return chatDao.findChatRoom2(empCode);
+	}
+	
+	
     public ChatService(ChatDao chatDao) {
         this.chatDao = chatDao;
     }

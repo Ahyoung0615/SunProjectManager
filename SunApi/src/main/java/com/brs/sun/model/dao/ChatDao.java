@@ -15,6 +15,8 @@ public interface ChatDao {
 	
 	List<ChatRoomVo> findChatRoom(@Param("empCode") String empCode);
 	
+	List<ChatRoomVo> findChatRoom2(@Param("empCode") String empCode);
+	
 	void insertChatMessage(ChatVo message);
 	
 	List<ChatVo> chatList(@Param("chatroomCode") String chatroomCode);
