@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MrReservationDetailFullCalendarDTO {
 
+	private int mrrCode;
 	private int empCode;
 	private String empName;
 	private String jobName;

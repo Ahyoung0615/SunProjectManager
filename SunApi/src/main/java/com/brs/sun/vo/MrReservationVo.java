@@ -19,14 +19,14 @@ public class MrReservationVo {
 
 	// 예약 코드, PK
 	private int mrrCode;
-	// 회의실 코드
-	private int empCode;
 	// 예약한 사용자 사번
+	private int empCode;
+	// 회의실 코드
 	private int meetroomCode;
 	// 시작 날짜
-	private LocalDateTime mrrStartTime;
+	private LocalDateTime mrrStarttime;
 	// 종료 날짜
-	private LocalDateTime mrrEndTime;
+	private LocalDateTime mrrEndtime;
 	
 	// MeetRoom Table Join
 	// 회의실 이름
