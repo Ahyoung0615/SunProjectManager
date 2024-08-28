@@ -60,6 +60,7 @@ const HeaderTopComponent = () => {
       await axios.post('http://localhost:8787/logout', {}, { withCredentials: true });
       window.sessionStorage.removeItem("user");
       setUserName(null); 
+      setIsChatModalOpen(false);
       alert('로그아웃 완료');
       navigate('/'); 
     } catch (error) {
