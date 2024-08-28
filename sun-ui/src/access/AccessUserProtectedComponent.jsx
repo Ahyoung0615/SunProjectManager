@@ -40,8 +40,10 @@ import MyPageComponent from '../mypage/MyPageComponent';
 import TimeTableListComponent from '../timetable/TimeTableListComponent';
 import VacationListComponent from '../vacation/VacationListComponent';
 import AccessUserComponent from './AccessUserComponent';
-import MeetingSummaryComponent from '../meeting/MeetingSummaryComponent';
 import OcrFileFormComponent from '../OcrFileUpload/OcrFileFormComponent';
+import MinutesDetailComponent from '../meeting/MinutesDetailComponent';
+import MinutesFormComponent from '../meeting/MinutesFormComponent';
+import MinutesListComponent from '../meeting/MinutesListComponent';
 
 // Exporting components with AU prefix
 export const AUAttendence = () => (
@@ -294,12 +296,6 @@ export const AUTimeTableList = () => (
 export const AUVacationList = () => (
     <AccessUserComponent>
         <VacationListComponent />
-    </AccessUserComponent>
-);
-
-export const AUMeetingSummary = () => (
-    <AccessUserComponent>
-        <MeetingSummaryComponent/>
     </AccessUserComponent>
 );
 
