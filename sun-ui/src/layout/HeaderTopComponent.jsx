@@ -3,11 +3,13 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import HeaderSearchComponent from './HeaderSearchComponent';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ChatSunComponent from '../chat/ChatSunComponent'; // Import ChatSunComponent
 
 const HeaderTopComponent = () => {
   const navigate = useNavigate();
   const [isToggled, setIsToggled] = useState(false);
   const [userName, setUserName] = useState(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false); // Modal state
 
   // 세션에서 유저 정보를 가져오는 함수
   const fetchUserInfo = useCallback(() => {
@@ -58,6 +60,7 @@ const HeaderTopComponent = () => {
       await axios.post('http://localhost:8787/logout', {}, { withCredentials: true });
       window.sessionStorage.removeItem("user");
       setUserName(null); 
+      setIsChatModalOpen(false);
       alert('로그아웃 완료');
       navigate('/'); 
     } catch (error) {
@@ -73,6 +76,16 @@ const HeaderTopComponent = () => {
       console.log("세션이 존재합니다.");
     }
   }, []);
+
+  // 채팅 모달 열기
+  const openChatModal = () => {
+    setIsChatModalOpen(true);
+  };
+
+  // 채팅 모달 닫기
+  const closeChatModal = () => {
+    setIsChatModalOpen(false);
+  };
 
   return (
     <nav className="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -97,9 +110,9 @@ const HeaderTopComponent = () => {
       </div>
 
       <HeaderSearchComponent style={{ marginRight: 80 }} />
-      <Link to='/chatSun' style={{ color: 'white', textDecorationLine: 'none', marginRight: 20 }}>
-      <i class="bi bi-chat-dots-fill"></i> 채팅
-      </Link>
+      <button onClick={openChatModal} style={{ color: 'white', background: 'none', border: 'none', marginRight: 20, cursor: 'pointer' }}>
+        <i className="bi bi-chat-dots-fill"></i> 채팅
+      </button>
       <Link to='/myPage' style={{ color: 'white', textDecorationLine: 'none', marginRight: 20 }}>
         <i className="bi bi-person-circle"></i> 마이페이지
       </Link>
@@ -112,6 +125,37 @@ const HeaderTopComponent = () => {
         >
           <i className="bi bi-person-fill-slash"></i> 로그아웃
         </Link>
+      )}
+
+      {/* 채팅 모달 컴포넌트 */}
+      {isChatModalOpen && (
+        <div style={{
+                position: 'fixed',
+                top: '10%',
+                right: '0',
+                width: '400px',
+                height: '80%',
+                border: '1px solid #ccc',
+                boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
+                backgroundColor: 'white',
+                zIndex: 1050, // Bootstrap modal default z-index is 1050
+          display: 'block' 
+      }}  role="dialog" tabIndex="-1" data-bs-backdrop="static">
+          <div className="modal-dialog modal-dialog-scrollable modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">채팅</h5>
+                <button type="button" className="btn-close" onClick={closeChatModal}></button>
+              </div>
+              <div className="modal-body">
+                <ChatSunComponent />
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={closeChatModal}>닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </nav>
   );

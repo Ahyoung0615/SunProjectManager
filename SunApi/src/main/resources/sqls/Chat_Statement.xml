@@ -16,6 +16,27 @@
 	    FROM CHATROOM
 	    WHERE REGEXP_LIKE(CHATROOM_PARTI, '(^|,)' || #{empCode} || '(,|$)')
 	</select>
+	<select id="findChatRoom2" resultType="ChatRoomVo">
+	    SELECT 
+	        cr.CHATROOM_CODE,
+	        REGEXP_REPLACE(cr.CHATROOM_PARTI, '^'||#{empCode}||'(,|$)|(,)'||#{empCode}||'(,|$)', '') AS CHATROOM_PARTI,
+	        cr.CHATROOM_CREDTEDAT,
+	        COALESCE(MAX(c.CHAT_TIME), cr.CHATROOM_CREDTEDAT) AS LAST_ACTIVITY_TIME
+	    FROM 
+	        CHATROOM cr
+	    LEFT JOIN 
+	        CHAT c 
+	    ON 
+	        cr.CHATROOM_CODE = c.CHATROOM_CODE
+	    WHERE 
+	        REGEXP_LIKE(cr.CHATROOM_PARTI, '(^|,)' || #{empCode} || '(,|$)')
+	    GROUP BY 
+	        cr.CHATROOM_CODE, 
+	        cr.CHATROOM_PARTI, 
+	        cr.CHATROOM_CREDTEDAT
+	    ORDER BY 
+	        LAST_ACTIVITY_TIME DESC
+	</select>
 	<insert id="insertChatMessage" parameterType="ChatVo">
         INSERT INTO CHAT (CHAT_CODE, CHATROOM_CODE, CHAT_CONTENT, CHAT_SENDER, CHAT_TIME)
         VALUES ((SELECT NVL(MAX(CHAT_CODE), 0) + 1 FROM CHAT), #{chatroomCode}, #{chatContent}, #{chatSender}, SYSDATE)

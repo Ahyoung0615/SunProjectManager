@@ -52,6 +52,14 @@ public class ChatController {
         //log.info("Employee code: {}", empCodeString);
         return chatService.chatList(empCodeString);
     }
+    @GetMapping("/api/chatList2")
+    public List<ChatRoomVo> getChatList2(@RequestParam("empCode") String empCode) {
+        EmployeeVo emp = employeeDao.Info(empCode);
+        //log.info("Employee info: {}", emp);
+        String empCodeString = String.valueOf(emp.getEmpCode());
+        //log.info("Employee code: {}", empCodeString);
+        return chatService.chatingList(empCodeString);
+    }
     @GetMapping("/api/employee/{empCode}")
     public ResponseEntity<EmployeeVo> getEmployeeInfo(@PathVariable("empCode") String empCode) {
         EmployeeVo employee = employeeService.getOneMember(empCode);
