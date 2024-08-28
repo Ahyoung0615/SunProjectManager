@@ -66,7 +66,8 @@ import {
     AUBoardDetail,
     AUBoardInsert,
     AUBoardUpdate,
-    AUMeetingSummary
+    AUMeetingSummary,
+    OCRFileUploadForm
 } from './access/AccessUserProtectedComponent';
 
 function App() {
@@ -142,6 +143,13 @@ function App() {
                                 <Route path="/fVehicleForm" element={<AUFVehicleForm />} />
                                 <Route path="/fVehicleList" element={<AUFVehicleList />} />
                                 <Route path="/meetingSummary" element={<AUMeetingSummary />} />
+
+                                <Route path="/meetingSummary" element={<AUMeetingList />} />
+                                <Route path="/minutesDetail/:minutesCode" element={<AUMeetingDetail />} />
+                                <Route path="/minutesForm" element={<AUMeetingForm />} />
+
+                                <Route path='/ocrFileUpload' element={<OCRFileUploadForm />} />
+                                
                                 {/* Fallback Route */}
                                 <Route path="/*" element={<Error404Component />} />
                             </Routes>

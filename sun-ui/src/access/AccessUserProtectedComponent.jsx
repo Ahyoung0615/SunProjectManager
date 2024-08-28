@@ -24,7 +24,6 @@ import DocumentListComponent from '../document/DocumentListComponent';
 import DocumentTempDetailComponent from '../document/DocumentTempDetailComponent';
 import DocumentTempListComponent from '../document/DocumentTempListComponent';
 import ExpenseApprovalComponent from '../document/ExpenseApprovalComponent';
-import FileUploadTest from '../document/FileUploadTest';
 import VacationDocComponent from '../document/VacationDocComponent';
 import FDeliveryCalRsvListComponent from '../fdelivery/FDeliveryCalRsvListComponent';
 import FDeliveryDetailComponent from '../fdelivery/FDeliveryDetailComponent';
@@ -42,6 +41,7 @@ import TimeTableListComponent from '../timetable/TimeTableListComponent';
 import VacationListComponent from '../vacation/VacationListComponent';
 import AccessUserComponent from './AccessUserComponent';
 import MeetingSummaryComponent from '../meeting/MeetingSummaryComponent';
+import OcrFileFormComponent from '../OcrFileUpload/OcrFileFormComponent';
 
 // Exporting components with AU prefix
 export const AUAttendence = () => (
@@ -195,6 +195,12 @@ export const AUDocumentTempList = () => (
     </AccessUserComponent>
 );
 
+export const OCRFileUploadForm = () => (
+    <AccessUserComponent>
+        <OcrFileFormComponent/>
+    </AccessUserComponent>
+)
+
 export const AUExpenseApproval = () => (
     <AccessUserComponent>
         <ExpenseApprovalComponent />
@@ -294,5 +300,23 @@ export const AUVacationList = () => (
 export const AUMeetingSummary = () => (
     <AccessUserComponent>
         <MeetingSummaryComponent/>
+    </AccessUserComponent>
+);
+
+export const AUMeetingList = () => (
+    <AccessUserComponent>
+        <MinutesListComponent/>
+    </AccessUserComponent>
+);
+
+export const AUMeetingDetail = () => (
+    <AccessUserComponent>
+        <MinutesDetailComponent/>
+    </AccessUserComponent>
+);
+
+export const AUMeetingForm = () => (
+    <AccessUserComponent>
+        <MinutesFormComponent/>
     </AccessUserComponent>
 );

@@ -93,7 +93,7 @@
 		) ch
 		JOIN EDOC ed 
 		ON ed.EDOC_CODE = ch.EDOC_CODE
-		WHERE ch.EMP_CODE = #{edocCode}
+		WHERE ch.EMP_CODE = #{empCode}
 		AND ch.RN = 1 <!-- 첫 번째 결재자 (현재 결재 차례인 사람) -->
 	</select>
 	
