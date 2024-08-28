@@ -149,12 +149,14 @@ const MemberAddModal = ({ show, handleClose }) => {
                             onChange={handleChange}
                         />
                     </Form.Group>
-                    <Button variant="secondary" onClick={handleClose}>
-                        닫기
-                    </Button>
-                    <Button variant="primary" type="submit">
-                        사원 등록
-                    </Button>
+                    <div className="d-flex justify-content-end">
+                        <Button variant="primary" type="submit">
+                            사원 등록
+                        </Button>
+                        <Button variant="secondary" onClick={handleClose}>
+                            닫기
+                        </Button>
+                    </div>
                 </Form>
             </Modal.Body>
         </Modal>

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import OrgChatComponent from '../commodule/OrgChatComponent';
 import ChatRoomComponent from './ChatRoomPage'; // ChatRoomComponent import
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 
 const SOCKET_URL = 'ws://localhost:8787/socket';
 
@@ -11,7 +13,7 @@ const ChatSunComponent = () => {
     const [employeeData, setEmployeeData] = useState({});
     const [lastMessage, setLastMessage] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedChatroomCode, setSelectedChatroomCode] = useState(null); // 선택된 채팅방 코드
+    const [selectedChatroomCode, setSelectedChatroomCode] = useState(null);
     const [socket, setSocket] = useState(null);
 
     // 사용자 정보 가져오기
@@ -22,54 +24,62 @@ const ChatSunComponent = () => {
         }
     }, []);
 
+    const updateChatRoomList = () => {
+        // 채팅방 목록을 다시 불러오거나 업데이트하는 로직을 구현합니다.
+        handleChatRoomCreated();
+    };
+
     // 채팅 목록과 사원 정보 가져오기
     useEffect(() => {
         if (emp && emp.empcode) {
-            handleChatRoomCreated();
+            updateChatRoomList();
         }
-    }, [emp]);
+    }, [emp ,selectedChatroomCode]);
 
-    // WebSocket 설정
+    // WebSocket 설정 및 메시지 처리
     useEffect(() => {
         if (emp) {
-            const ws = new WebSocket(SOCKET_URL);
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established');
-                ws.send(JSON.stringify({ type: 'JOIN', empCode: emp.empcode }));
-            };
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-
-                if (data.type === 'NEW_MESSAGE' && data.chatroomCode) {
-                    setLastMessage(prevLastMessage => ({
-                        ...prevLastMessage,
-                        [data.chatroomCode]: data.message
-                    }));
+            const socket = new SockJS('http://localhost:8787/ws');
+            const client = new Client({
+                webSocketFactory: () => socket,
+                connectHeaders: {},
+                debug: (str) => console.log('STOMP debug:', str),
+                reconnectDelay: 5000,
+                heartbeatIncoming: 4000,
+                heartbeatOutgoing: 4000,
+                onConnect: () => {
+                    console.log('STOMP connected');
+                    client.subscribe(`/topic/chatRoom/${selectedChatroomCode}`, (message) => {
+                        try {
+                            // 채팅방 메시지 수신 후 채팅방 목록을 업데이트합니다.
+                            console.log('Received message:', message.body);
+                            updateChatRoomList();
+                        } catch (error) {
+                            console.error('Error processing STOMP message:', error);
+                        }
+                    });
+                },
+                onStompError: (frame) => {
+                    console.error('STOMP error:', frame.headers['message']);
+                    console.error('STOMP error details:', frame.body);
+                },
+                onWebSocketError: (error) => {
+                    console.error('WebSocket error:', error);
                 }
-
-                if (data.type === 'UPDATE_CHAT_LIST') {
-                    setChat(data.chatList);
-                }
-            };
-
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket connection closed');
-            };
-
-            setSocket(ws);
-
+            });
+    
+            client.activate();
+            setSocket(client);
+    
             return () => {
-                ws.close();
+                if (client) {
+                    client.deactivate();
+                }
             };
         }
     }, [emp]);
-
+    
+    
     // 채팅방 생성 후 호출되는 함수
     const handleChatRoomCreated = async () => {
         if (emp && emp.empcode) {
@@ -80,7 +90,7 @@ const ChatSunComponent = () => {
                 }
                 const chatData = await chatResponse.json();
                 setChat(chatData);
-                console.log(chatData);
+
                 const empCodes = new Set();
                 chatData.forEach(item => {
                     item.chatroomParti.split(',').forEach(code => empCodes.add(code));
@@ -101,8 +111,8 @@ const ChatSunComponent = () => {
                         console.error(`Error fetching employee data for code ${code}:`, error);
                     }
                 }
-                console.log(employeeData);
                 setEmployeeData(employeeData);
+
             } catch (error) {
                 console.error('Error fetching chat list:', error);
             }
@@ -111,11 +121,12 @@ const ChatSunComponent = () => {
 
     // 채팅방 페이지로 이동 대신 모달 열기
     const handleChatRoomClick = (chatroomCode) => {
+        setIsModalOpen(false);
         setSelectedChatroomCode(chatroomCode);
         setIsModalOpen(true);
     };
 
-    // 모달 닫기
+    // 모달 닫기 및 채팅 목록 갱신
     const closeModal = () => {
         setIsModalOpen(false);
         handleChatRoomCreated(); // 모달 닫힐 때 채팅 목록 갱신
@@ -136,59 +147,55 @@ const ChatSunComponent = () => {
         }
     };
 
-    // 마지막 메시지 가져오기
-    useEffect(() => {
-        const fetchLastMessages = async () => {
-            try {
-                const lastMessages = {};
-                for (const item of chat) {
-                    const response = await fetch(`http://localhost:8787/getLastChatMessage?chatroomCode=${item.chatroomCode}`);
-                    if (response.ok) {
-                        const message = await response.text();
-                        lastMessages[item.chatroomCode] = message;
-                    }
-                }
-                setLastMessage(lastMessages);
-            } catch (error) {
-                console.error('Error fetching last messages:', error);
-            }
-        };
-
-        if (chat.length > 0) {
-            fetchLastMessages();
-        }
-    }, [chat]);
-
     return (
-        <div>
+        <div style={{ backgroundColor: '#fafafa', padding: '10px', borderRadius: '8px' }}>
             <OrgChatComponent 
-                buttonName="채팅방생성" 
+                buttonName="채팅방 생성" 
                 mappingUrl="chat" 
                 onChatRoomCreated={handleChatRoomCreated} 
                 onClose={closeModal}
             />
-            <div className="list-group" style={{ height: '600px'}}>
+            <div 
+                className="list-group" 
+                style={{
+                    width: '140px', 
+                    height: '800px', 
+                    backgroundColor: '#ffffff', 
+                    borderRadius: '10px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    overflowY: 'auto'
+                }}
+            >
                 {chat.map((item, index) => (
                     <button
                         key={index}
                         type="button"
-                        className={`list-group-item list-group-item-action ${index === 0 ? '' : ''}`}
+                        className="list-group-item list-group-item-action"
+                        style={{
+                            backgroundColor: item.chatroomCode === selectedChatroomCode ? '#0095f6' : '#ffffff',
+                            color: item.chatroomCode === selectedChatroomCode ? '#ffffff' : '#262626',
+                            border: 'none',
+                            padding: '10px',
+                            marginBottom: '5px',
+                            borderRadius: '8px',
+                        }}
                         onClick={() => handleChatRoomClick(item.chatroomCode)}
                     >
                         <div className="d-flex w-100 justify-content-between">
-                            <h5 className="mb-1">
+                            <h5 className="mb-1" style={{ fontSize: '14px', fontWeight: '500' }}>
                                 {item.chatroomParti.split(',').map((code, idx) => (
                                     <span key={idx}>
-                                        {' [' + getDeptTitle(employeeData[code]?.empDept) + '] '}
+                                        <span style={{ color: '#8e8e8e' }}>
+                                            {' [' + getDeptTitle(employeeData[code]?.empDept) + '] '}
+                                        </span>
                                         {employeeData[code]?.empName || code}
                                     </span>
                                 ))}
                             </h5>
-                            <small>{item.chatTime}</small>
+                            <small style={{ color: item.chatroomCode === selectedChatroomCode ? '#ffffff' : '#8e8e8e' }}>
+                                {item.chatTime}
+                            </small>
                         </div>
-                        <p className="mb-1">
-                            {lastMessage[item.chatroomCode] || '최근 메시지가 없습니다.'}
-                        </p>
                     </button>
                 ))}
             </div>
@@ -197,10 +204,12 @@ const ChatSunComponent = () => {
                     show={isModalOpen} 
                     handleClose={closeModal} 
                     chatroomCode={selectedChatroomCode} // 선택된 채팅방 코드 전달
+                    onUpdateChatRoomList={updateChatRoomList}
                 />
             )}
         </div>
     );
+    
 };
 
 export default ChatSunComponent;

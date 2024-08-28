@@ -58,9 +58,10 @@ const HeaderTopComponent = () => {
   const handleLogout = async () => {
     try {
       await axios.post('http://localhost:8787/logout', {}, { withCredentials: true });
+      setIsChatModalOpen(false);
       window.sessionStorage.removeItem("user");
       setUserName(null); 
-      setIsChatModalOpen(false);
+      
       alert('로그아웃 완료');
       navigate('/'); 
     } catch (error) {
@@ -132,12 +133,12 @@ const HeaderTopComponent = () => {
         <div style={{
                 position: 'fixed',
                 top: '10%',
-                right: '0',
-                width: '400px',
-                height: '80%',
+                right: '0px',
+                width: '550px',
+                height: '84%',
                 border: '1px solid #ccc',
                 boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
-                backgroundColor: 'white',
+                backgroundColor: '#fafafa',
                 zIndex: 1050, // Bootstrap modal default z-index is 1050
           display: 'block' 
       }}  role="dialog" tabIndex="-1" data-bs-backdrop="static">
@@ -149,9 +150,6 @@ const HeaderTopComponent = () => {
               </div>
               <div className="modal-body">
                 <ChatSunComponent />
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={closeChatModal}>닫기</button>
               </div>
             </div>
           </div>
