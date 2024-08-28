@@ -5,33 +5,50 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ModalComponent from '../commodule/ModalComponent';
+import { param } from 'jquery';
 
 const TimeTableListComponent = () => {
-
     const apiKey = 'AIzaSyAMJA5opuUkb9_PAOeE2qaGiPPoWz-ryJE';
 
+    const [user, setUser] = useState();
     const [reservationList, setReservationList] = useState(null);
-    const [show, setShow] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [showFormModal, setShowFormModal] = useState(false);
     const [modalContent, setModalContent] = useState({ title: '', body: '' });
+    const [formData, setFormData] = useState({
+        meetroomCode: '',
+        startTime: '',
+        endTime: ''
+    });
+    const [meetroomList, setMeetroomList] = useState([]);
+
+    useEffect(() => {
+        const sessionStorage = window.sessionStorage.getItem("user");
+        const empInfo = JSON.parse(sessionStorage);
+        setUser(empInfo);
+    }, []);
 
     useEffect(() => {
         axios.get("http://localhost:8787/api/mrReservation/getReservationList")
             .then((res) => {
-                // API 응답 데이터를 FullCalendar 이벤트 형식으로 변환
                 const formattedEvents = res.data.map((reservation) => ({
-                    id: reservation.id,  // 고유 ID
-                    title: reservation.title || '회의 예약',       // 이벤트 제목
-                    start: reservation.start,              // 시작일
-                    end: reservation.end,                  // 종료일
-                    display: 'block',                        // 블록 형식으로 표시
-                    backgroundColor: '#3399ff',              // 바탕색
-                    borderColor: '#3399ff',                  // 테두리 색
+                    id: reservation.id,
+                    title: reservation.title,
+                    start: reservation.start,
+                    end: reservation.end,
+                    display: 'block',
+                    backgroundColor: '#3399ff',
+                    borderColor: '#3399ff',
                 }));
                 setReservationList(formattedEvents);
             });
+
+        axios.get("http://localhost:8787/api/mrReservation/getMeetRoom")
+            .then((res) => {
+                setMeetroomList(res.data);
+            });
     }, []);
 
-    // 서버에서 받은 날짜 및 시간 문자열을 변환하는 함수
     function formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleString('ko-KR', {
@@ -44,15 +61,13 @@ const TimeTableListComponent = () => {
         });
     }
 
-    // 이벤트 콘텐츠를 렌더링하는 함수
     function renderEventContent(eventInfo) {
         const eventStyle = {
-            color: 'white', // 이벤트 텍스트 색상
+            color: 'white',
             textAlign: 'center',
             width: '100%',
             display: 'block'
         };
-        // 날짜 객체를 문자열로 변환하여 렌더링
         const startTime = eventInfo.event.start ? eventInfo.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         const endTime = eventInfo.event.end ? eventInfo.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         return (
@@ -62,15 +77,13 @@ const TimeTableListComponent = () => {
         );
     }
 
-    // 이벤트 클릭 시 호출
     function handleEventClick(info) {
         const { event } = info;
-        const sessionStorage = window.sessionStorage.getItem("user");
-        const empInfo = JSON.parse(sessionStorage);
         axios.get(`http://localhost:8787/api/mrReservation/getReservationDetail?mrrCode=${event.id}`)
             .then((res) => {
-                const startTime = formatDate(res.data.start); // 서버에서 받은 시작일
-                const endTime = res.data.end ? formatDate(res.data.end) : ''; // 서버에서 받은 종료일
+                console.log(res.data);
+                const startTime = formatDate(res.data.start);
+                const endTime = res.data.end ? formatDate(res.data.end) : '';
                 setModalContent({
                     title: '일정 상세',
                     body: (
@@ -78,47 +91,133 @@ const TimeTableListComponent = () => {
                             <p>장소: {res.data.title}</p>
                             <p>예약자: {res.data.deptName} {res.data.empName} {res.data.jobName}</p>
                             <p>일정: {startTime} ~ {endTime}</p>
-                            {empInfo.empcode == res.data.empCode && (
+                            {user.empcode == res.data.empCode && (
                                 <div style={{ textAlign: 'right', marginTop: 10 }}>
                                     <input
                                         type='button'
-                                        value="수정"
-                                        onClick={modifyReservation}
+                                        value="삭제"
+                                        onClick={() => deleteReservation(res.data.mrrCode)}
                                         style={{
-                                            backgroundColor: '#3399ff',
+                                            backgroundColor: '#ff4d4d',
                                             color: 'white',
                                             border: 'none',
-                                            padding: '5px 10px', // 크기 조정
+                                            padding: '5px 10px',
                                             borderRadius: '5px',
                                             cursor: 'pointer',
-                                            fontSize: '14px' // 텍스트 크기 조정
+                                            fontSize: '14px'
                                         }} />
+
                                 </div>
                             )}
                         </div>
                     )
                 });
-                setShow(true);
+                setShowDetailModal(true);
             })
             .catch(error => {
                 console.error("Error fetching reservation details: ", error);
             });
     }
 
-
     const closeModal = () => {
-        setShow(false);
+        setShowDetailModal(false);
+        setShowFormModal(false);
     };
 
-    // insertReservation
+    const formatLocalDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hour}:${minute}`;
+    };
+
     const insertReservation = () => {
-
+        setShowFormModal(true);
     };
 
-    const modifyReservation = () => {
-
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            [name]: value
+        }));
     };
 
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const sendInsertData = {
+            meetroomCode: formData.meetroomCode,
+            empCode: user.empcode,
+            mrrStarttime: formatLocalDate(new Date(formData.startTime)),
+            mrrEndtime: formatLocalDate(new Date(formData.endTime))
+        };
+        // 중복 검사
+        axios.get("http://localhost:8787/api/mrReservation/getReservationOverlap", {
+            params: sendInsertData
+        })
+            .then((res) => {
+                if (res.data === 0) {
+                    axios.post("http://localhost:8787/api/mrReservation/insertReservation", sendInsertData)
+                        .then(() => {
+                            setShowFormModal(false);
+                            setReservationList(null);
+                            // 리스트 새로 불러오기
+                            axios.get("http://localhost:8787/api/mrReservation/getReservationList")
+                                .then((res) => {
+                                    const formattedEvents = res.data.map((reservation) => ({
+                                        id: reservation.id,
+                                        title: reservation.title,
+                                        start: reservation.start,
+                                        end: reservation.end,
+                                        display: 'block',
+                                        backgroundColor: '#3399ff',
+                                        borderColor: '#3399ff',
+                                    }));
+                                    setReservationList(formattedEvents);
+                                });
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                        });
+                } else {
+                    alert("예약 시간에 중복이 발생했습니다.");
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const deleteReservation = (mrrCode) => {
+        console.log(mrrCode);
+        axios.delete(`http://localhost:8787/api/mrReservation/deleteReservation/${mrrCode}`)
+            .then((response) => {
+                if(response.status == 200) {
+                    setShowFormModal(false);
+                    setReservationList(null);
+                    // 리스트 새로 불러오기
+                    axios.get("http://localhost:8787/api/mrReservation/getReservationList")
+                        .then((res) => {
+                            const formattedEvents = res.data.map((reservation) => ({
+                                id: reservation.id,
+                                title: reservation.title,
+                                start: reservation.start,
+                                end: reservation.end,
+                                display: 'block',
+                                backgroundColor: '#3399ff',
+                                borderColor: '#3399ff',
+                            }));
+                            setReservationList(formattedEvents);
+                            setShowDetailModal(false);
+                        }).catch((error) => console.error(error));
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+    };
+    
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <br />
@@ -129,14 +228,14 @@ const TimeTableListComponent = () => {
                     value="시설 예약"
                     onClick={insertReservation}
                     style={{
-                        backgroundColor: '#6ABEDC', // 버튼 색상
+                        backgroundColor: '#6ABEDC',
                         border: 'none',
-                        padding: '8px 16px', // 버튼 크기
-                        borderRadius: '5px', // 버튼 모서리 둥글기
+                        padding: '8px 16px',
+                        borderRadius: '5px',
                         cursor: 'pointer',
-                        fontSize: '14px', // 버튼 텍스트 크기
+                        fontSize: '14px',
                         fontWeight: 'bold',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // 버튼 그림자 효과
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                         marginBottom: 10
                     }}
                 />
@@ -161,19 +260,87 @@ const TimeTableListComponent = () => {
                             },
                             {
                                 events: reservationList,
-                                color: '#3399ff', // 로컬 예약 이벤트의 색상
-                                textColor: 'white' // 텍스트 색상
+                                color: '#3399ff',
+                                textColor: 'white'
                             }
                         ]}
                         height={"70vh"}
                         locale="ko"
                         eventClick={handleEventClick}
-                        eventContent={renderEventContent} // 이벤트 텍스트 스타일 적용
+                        eventContent={renderEventContent}
                     />
                 </div>
             </div>
+
+            {/* 폼 모달 */}
             <ModalComponent
-                open={show}
+                open={showFormModal}
+                close={closeModal}
+                title="시설 예약 추가"
+                body={
+                    <form onSubmit={handleFormSubmit}>
+                        <div>
+                            <label>
+                                회의실 코드:
+                                <select
+                                    name="meetroomCode"
+                                    value={formData.meetroomCode}
+                                    onChange={handleFormChange}
+                                    required>
+                                    <option value="">회의실을 선택하세요</option>
+                                    {meetroomList.map(room => (
+                                        <option key={room.meetroomCode} value={room.meetroomCode}>
+                                            {room.meetroomName}({room.meetroomSize})
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                시작 시간:
+                                <input
+                                    type="datetime-local"
+                                    name="startTime"
+                                    value={formData.startTime}
+                                    onChange={handleFormChange}
+                                    required
+                                />
+                            </label>
+                        </div>
+                        <div>
+                            <label>
+                                종료 시간:
+                                <input
+                                    type="datetime-local"
+                                    name="endTime"
+                                    value={formData.endTime}
+                                    onChange={handleFormChange}
+                                    required
+                                />
+                            </label>
+                        </div>
+                        <div style={{ textAlign: 'right', marginTop: 10 }}>
+                            <input
+                                type="submit"
+                                value="예약 추가"
+                                style={{
+                                    backgroundColor: '#3399ff',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '5px 10px',
+                                    borderRadius: '5px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px'
+                                }}
+                            />
+                        </div>
+                    </form>
+                }
+            />
+
+            <ModalComponent
+                open={showDetailModal}
                 close={closeModal}
                 title={modalContent.title}
                 body={modalContent.body}

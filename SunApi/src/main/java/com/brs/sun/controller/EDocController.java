@@ -136,8 +136,8 @@ public class EDocController {
 	@PostMapping("/insertVacation")
 	public String insertVacation(@RequestBody VacationRequestDTO docData) {
 		/*
-		 * startDate: startDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 endDate:
-		 * endDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 reason, weekdayCount,
+		 * startDate: startDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 
+		 * endDate: endDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 reason, weekdayCount,
 		 * approvers: selectedApprovers.map(approver => approver.empCode) // 결재자 목록
 		 */
 		log.info("docData: {}", docData);
@@ -189,8 +189,8 @@ public class EDocController {
 	@PostMapping("/insertTempVacation")
 	public String insertTempVacation(@RequestBody VacationRequestDTO docData) {
 		/*
-		 * startDate: startDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 endDate:
-		 * endDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 reason, weekdayCount,
+		 * startDate: startDate.toISOString().split('T')[0], // YYYY-MM-DD 
+		 * 형식 endDate: endDate.toISOString().split('T')[0], // YYYY-MM-DD 형식 reason, weekdayCount,
 		 * approvers: selectedApprovers.map(approver => approver.empCode) // 결재자 목록
 		 */
 		log.info("docData: {}", docData);

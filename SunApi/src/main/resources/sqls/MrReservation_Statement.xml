@@ -5,12 +5,14 @@
  
 <mapper namespace="com.brs.sun.model.dao.MrReservationDao">
 	
+	<!-- 예약 목록 -->
 	<select id="selectReservationList" resultType="MrReservationVo">
 		SELECT *
 		FROM MRRESERVATION m JOIN MEETROOM m2 
 		ON m.MEETROOM_CODE = m2.MEETROOM_CODE
 	</select>
 	
+	<!-- 상세보기 -->
 	<select id="selectReservationDetail" resultType="MrReservationVo">
 		SELECT *
 		FROM MRRESERVATION m JOIN MEETROOM m2 
@@ -24,4 +26,51 @@
 		WHERE m.MRR_CODE = #{mrrCode}
 	</select>
 	
+	<!-- 예약 중복 검사 -->
+	<select id="selectOverlap" resultType="java.lang.Integer">
+	    SELECT CASE
+	        WHEN COUNT(*) > 0 THEN 1
+	        ELSE 0
+	    END AS OVERLAP
+	    FROM MRRESERVATION m 
+	    <trim prefix="WHERE" prefixOverrides="AND">
+	        <if test="mrrStarttime != null and mrrEndtime != null">
+	            <![CDATA[
+	                AND (MRR_STARTTIME BETWEEN #{mrrStarttime} AND #{mrrEndtime}
+	                OR MRR_ENDTIME BETWEEN #{mrrStarttime} AND #{mrrEndtime}
+	                OR (MRR_STARTTIME <= #{mrrStarttime} AND MRR_ENDTIME >= #{mrrEndtime}))
+	            ]]>
+	        </if>
+	        <if test="mrrStarttime == null or mrrEndtime == null">
+	            <if test="mrrStarttime != null">
+	                <![CDATA[
+	                    AND MRR_STARTTIME <= #{mrrStarttime}
+	                ]]>
+	            </if>
+	            <if test="mrrEndTime != null">
+	                <![CDATA[
+	                    AND MRR_ENDTIME >= #{mrrEndtime}
+	                ]]>
+	            </if>
+	        </if>
+	        AND MEETROOM_CODE = #{meetroomCode}
+	    </trim>
+	</select>
+
+	<!-- 회의실 목록 -->
+	<select id="selectMeetRoom" resultType="MeetRoomVo">
+		SELECT *
+			FROM MEETROOM
+	</select>
+	
+	<!-- 예약 등록 -->
+	<insert id="insertReservation">
+		INSERT INTO MRRESERVATION
+		(MRR_CODE, EMP_CODE, MEETROOM_CODE, MRR_STARTTIME, MRR_ENDTIME)
+		VALUES((SELECT NVL(MAX(MRR_CODE) + 1 ,0) FROM MRRESERVATION m), #{empCode}, #{meetroomCode}, #{mrrStarttime}, #{mrrEndtime})
+	</insert>
+	
+	<delete id="deleteReservation">
+		DELETE FROM MRRESERVATION m WHERE MRR_CODE = #{mrrCode}
+	</delete>
 </mapper>
