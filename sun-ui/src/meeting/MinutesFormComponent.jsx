@@ -190,6 +190,7 @@ const MinutesFormComponent = () => {
                                 value={meetroomCode}
                                 onChange={(e) => setMeetroomCode(e.target.value)}
                                 required
+                                defaultValue={101}
                             >
                                 <option value="101">101 호실</option>
                                 <option value="102">102 호실</option>
