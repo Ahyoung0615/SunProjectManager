@@ -7,7 +7,11 @@ const OcrFileFormComponent = () => {
     
     const handleChangeFile = (event) => {
         setFile(event.target.files);
-    }
+    };
+
+    const send = () => {
+        const formData = new FormData();
+    };
 
     return (
         <div>
