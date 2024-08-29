@@ -11,8 +11,9 @@
 	</select>
 	
 	<select id="selectEmp" resultType="EmployeeVo">
-		SELECT *
-		FROM EMPLOYEE
+		SELECT EMP_CODE, EMP_NAME || '('||JOB_NAME||')' AS EMP_NAME , e.JOB_CODE, DEPT_CODE
+	FROM EMPLOYEE e JOIN JOB b
+	ON e.JOB_CODE = b.JOB_CODE
 	</select>
 	
 	<select id="selectApprovers" resultType="EmployeeVo">
