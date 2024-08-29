@@ -19,10 +19,6 @@ const HeaderSideComponent = () => {
             <div className="sb-sidenav-menu">
                 <div className="nav">
                     <div className="sb-sidenav-menu-heading" style={{ fontSize: 15, marginLeft: 10, color: 'white' }}>근태관리</div>
-                    <Link className='nav-link' to='/attendence'>
-                        <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-buildings-fill"></i></div>
-                        출퇴근관리
-                    </Link>
                     <Link className='nav-link' to='/vacationList'>
                         <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-calendar2-check"></i></div>
                         연가관리
