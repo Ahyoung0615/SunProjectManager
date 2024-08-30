@@ -116,9 +116,12 @@
 		JOIN EDOC ed 
 		ON ed.EDOC_CODE = ch.EDOC_CODE
 		WHERE ch.EMP_CODE = #{empCode}
+		<![CDATA[
+			AND ch.RN <> 1
+		]]>
 	</select>
 	
-	<!-- 내가 승인한 문서 찾기 -->
+	<!-- 내가 반려한 문서 찾기 -->
 	<select id="selectMyAppRejectList" resultType="EDocVo">
 		SELECT *
 		FROM (
@@ -131,6 +134,9 @@
 		JOIN EDOC ed 
 		ON ed.EDOC_CODE = ch.EDOC_CODE
 		WHERE ch.EMP_CODE = #{empCode}
+		<![CDATA[
+			AND ch.RN <> 1
+		]]>
 	</select>
 	
 	<!-- 기안 문서 상세보기 -->
