@@ -7,6 +7,7 @@ const MemberDetailComponent = () => {
     const [employee, setEmployee] = useState({});
     const [file, setFile] = useState(null);
     const [empImg, setEmpImg] = useState(null); // 초기값을 null로 설정
+    const [previewImage, setPreviewImage] = useState(null); // 미리보기 이미지 상태
     const [showModal, setShowModal] = useState(false);
 
     const handleShow = () => setShowModal(true);
@@ -151,7 +152,18 @@ const MemberDetailComponent = () => {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+
+            // 기존의 객체 URL을 해제하여 메모리 누수 방지
+            if (previewImage) {
+                URL.revokeObjectURL(previewImage);
+            }
+
+            const objectURL = URL.createObjectURL(selectedFile);
+            setPreviewImage(objectURL);
+        }
     };
 
     const handlePasswordReset = async () => {
@@ -181,13 +193,13 @@ const MemberDetailComponent = () => {
                 <div style={{ marginRight: 20, textAlign: "center" }}>
                     <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
                         <img
-                            src={empImg}
+                            src={previewImage || empImg || '/img/noimages.png'}
                             alt="사원 이미지"
                             style={{ width: "100%", height: "100%" }}
                         />
                     </div>
                     <label>파일 업로드:</label>
-                    <input type="file" onChange={handleFileChange} />
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
                     <br />
                     <button className="btn btn-primary" onClick={handleUpload}>업로드</button>
                 </div>
