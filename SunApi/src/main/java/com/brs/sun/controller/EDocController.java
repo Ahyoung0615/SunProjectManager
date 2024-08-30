@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,11 +67,12 @@ public class EDocController {
 	    return "문서 상태 변경";
 	}
 	
+	// 문서 반려
 	@PostMapping("/appReject")
-	public String updateDocReply(@RequestBody EDocRejectRequestDTO dto) {
-	    log.info("map data: {}", dto);
+	public ResponseEntity<String> updateDocReply(@RequestBody EDocRejectRequestDTO dto) {
+	    log.info("Received DTO: {}", dto);
 
-	    // JSON 객체 생성
+	    // JSON 객체 생성 및 매핑
 	    JsonObject jsonObject = new JsonObject();
 	    jsonObject.addProperty("empName", dto.getEmpName());
 	    jsonObject.addProperty("jobName", dto.getJobName());
@@ -77,30 +80,61 @@ public class EDocController {
 	    jsonObject.addProperty("reason", dto.getReason());
 	    jsonObject.addProperty("rejectDate", dto.getRejectDate());
 
-	    log.info("jsonData: {}", jsonObject);
+	    log.info("Constructed JSON: {}", jsonObject);
 
+	    // EDocVo 객체 빌드
 	    EDocVo vo = EDocVo.builder()
 	                      .edocCode(dto.getEdocCode())
 	                      .empCode(dto.getEmpCode())
 	                      .edocReply(jsonObject.toString())
 	                      .build();
 
-	    return docService.updateRejectDocStatus(vo) ? "success" : "";
-	}
+	    // dayOffService revertDayOff 호출
+	    Map<String, Object> map = Map.of(
+	        "weekdayCount", dto.getWeekdayCount(),
+	        "empCode", dto.getDocEmpCode()
+	    );
 
-
-	@PostMapping("/docCancel")
-	public String updateCancelDocStatus(@RequestParam int edocCode) {
-	    final String SUCCESS = "success";
-	    final String FAIL = "fail";
-	    
-	    try {
-	        return docService.updateCancelDocStatus(edocCode) ? SUCCESS : FAIL;
-	    } catch (Exception e) {
-	         log.error("update 실패" + edocCode, e);
-	        return FAIL;
+	    if (dayOffService.revertDayOff(map)) {
+	        boolean updateResult = docService.updateRejectDocStatus(vo);
+	        return updateResult ? ResponseEntity.ok("success") : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Day off revert failed");
 	    }
 	}
+
+	@PostMapping("/docCancel")
+	public String updateCancelDocStatus(@RequestBody Map<String, Integer> map) {
+	    log.info("request data: {}", map);
+
+	    if (map == null || !map.containsKey("weekdayCount") || !map.containsKey("docEmpCode") || !map.containsKey("edocCode")) {
+	        log.warn("Invalid input data: {}", map);
+	        return "fail";
+	    }
+
+	    // revertMapData에 필요한 데이터 추가
+	    Map<String, Object> revertMapData = new HashMap<>();
+	    revertMapData.put("weekdayCount", map.get("weekdayCount"));
+	    revertMapData.put("empCode", map.get("docEmpCode"));
+
+	    try {
+	        // 연차 복구
+	        boolean revertDayOff = dayOffService.revertDayOff(revertMapData);
+
+	        if (revertDayOff) {
+	            // 문서 상태 업데이트
+	            boolean updateStatus = docService.updateCancelDocStatus(map.get("edocCode"));
+	            return updateStatus ? "success" : "fail";
+	        } else {
+	            log.warn("Failed to revert day off for empCode: {}", map.get("docEmpCode"));
+	            return "fail";
+	        }
+	    } catch (Exception e) {
+	        log.error("Exception occurred while processing docCancel for edocCode: {}", map.get("edocCode"), e);
+	        return "fail";
+	    }
+	}
+
 
 	// 임시저장 상세
 	@GetMapping("/tempDetail")
@@ -150,6 +184,7 @@ public class EDocController {
 		jsonContent.addProperty("endDate", docData.getEndDate());
 		jsonContent.addProperty("usedDayOff", docData.getWeekdayCount());
 		jsonContent.addProperty("reason", docData.getReason());
+		jsonContent.addProperty("weekdayCount", docData.getWeekdayCount());
 		log.info("jsonData: {}", jsonContent.toString());
 
 		List<Integer> approvers = docData.getApprovers();

@@ -25,4 +25,9 @@ public class DayOffServiceImpl implements DayOffService {
 	public boolean updateDayOff(Map<String, Object> map) {
 		return dao.updateDayOff(map);
 	}
+	
+	@Override
+	public boolean revertDayOff(Map<String, Object> map) {
+		return dao.revertDayOff(map);
+	}
 }

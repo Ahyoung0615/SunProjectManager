@@ -1,5 +1,6 @@
 package com.brs.sun.jpa.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -46,12 +47,19 @@ public class EDocJpaServiceImpl implements EDocJpaService {
 	}
 	
 	@Override
-	public Page<AppEDocListResponseDTO> edocAppList(int empCode, List<Integer> eDocCode, int page, int size) {
-		List<EDocVo> edocCodeList = docService.selectAppEmp(empCode);
+	public Page<AppEDocListResponseDTO> edocAppList(int empCode, List<Integer> eDocCode, String eDocStatus, int page, int size) {
+		List<EDocVo> edocCodeList = new ArrayList<EDocVo>();
+		if(eDocStatus.equals("A")) {
+			edocCodeList = docService.selectAppEmp(empCode);// 내가 결재할 코드
+		}else if(eDocStatus.equals("S")) {
+			edocCodeList = docService.selectMyAppSuccessList(empCode);// 내가 결재한 코드
+		}else if(eDocStatus.equals("R")){
+			edocCodeList = docService.selectMyAppRejectList(empCode);// 내가 반려한 코드
+		}
 		Pageable pageable = PageRequest.of(page, size);
 		for (EDocVo employeeVo : edocCodeList) {
 			eDocCode.add(employeeVo.getEdocCode());
 		}
-		return repository.edocAppList(eDocCode, pageable);
+		return repository.edocAppList(eDocCode, eDocStatus, pageable);
 	}
 }

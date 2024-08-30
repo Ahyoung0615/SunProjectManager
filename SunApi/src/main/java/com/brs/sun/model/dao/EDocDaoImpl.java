@@ -26,6 +26,16 @@ public class EDocDaoImpl implements EDocDao {
 	}
 	
 	@Override
+	public List<EDocVo> selectMyAppSuccessList(int empCode) {
+		return template.selectList(NS + "selectMyAppSuccessList", empCode);
+	}
+	
+	@Override
+	public List<EDocVo> selectMyAppRejectList(int empCode) {
+		return template.selectList(NS + "selectMyAppSuccessList", empCode);
+	}
+	
+	@Override
 	public boolean insertEDoc(EDocVo vo) {
 		return (template.insert(NS + "insertEDoc", vo) > 0) ? true : false;
 	}

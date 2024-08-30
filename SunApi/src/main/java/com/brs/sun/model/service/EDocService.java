@@ -13,6 +13,10 @@ public interface EDocService {
 
 	List<EDocVo> selectAppEmp(int empCode);
 	
+	List<EDocVo> selectMyAppSuccessList(int empCode);
+	
+	List<EDocVo> selectMyAppRejectList(int empCode);
+	
 	boolean insertTransaction(EDocVo vo, List<EDocLineVo> edocLineList);
 	
 	boolean updateEDoc(EDocVo vo, List<EDocLineVo> edocLineList);

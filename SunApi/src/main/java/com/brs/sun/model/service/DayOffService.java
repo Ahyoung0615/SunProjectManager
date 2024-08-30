@@ -9,4 +9,6 @@ public interface DayOffService {
 	DayOffVo selectDayOff(int empCode);
 	
 	boolean updateDayOff(Map<String, Object> map);
+	
+	boolean revertDayOff(Map<String, Object> map);
 }

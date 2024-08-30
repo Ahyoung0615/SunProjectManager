@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import classNames from 'classnames';
 import styles from '../css/DocumentListComponent.module.css';
+import DocumentListPaginationComponent from '../commodule/DocumentListPaginationComponent';
 
 const DocumentListComponent = () => {
-
     const [docList, setDocList] = useState([]);
     const [filteredDocList, setFilteredDocList] = useState([]);
     const [status, setStatus] = useState("A");
@@ -13,6 +13,7 @@ const DocumentListComponent = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
+    const [clickedButton, setClickedButton] = useState('A');
 
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
@@ -74,6 +75,7 @@ const DocumentListComponent = () => {
 
     const handleStatusChange = (statusValue) => {
         setStatus(statusValue.target.value);
+        setClickedButton(statusValue.target.value);
     };
 
     const getStatusText = (status) => {
@@ -87,78 +89,91 @@ const DocumentListComponent = () => {
     };
 
     const isEmpty = docList.length === 0;
-    const displayTotalPages = totalPages > 0 ? totalPages : 1;
 
     return (
-        <div>
-            <div className="container" style={{ marginTop: 30 }}>
-                <br></br>
-                <h4>발신함</h4>
+        <div className="container">
+            <div className={styles.ListContainer}>
+                <div className={styles['table-container']}>
+                    <h4>발신함</h4>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {/* 검색어 입력 필드 */}
+                            <input
+                                type="text"
+                                placeholder="제목 검색"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className={styles['search-input']}
+                            />
+                        </div>
 
-                <div>
-                    <select value={status} onChange={handleStatusChange}>
-                        <option value="A">결재중</option>
-                        <option value="S">결재 완료</option>
-                        <option value="R">반려</option>
-                        <option value="C">회수</option>
-                    </select>
-                </div>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'A', 'btn-secondary': clickedButton !== 'A' })}
+                                style={{ borderRadius: '2px' }}
+                                value="A"
+                                onClick={handleStatusChange}
+                            >
+                                결재중
+                            </button>
+                            <button
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'S', 'btn-secondary': clickedButton !== 'S' })}
+                                style={{ borderRadius: '2px' }}
+                                value="S"
+                                onClick={handleStatusChange}
+                            >
+                                결재완료
+                            </button>
+                            <button
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'R', 'btn-secondary': clickedButton !== 'R' })}
+                                style={{ borderRadius: '2px' }}
+                                value="R"
+                                onClick={handleStatusChange}
+                            >
+                                회수
+                            </button>
+                            <button
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'C', 'btn-secondary': clickedButton !== 'C' })}
+                                style={{ borderRadius: '2px' }}
+                                value="C"
+                                onClick={handleStatusChange}
+                            >
+                                반려
+                            </button>
+                        </div>
+                    </div>
 
-                {/* 검색어 입력 필드 */}
-                <input
-                    type="text" placeholder="제목 검색" value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className={styles['search-input']} style={{ marginLeft: '0'}}/>
+                    <table className={classNames("table", "table-bordered", styles['doc-table'])}>
+                        <thead>
+                            <tr>
+                                <th className={styles['th-id']}>번호</th>
+                                <th>제목</th>
+                                <th>작성일</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                filteredDocList.map((doc, index) =>
+                                    <tr key={index}>
+                                        <td><Link to={`/documentDetail/${doc.edocCode}`} >{doc.edocCode}</Link></td>
+                                        <td>{doc.edocTitle}</td>
+                                        <td>{doc.edocDate}</td>
+                                        <td>{getStatusText(doc.edocStatus)}</td>
+                                    </tr>
+                                )}
+                        </tbody>
+                    </table>
 
-                <table className={classNames("table", "table-bordered", styles['doc-table'])}>
-                    <thead>
-                        <tr>
-                            <th className={styles['th-id']}>번호</th>
-                            <th>제목</th>
-                            <th>작성일</th>
-                            <th>상태</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            filteredDocList.map((doc, index) =>
-                                <tr key={index}>
-                                    <td><Link to={`/documentDetail/${doc.edocCode}`} >{doc.edocCode}</Link></td>
-                                    <td>{doc.edocTitle}</td>
-                                    <td>{doc.edocDate}</td>
-                                    <td>{getStatusText(doc.edocStatus)}</td>
-                                </tr>
-                            )}
-                    </tbody>
-                </table>
-
-                {/* 페이지 네이션 버튼 */}
-                <div className={styles['pagination-container']}>
-                    <button
-                        className={classNames(styles['pagination-button'], { [styles['disabled']]: currentPage === 0 || isEmpty })}
-                        onClick={() => handlePageChange(0)}
-                        disabled={currentPage === 0 || isEmpty}>
-                        처음
-                    </button>
-                    <button
-                        className={classNames(styles['pagination-button'], { [styles['disabled']]: currentPage === 0 || isEmpty })}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 0 || isEmpty}>
-                        이전
-                    </button>
-                    <span>페이지 {currentPage + 1} / {displayTotalPages}</span>
-                    <button
-                        className={classNames(styles['pagination-button'], { [styles['disabled']]: currentPage + 1 === totalPages || isEmpty })}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage + 1 === totalPages || isEmpty}>
-                        다음
-                    </button>
-                    <button
-                        className={classNames(styles['pagination-button'], { [styles['disabled']]: currentPage + 1 === totalPages || isEmpty })}
-                        onClick={() => handlePageChange(totalPages - 1)}
-                        disabled={currentPage + 1 === totalPages || isEmpty}>
-                        마지막
-                    </button>
+                    {/* Pagination 컴포넌트 사용 */}
+                    <div className={styles['pagination-wrapper']}>
+                        <DocumentListPaginationComponent
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            isEmpty={isEmpty}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

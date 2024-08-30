@@ -241,7 +241,7 @@ const DocumentTempDetailComponent = () => {
             )}
             <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
             <form>
-                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
+                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
                     <thead>
                         <tr>
                             {selectedApprovers.map((approver) => (
@@ -351,7 +351,7 @@ const DocumentTempDetailComponent = () => {
 
                 <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
                 <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
+                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
             </div>
 
             <div

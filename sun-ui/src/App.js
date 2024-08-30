@@ -67,7 +67,10 @@ import {
     AUBoardInsert,
     AUBoardUpdate,
     AUMeetingSummary,
-    OCRFileUploadForm
+    OCRFileUploadForm,
+    AUMeetingList,
+    AUMeetingDetail,
+    AUMeetingForm
 } from './access/AccessUserProtectedComponent';
 
 function App() {
@@ -125,7 +128,7 @@ function App() {
                                 <Route path="/coWorkMap" element={<AUCoWorkMap />} />
                                 <Route path="/documentAppList" element={<AUDocumentApp />} />
                                 <Route path="/documentDetail/:edocCode" element={<AUDocumentDetail />} />
-                                <Route path="/documentAppDetail/:edocCode" element={<AUDocumentAppDetail />} />
+                                <Route path="/documentAppDetail/:edocCode/:status" element={<AUDocumentAppDetail />} />
                                 <Route path="/documentInsert" element={<AUDocumentInsert />} />
                                 <Route path="/documentList" element={<AUDocumentList />} />
                                 <Route path="/documentTempDetail/:edocCode" element={<AUDocumentTempDetail />} />
@@ -142,14 +145,12 @@ function App() {
                                 <Route path="/fVehicleDetail/:fvehiclecode" element={<AUFVehicleDetail />} />
                                 <Route path="/fVehicleForm" element={<AUFVehicleForm />} />
                                 <Route path="/fVehicleList" element={<AUFVehicleList />} />
-                                <Route path="/meetingSummary" element={<AUMeetingSummary />} />
-
                                 <Route path="/meetingSummary" element={<AUMeetingList />} />
                                 <Route path="/minutesDetail/:minutesCode" element={<AUMeetingDetail />} />
                                 <Route path="/minutesForm" element={<AUMeetingForm />} />
 
                                 <Route path='/ocrFileUpload' element={<OCRFileUploadForm />} />
-                                
+
                                 {/* Fallback Route */}
                                 <Route path="/*" element={<Error404Component />} />
                             </Routes>

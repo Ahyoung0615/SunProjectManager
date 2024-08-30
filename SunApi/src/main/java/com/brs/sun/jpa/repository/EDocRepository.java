@@ -60,8 +60,8 @@ public interface EDocRepository extends JpaRepository<EDocEntity, Long> {
 //	@Query("select e from EDocEntity e where e.eDocCode IN :eDocCode order by e.eDocCode desc")
 	@Query("select new com.brs.sun.dto.response.AppEDocListResponseDTO(e.eDocCode, e.eDocTitle, e.eDocDate, emp.empName) "
 		       + "from EDocEntity e join e.employee emp "
-		       + "where e.eDocCode IN :eDocCode and e.eDocStatus = 'A' order by e.eDocCode desc")
-	Page<AppEDocListResponseDTO> edocAppList(@Param("eDocCode") List<Integer> eDocCode, Pageable pageable);
+		       + "where e.eDocCode IN :eDocCode and e.eDocStatus = :eDocStatus order by e.eDocCode desc")
+	Page<AppEDocListResponseDTO> edocAppList(@Param("eDocCode") List<Integer> eDocCode, @Param("eDocStatus") String eDocStatus, Pageable pageable);
 
 	// JPA 에서 nativeQuery 사용 하기
 //	@Query(value = "select new com.brs.sun.dto.response.AppEDocListResponseDTO(e.eDocCode, e.eDocTitle, e.eDocDate, emp.empName) "

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ModalComponent from '../commodule/ModalComponent';
 import styles from '../css/VacationDocComponent.module.css';
 
 const DocumentAppDetailComponent = () => {
     const navigate = useNavigate();
-    const { edocCode } = useParams();
+    const { edocCode, status } = useParams();
 
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
@@ -20,6 +20,8 @@ const DocumentAppDetailComponent = () => {
     const [showModal, setShowModal] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
     const [sessionEmp, setSessionEmp] = useState();
+    const [docEmpCode, setDocEmpCode] = useState();
+
 
     useEffect(() => {
         const today = new Date();
@@ -53,6 +55,7 @@ const DocumentAppDetailComponent = () => {
                     setReason(tempJsonData.reason);
                     setWeekdayCount(tempJsonData.weekdayCount);
                     setDocTitle(res.data.edocTitle);
+                    setDocEmpCode(res.data.empCode);
                 })
                 .catch((error) => console.log(error));
 
@@ -84,7 +87,7 @@ const DocumentAppDetailComponent = () => {
     };
 
     const handleReject = () => {
-        setShowModal(true); // 반려 버튼 클릭 시 모달을 띄웁니다
+        setShowModal(true);
     };
 
     const closeModal = () => {
@@ -127,7 +130,9 @@ const DocumentAppDetailComponent = () => {
             jobName: jobCodeToText(sessionEmp.jobCode),
             deptName: deptCodeToText(sessionEmp.deptCode),
             reason: rejectReason,
-            rejectDate: currentDate
+            rejectDate: currentDate,
+            weekdayCount: weekdayCount,
+            docEmpCode: docEmpCode
         };
         console.log(data);
         axios.post("http://localhost:8787/api/edoc/appReject", data)
@@ -145,7 +150,7 @@ const DocumentAppDetailComponent = () => {
         borderRadius: '4px',
         cursor: 'pointer',
         fontSize: '16px',
-        width: '120px' // 버튼의 동일한 너비 설정
+        width: '120px'
     };
 
     return (
@@ -171,8 +176,9 @@ const DocumentAppDetailComponent = () => {
                 }
             />
             <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
+            d: {status}
             <form>
-                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
+                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
                     <thead>
                         <tr>
                             {selectedApprovers.map((approver) => (
@@ -241,39 +247,43 @@ const DocumentAppDetailComponent = () => {
 
                 <p className={styles.vacationDocSignature}>부서: {empInfo.deptName}</p>
                 <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
+                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
             </div>
 
-            <div
-                className={styles.buttonContainer}
-                style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
+            {
+                status == 'A' && (
+                    <div
+                        className={styles.buttonContainer}
+                        style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
+                    
+                        {/* 반려 버튼 */}
+                        <input
+                            type='button'
+                            value="반려"
+                            onClick={handleReject}
+                            className={styles.vacationDocRejectButton}
+                            style={{
+                                ...buttonStyle,
+                                marginRight: '10px',
+                                backgroundColor: '#ff4d4f' // 반려 버튼의 배경색
+                            }}
+                        />
 
-                {/* 반려 버튼 */}
-                <input
-                    type='button'
-                    value="반려"
-                    onClick={handleReject}
-                    className={styles.vacationDocRejectButton}
-                    style={{
-                        ...buttonStyle,
-                        marginRight: '10px',
-                        backgroundColor: '#ff4d4f' // 반려 버튼의 배경색
-                    }}
-                />
-
-                {/* 승인 버튼 */}
-                <input
-                    type='button'
-                    value="승인"
-                    onClick={handleSubmit}
-                    className={styles.vacationDocSubmitButton}
-                    style={{
-                        ...buttonStyle,
-                        marginLeft: '10px',
-                        backgroundColor: '#007bff' // 승인 버튼의 배경색 설정
-                    }}
-                />
-            </div>
+                        {/* 승인 버튼 */}
+                        <input
+                            type='button'
+                            value="승인"
+                            onClick={handleSubmit}
+                            className={styles.vacationDocSubmitButton}
+                            style={{
+                                ...buttonStyle,
+                                marginLeft: '10px',
+                                backgroundColor: '#007bff' // 승인 버튼의 배경색 설정
+                            }}
+                        />
+                    </div>
+                )
+            }
         </div>
     );
 };
