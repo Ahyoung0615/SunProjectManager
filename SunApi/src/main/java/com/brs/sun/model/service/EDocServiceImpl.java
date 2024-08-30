@@ -27,6 +27,16 @@ public class EDocServiceImpl implements EDocService {
 	}
 	
 	@Override
+	public List<EDocVo> selectMyAppSuccessList(int empCode) {
+		return dao.selectMyAppSuccessList(empCode);
+	}
+
+	@Override
+	public List<EDocVo> selectMyAppRejectList(int empCode) {
+		return dao.selectMyAppRejectList(empCode);
+	}
+	
+	@Override
 	@Transactional
 	public boolean insertTransaction(EDocVo vo, List<EDocLineVo> edocLineList) {
 		boolean docInsertChk = dao.insertEDoc(vo);

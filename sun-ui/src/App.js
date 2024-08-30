@@ -139,6 +139,7 @@ function App() {
                                 <Route path="/documentTempList" element={<AUDocumentTempList />} />
                                 <Route path="/expenseApproval" element={<AUExpenseApproval />} />
                                 <Route path="/vacationDoc" element={<AUVacationDoc />} />
+                                  
                                 <Route path="/meetingSummary" element={<AUMeetingList />} />
                                 <Route path="/minutesDetail/:minutesCode" element={<AUMeetingDetail />} />
                                 <Route path="/minutesForm" element={<AUMeetingForm />} />

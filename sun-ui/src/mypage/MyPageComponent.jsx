@@ -9,7 +9,7 @@ const MyPageComponent = () => {
     const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${emp.empImg}`);
     const [showModal, setShowModal] = useState(false);
     const [showModal1, setShowModal1] = useState(false);
-
+    const [previewImage, setPreviewImage] = useState(null); 
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
     const handleShow1 = () => setShowModal1(true);
@@ -33,6 +33,7 @@ const MyPageComponent = () => {
                 })
                 .then(data => {
                     setEmp(data);
+                    setPreviewImage(null); // 기존 이미지 로드 후 미리보기 초기화
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -163,7 +164,18 @@ const MyPageComponent = () => {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0]; // 파일을 선택합니다.
+        if (selectedFile) {
+            setFile(selectedFile);
+
+            // 기존의 객체 URL을 해제하여 메모리 누수 방지
+            if (previewImage) {
+                URL.revokeObjectURL(previewImage);
+            }
+
+            const objectURL = URL.createObjectURL(selectedFile);
+            setPreviewImage(objectURL);
+        }
     };
 
     return (
@@ -172,16 +184,16 @@ const MyPageComponent = () => {
             <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
                 <div style={{ marginRight: 20, textAlign: "center" }}>
                     <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
-                        {emp.empImg ? (
+                        {previewImage ? (
+                            <img src={previewImage} alt="미리보기 이미지" style={{ width: "100%", height: "100%" }} />
+                        ) : emp.empImg ? (
                             <img src={`http://localhost:8787/memberImage/${emp.empImg}`} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
                         ) : (
-                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
-                                이미지 없음
-                            </div>
+                            <img src="/img/noimages.png" alt="기본 이미지" style={{ width: "100%", height: "100%" }} />
                         )}
                     </div>
                     <label>파일 업로드:</label>
-                    <input type="file" onChange={handleFileChange} />
+                    <input type="file" accept="image/*" onChange={handleFileChange} />
                     <br />
                     <button className="btn btn-primary" onClick={handleUpload} style={{alignItems: "center"}}>업로드</button>
                 </div>
@@ -227,6 +239,28 @@ const MyPageComponent = () => {
                             <tr>
                                 <td>근무현황</td>
                                 <td>{getStatus(emp.empStatus)}</td>
+                            </tr>
+                            <tr>
+                                <td>사인</td>
+                                <td> {
+                                    emp.empSig ? (
+                                        <img
+                                            src={emp.empSig}
+                                            alt="사인"
+                                            style={{ maxWidth: '100px', maxHeight: '50px' }}
+                                        />
+                                    ) : (
+                                        <div>
+                                            <span>등록하세요</span>
+                                            <button
+                                                onClick={() => alert('등록 버튼 클릭됨')}
+                                                style={{ marginLeft: '10px' }}
+                                            >
+                                                등록
+                                            </button>
+                                        </div>
+                                    )
+                                }</td>
                             </tr>
                         </tbody>
                     </table>

@@ -44,5 +44,5 @@ public interface EDocJpaService {
 	 * @param size
 	 * @return Page<EDocEntity>
 	 */
-	Page<AppEDocListResponseDTO> edocAppList(int empCode, List<Integer> eDocCode, int page, int size);
+	Page<AppEDocListResponseDTO> edocAppList(int empCode, List<Integer> eDocCode, String eDocStatus, int page, int size);
 }

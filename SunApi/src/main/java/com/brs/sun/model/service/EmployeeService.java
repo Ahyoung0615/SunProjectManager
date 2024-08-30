@@ -44,7 +44,7 @@ public class EmployeeService {
 
 	public void saveImage(MultipartFile file, String empCode) throws IOException {
         // 이미지 저장 디렉토리 설정
-		String uploadDir = "C:\\Users\\GDJ\\git\\SunProjectManager\\SunApi\\src\\main\\webapp\\memberImage\\";
+		String uploadDir =  System.getProperty("user.dir") +"src/main/resources/static/memberImage/";
 
 	    // 디렉토리가 존재하지 않으면 생성
 	    File dir = new File(uploadDir);

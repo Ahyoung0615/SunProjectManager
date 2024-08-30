@@ -48,7 +48,7 @@ public class EmployeeController {
 	}
 	
 	@PostMapping("/uploadImage")
-	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("empCode") String empCode) {
+	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("empCode") String empCode) {
 	    Map<String, String> response = new HashMap<>();
 	    try {
 	        employeeService.saveImage(file, empCode);

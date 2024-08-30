@@ -15,7 +15,8 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         EmpAddress: '',
         EmpStatus: '',
     });
-
+    const [phoneError, setPhoneError] = useState('');
+    
     useEffect(() => {
         // API 호출
         fetch(`http://localhost:8787/memberDetail/${empCode}`)
@@ -42,8 +43,28 @@ const MemberUpdateModal = ({ show, handleClose }) => {
             });
     }, [empCode]);
 
+    const validatePhoneNumber = (phoneNumber) => {
+        // 전화번호 형식 검사 정규 표현식
+        const phoneRegex = /^(010[-\s]?\d{4}[-\s]?\d{4})$/;
+        return phoneRegex.test(phoneNumber);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // 전화번호 유효성 검사
+        if (emp.EmpTel === '') {
+            setPhoneError('전화번호는 필수 입력 항목입니다.');
+            return;
+        }
+
+        if (!validatePhoneNumber(emp.EmpTel)) {
+            setPhoneError('유효한 전화번호를 입력해주세요. 형식: 010-XXXX-XXXX 또는 010XXXXXXXX');
+            return;
+        }
+
+        setPhoneError(''); // 전화번호 오류를 제거합니다.
+
         const formData = new FormData();
         formData.append('EmpCode', emp.EmpCode);
         formData.append('EmpJob', emp.EmpJob);
@@ -89,6 +110,17 @@ const MemberUpdateModal = ({ show, handleClose }) => {
             ...prevState,
             [name]: value
         }));
+
+        // 전화번호 유효성 검사
+        if (name === 'EmpTel') {
+            if (value === '') {
+                setPhoneError('전화번호는 필수 입력 항목입니다.');
+            } else if (!validatePhoneNumber(value)) {
+                setPhoneError('유효한 전화번호를 입력해주세요. 형식: 010-XXXX-XXXX 또는 010XXXXXXXX');
+            } else {
+                setPhoneError('');
+            }
+        }
     };
 
     return (
@@ -161,7 +193,11 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                             name="EmpTel"
                             value={emp.EmpTel}
                             onChange={handleChange}
+                            isInvalid={phoneError !== ''}
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {phoneError}
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="formEmpEmail">
                         <Form.Label>이메일</Form.Label>
@@ -197,12 +233,12 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                         </Form.Control>
                     </Form.Group>
                     <div>
-                    <Button variant="secondary" onClick={handleClose}>
-                        닫기
-                    </Button>
-                    <Button variant="primary" type="submit">
-                        수정
-                    </Button>
+                        <Button variant="secondary" onClick={handleClose}>
+                            닫기
+                        </Button>
+                        <Button variant="primary" type="submit">
+                            수정
+                        </Button>
                     </div>
                 </Form>
             </Modal.Body>

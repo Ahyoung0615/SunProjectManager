@@ -13,6 +13,7 @@ const ChangePasswordModal = ({ show, handleClose, empCode }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if(empCode){
         fetch(`http://localhost:8787/memberDetail/${empCode}`)
             .then(response => {
                 if(!response.ok){
@@ -31,6 +32,7 @@ const ChangePasswordModal = ({ show, handleClose, empCode }) => {
             .catch(error => {
                 console.error('Fetch 에러:',error);
             })
+        }
     }, [empCode]);
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,10 +52,11 @@ const ChangePasswordModal = ({ show, handleClose, empCode }) => {
                     withCredentials: true,
                 });
                 console.log(response.data);
-                alert('사원 정보 수정이 완료되었습니다.');
+                alert('비밀번호 수정이 완료되었습니다.');
                 handleClose(); // 모달 닫기
-                navigate('/');
+                
                 window.sessionStorage.removeItem("user");
+                navigate('/');
             } catch (error) {
                 console.error('사원 정보 수정 중 오류가 발생했습니다:', error);
                 alert('사원 정보 수정 중 오류가 발생했습니다.');

@@ -47,18 +47,29 @@ public class EDocJPAController {
 	}
 	
 	@GetMapping("/appDocList")
-	public Page<AppEDocListResponseDTO> appEdocList(@RequestParam int empCode,
+	public Page<AppEDocListResponseDTO> appEdocList(
+										@RequestParam String eDocStatus,
+										@RequestParam int empCode,
 										@RequestParam(defaultValue = "0") int page,
 			   							@RequestParam(defaultValue = "10") int size){
+		System.out.println("status : " + eDocStatus);
 		List<Integer> filteredEdocCodeIds = new ArrayList<Integer>();
-		List<EDocVo> edocCodeList = docService.selectAppEmp(empCode);// 내가 결제할 코드
+		List<EDocVo> edocCodeList = new ArrayList<EDocVo>();
+		if(eDocStatus.equals("A")) {
+			edocCodeList = docService.selectAppEmp(empCode);// 내가 결재할 코드
+		}else if(eDocStatus.equals("S")) {
+			edocCodeList = docService.selectMyAppSuccessList(empCode);// 내가 결재한 코드
+		}else if(eDocStatus.equals("R")){
+			edocCodeList = docService.selectMyAppRejectList(empCode);// 내가 반려한 코드
+		}
+		
 		for (EDocVo eDocVo : edocCodeList) {
 			filteredEdocCodeIds.add(eDocVo.getEdocCode());
 		}
 		if (page < 0) {
 	        throw new IllegalArgumentException("Page index must not be less than zero");
 	    }
-		return jpaService.edocAppList(empCode, filteredEdocCodeIds, page, size);
+		return jpaService.edocAppList(empCode, filteredEdocCodeIds, eDocStatus, page, size);
 	}
 	
 	@GetMapping("/eDocTempList")

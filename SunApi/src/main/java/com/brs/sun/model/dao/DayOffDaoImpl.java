@@ -26,5 +26,10 @@ public class DayOffDaoImpl implements DayOffDao {
 	public boolean updateDayOff(Map<String, Object> map) {
 		return (template.update(NS + "updateDayOff", map) > 0) ? true : false;
 	}
+	
+	@Override
+	public boolean revertDayOff(Map<String, Object> map) {
+		return (template.update(NS + "revertDayOff", map) > 0) ? true : false;
+	}
 
 }

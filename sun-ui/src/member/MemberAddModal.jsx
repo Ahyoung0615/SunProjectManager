@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
-const MemberAddModal = ({ show, handleClose }) => {
+const MemberAddModal = ({ show, handleClose, onSuccess }) => {
     const [emp, setEmp] = useState({
         EmpName: '',
         EmpJob: '',
@@ -12,9 +12,29 @@ const MemberAddModal = ({ show, handleClose }) => {
         EmpEmail: '',
         EmpAddress: '',
     });
+    const [phoneError, setPhoneError] = useState('');
+    const [formError, setFormError] = useState('');
+
+    const validatePhoneNumber = (phoneNumber) => {
+        // 전화번호 형식 검사 정규 표현식
+        const phoneRegex = /^(010[-\s]?\d{4}[-\s]?\d{4})$/;
+        return phoneRegex.test(phoneNumber);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+        // 전화번호 유효성 검사
+        if (name === 'EmpTel') {
+            if (value === '') {
+                setPhoneError('전화번호는 필수 입력 항목입니다.');
+            } else if (!validatePhoneNumber(value)) {
+                setPhoneError('유효한 전화번호를 입력해주세요. 형식: 010-XXXX-XXXX 또는 010XXXXXXXX');
+            } else {
+                setPhoneError('');
+            }
+        }
+
         setEmp((prevState) => ({
             ...prevState,
             [name]: value
@@ -23,7 +43,22 @@ const MemberAddModal = ({ show, handleClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData  = new FormData();
+        
+        // 전화번호 유효성 검사
+        if (emp.EmpTel === '') {
+            setPhoneError('전화번호는 필수 입력 항목입니다.');
+            return;
+        }
+
+        if (!validatePhoneNumber(emp.EmpTel)) {
+            setPhoneError('유효한 전화번호를 입력해주세요. 형식: 010-XXXX-XXXX 또는 010XXXXXXXX');
+            return;
+        }
+
+        setPhoneError(''); // 전화번호 오류를 제거합니다.
+        setFormError(''); // 폼 오류를 제거합니다.
+
+        const formData = new FormData();
         formData.append('EmpName', emp.EmpName);
         formData.append('EmpJob', emp.EmpJob);
         formData.append('EmpDept', emp.EmpDept);
@@ -44,6 +79,7 @@ const MemberAddModal = ({ show, handleClose }) => {
             });
             console.log(response.data); // 서버에서 반환한 데이터를 로그로 출력합니다.
             alert('사원 등록이 완료되었습니다.');
+            onSuccess(); // 등록 성공 후 onSuccess 호출
             handleClose(); // 모달 닫기
         } catch (error) {
             console.error('사원 등록 중 오류가 발생했습니다:', error);
@@ -129,7 +165,11 @@ const MemberAddModal = ({ show, handleClose }) => {
                             name="EmpTel"
                             value={emp.EmpTel}
                             onChange={handleChange}
+                            isInvalid={phoneError !== ''}
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {phoneError}
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="formEmpEmail">
                         <Form.Label>이메일</Form.Label>

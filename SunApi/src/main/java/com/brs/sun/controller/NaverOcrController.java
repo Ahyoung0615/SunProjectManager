@@ -41,5 +41,12 @@ public class NaverOcrController {
 
 	    return ResponseEntity.ok(result);
 	}
+	
+	public ResponseEntity<String> fileUpload(){
+		
+		
+		
+		return ResponseEntity.ok("ok");
+	}
 
 }

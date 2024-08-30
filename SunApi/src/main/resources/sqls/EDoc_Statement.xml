@@ -17,6 +17,12 @@
 		WHERE EMP_CODE = #{empCode}
 	</update>
 	
+	<!-- 반려나 회수시 연차 갯수 다시 업데이트 -->
+	<update id="revertDayOff">
+		UPDATE DAYOFF SET DAYOFF_USED = DAYOFF_USED - #{weekdayCount}
+		WHERE EMP_CODE = #{empCode}
+	</update>
+	
 	<!-- 문서 번호 조회 -->
 <!-- 	<select id="getEDocCode" resultType="java.lang.Integer"> -->
 <!-- 		SELECT  -->
@@ -95,6 +101,42 @@
 		ON ed.EDOC_CODE = ch.EDOC_CODE
 		WHERE ch.EMP_CODE = #{empCode}
 		AND ch.RN = 1 <!-- 첫 번째 결재자 (현재 결재 차례인 사람) -->
+	</select>
+	
+	<!-- 내가 승인한 문서 찾기 -->
+	<select id="selectMyAppSuccessList" resultType="EDocVo">
+		SELECT *
+		FROM (
+		    SELECT 
+		        e.*, 
+		        ROW_NUMBER() OVER (PARTITION BY e.EDOC_CODE ORDER BY e.EDCL_CODE) AS RN
+		    FROM EDOCLINE e
+		    WHERE e.EDCL_STATUS = 'S'
+		) ch
+		JOIN EDOC ed 
+		ON ed.EDOC_CODE = ch.EDOC_CODE
+		WHERE ch.EMP_CODE = #{empCode}
+		<![CDATA[
+			AND ch.RN <> 1
+		]]>
+	</select>
+	
+	<!-- 내가 반려한 문서 찾기 -->
+	<select id="selectMyAppRejectList" resultType="EDocVo">
+		SELECT *
+		FROM (
+		    SELECT 
+		        e.*, 
+		        ROW_NUMBER() OVER (PARTITION BY e.EDOC_CODE ORDER BY e.EDCL_CODE) AS RN
+		    FROM EDOCLINE e
+		    WHERE e.EDCL_STATUS = 'R'
+		) ch
+		JOIN EDOC ed 
+		ON ed.EDOC_CODE = ch.EDOC_CODE
+		WHERE ch.EMP_CODE = #{empCode}
+		<![CDATA[
+			AND ch.RN <> 1
+		]]>
 	</select>
 	
 	<!-- 기안 문서 상세보기 -->
