@@ -29,6 +29,7 @@ const DocumentTempDetailComponent = () => {
     const [docCode, setDocCode] = useState();
     const [edocStatus, setEdocStatus] = useState('');
     const [docReply, setDocReply] = useState(null);
+    const [docEmpCode, setDocEmpCode] = useState();
 
     useEffect(() => {
         const today = new Date();
@@ -82,6 +83,7 @@ const DocumentTempDetailComponent = () => {
                     setReason(tempJsonData.reason);
                     setDocTitle(res.data.edocTitle);
                     setEdocStatus(res.data.edocStatus);
+                    setDocEmpCode(res.data.empCode);
                     const serverDocDate = new Date(res.data.edocDate);
                     const formattedDate = `${serverDocDate.getFullYear()}년 ${String(serverDocDate.getMonth() + 1).padStart(2, '0')}월 ${String(serverDocDate.getDate()).padStart(2, '0')}일`;
                     setCurrentDate(formattedDate);
@@ -226,7 +228,13 @@ const DocumentTempDetailComponent = () => {
     };
 
     const handleCancel = () => {
-        axios.post(`http://localhost:8787/api/edoc/docCancel?edocCode=${edocCode}`)
+        const sendData = {
+            weekdayCount,
+            docEmpCode: docEmpCode,
+            edocCode: edocCode
+        };
+
+        axios.post(`http://localhost:8787/api/edoc/docCancel`, sendData)
             .then(() => {
                 navigate('/documentList');
             })
@@ -265,7 +273,7 @@ const DocumentTempDetailComponent = () => {
                     <thead>
                         <tr>
                             {selectedApprovers.map((approver) => (
-                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px', textAlign: 'center'}}>
                                     {approver.empName} {approver.jobName}
                                 </th>
                             ))}
@@ -340,7 +348,7 @@ const DocumentTempDetailComponent = () => {
                                 )}
                                 {dateError && <p className={styles.dateError}>{dateError}</p>}
                                 {weekdayCount !== null && !dateError && <p>사용일수: {weekdayCount}일</p>}
-                                {remainingDays !== null && edocStatus != 'S' &&(
+                                {remainingDays !== null && edocStatus != 'S' && edocStatus != 'A' && (
                                     <p className={remainingDays < 0 ? styles.balanceError : ''}>
                                         잔여 연차: {remainingDays}일
                                     </p>
@@ -388,7 +396,7 @@ const DocumentTempDetailComponent = () => {
 
                 <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
                 <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
+                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
             </div>
 
             <div

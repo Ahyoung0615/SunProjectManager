@@ -261,7 +261,7 @@ const VacationDocComponent = () => {
                     <thead>
                         <tr>
                             {selectedApprovers.map((approver) => (
-                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px', textAlign: 'center' }}>
                                     {approver.empName} {approver.jobName}
                                 </th>
                             ))}
@@ -358,7 +358,7 @@ const VacationDocComponent = () => {
 
                 <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
                 <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니</h1>
+                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
             </div>
             <div className={styles.buttonContainer}>
                 <input type='button' value="임시저장" onClick={tempDocWrite} className={styles.vacationDocSubmitButton} />

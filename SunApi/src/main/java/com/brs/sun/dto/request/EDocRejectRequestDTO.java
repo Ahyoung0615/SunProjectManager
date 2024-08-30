@@ -14,4 +14,6 @@ public class EDocRejectRequestDTO {
 	private String deptName;
 	private String reason;
 	private String rejectDate;
+	private int weekdayCount;
+	private int docEmpCode;
 }

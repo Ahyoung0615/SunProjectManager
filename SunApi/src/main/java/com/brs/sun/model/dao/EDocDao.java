@@ -11,6 +11,10 @@ public interface EDocDao {
 
 	List<EDocVo> selectAppEmp(int empCode);
 	
+	List<EDocVo> selectMyAppSuccessList(int empCode);
+	
+	List<EDocVo> selectMyAppRejectList(int empCode);
+	
 	boolean insertEDoc(EDocVo vo);
 	
 	boolean insertEDocLine(List<EDocLineVo> vo);
