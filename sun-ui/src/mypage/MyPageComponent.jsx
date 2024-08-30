@@ -226,6 +226,28 @@ const MyPageComponent = () => {
                                 <td>근무현황</td>
                                 <td>{getStatus(emp.empStatus)}</td>
                             </tr>
+                            <tr>
+                                <td>사인</td>
+                                <td> {
+                                    emp.empSig ? (
+                                        <img
+                                            src={emp.empSig}
+                                            alt="사인"
+                                            style={{ maxWidth: '100px', maxHeight: '50px' }}
+                                        />
+                                    ) : (
+                                        <div>
+                                            <span>등록하세요</span>
+                                            <button
+                                                onClick={() => alert('등록 버튼 클릭됨')}
+                                                style={{ marginLeft: '10px' }}
+                                            >
+                                                등록
+                                            </button>
+                                        </div>
+                                    )
+                                }</td>
+                            </tr>
                         </tbody>
                     </table>
                     <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '350px' }}>사원 정보 수정</button>
