@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import CoWorkMapComponent from './CoWorkMapComponent';
 
-const CoWorkComponent = ({ onSelect }) => {
+const CoWorkComponent = ({ onSelectOne }) => {
     const [coworkList, setCoworkList] = useState([]);
     const [searchType, setSearchType] = useState("cowName");
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -40,10 +40,10 @@ const CoWorkComponent = ({ onSelect }) => {
         fetchCoWorkList(0);
     };
 
-    const getcowOneAddress = (cowAddress) => {
+    const getcowOneAddress = (cowCode, cowAddress) => {
         setSelectedAddress(cowAddress);
-        if (onSelect) {
-            onSelect(cowAddress);
+        if (onSelectOne) {
+            onSelectOne(cowCode);
         }
     };
 
@@ -63,6 +63,7 @@ const CoWorkComponent = ({ onSelect }) => {
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <h4 style={{ marginBottom: '20px', textAlign: 'center' }}>협력사 정보</h4>
+            <br />
             <div style={{ display: 'flex' }}>
                 <div style={{ flex: 1, marginRight: '20px' }}>
                     <CoWorkMapComponent selectedAddress={selectedAddress} />
@@ -90,7 +91,7 @@ const CoWorkComponent = ({ onSelect }) => {
                             onChange={(e) => setSearchKeyword(e.target.value)}
                             style={{
                                 height: '40px',
-                                width: '40%', // 검색어 창 크기를 줄입니다
+                                width: '40%',
                                 padding: '10px',
                                 borderRadius: '5px',
                                 border: '1px solid #ccc'
@@ -132,7 +133,7 @@ const CoWorkComponent = ({ onSelect }) => {
                                         <td>{item.cowCode}</td>
                                         <td>{item.cowName}</td>
                                         <td>
-                                            <button type="button" className="btn btn-link" style={{ padding: 0 }} onClick={() => getcowOneAddress(item.cowAddress)}>
+                                            <button type="button" className="btn btn-link" style={{ padding: 0 }} onClick={() => getcowOneAddress(item.cowCode, item.cowAddress)}>
                                                 {item.cowAddress}
                                             </button>
                                         </td>

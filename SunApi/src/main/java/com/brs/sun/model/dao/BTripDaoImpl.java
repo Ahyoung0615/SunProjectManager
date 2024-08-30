@@ -7,7 +7,6 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -119,6 +118,26 @@ public class BTripDaoImpl implements BTripDao {
 	@Override
 	public int insertReVehicleRsc(VehicleRentDTO requestDto) {
 		return template.update(NS + "insertReVehicleRsc", requestDto);
+	}
+
+	@Override
+	public int insertCoWork(CoWorkVo vo) {
+		return template.insert(NS+"insertCoWork", vo);
+	}
+
+	@Override
+	public int deleteCoWork(String cowCode) {
+		return template.update(NS + "deleteCoWork", cowCode);
+	}
+
+	@Override
+	public int updateCoWork(CoWorkVo vo) {
+		return template.update(NS + "updateCoWork", vo);
+	}
+
+	@Override
+	public CoWorkVo getOneCowork(String cowCode) {
+		return template.selectOne(NS + "getOneCowork", cowCode);
 	}
 
 

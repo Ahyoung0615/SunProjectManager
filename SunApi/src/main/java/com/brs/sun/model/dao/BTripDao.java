@@ -3,7 +3,6 @@ package com.brs.sun.model.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.brs.sun.dto.request.BTripRequestDTO;
 import com.brs.sun.dto.response.VehicleRentDTO;
 import com.brs.sun.vo.BTripVo;
 import com.brs.sun.vo.CoWorkVo;
@@ -38,5 +37,13 @@ public interface BTripDao {
 	public VehicleRentDTO getOneVehicleRsv(String vrsvCode);
 	
 	public int insertReVehicleRsc(VehicleRentDTO requestDto);
+	
+	public int insertCoWork(CoWorkVo vo);
+	
+	public int deleteCoWork(String cowCode);
+	
+	public int updateCoWork(CoWorkVo vo);
+	
+	public CoWorkVo getOneCowork(String cowCode);
 }
 

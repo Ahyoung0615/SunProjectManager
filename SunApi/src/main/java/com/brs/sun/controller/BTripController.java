@@ -19,6 +19,7 @@ import com.brs.sun.vo.CoWorkVo;
 import com.brs.sun.vo.PagingVo;
 import com.brs.sun.vo.VehicleReservationVo;
 
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,6 +75,30 @@ public class BTripController {
 
 	    // 결과 반환
 	    return paging;
+	}
+	
+	@GetMapping("/coWorkDetail/{cowCode}")
+	public CoWorkVo getOneCowork(@PathVariable String cowCode) {
+		log.info("상세조회 협력사 코드 : {}", cowCode);
+		return service.getOneCowork(cowCode);
+	}
+	
+	@PostMapping("/deleteCoWork")
+	public int deleteCoWork(@RequestParam String cowCode) {
+		log.info("삭제할 협력사 번호 : {}", cowCode);
+		return service.deleteCoWork(cowCode);
+	}
+	
+	@PostMapping("/insertCoWork")
+	public int insertCoWork(@RequestBody CoWorkVo vo) {
+		log.info("입력할 신규 협력사 정보 : {}", vo);
+		return service.insertCoWork(vo);
+	}
+	
+	@PostMapping("/updateCoWork")
+	public int updateCoWork(@RequestBody CoWorkVo vo) {
+		log.info("수정할 협력사 정보 : {}", vo);
+		return service.updateCoWork(vo);
 	}
 	
 	@GetMapping("/getAllVehicleRsv")

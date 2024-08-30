@@ -11,6 +11,8 @@ import Error404Component from './error/Error404Component';
 
 // Admin Protected Components
 import {
+    AdCoWorkForm,
+    AdCoWorkList,
     AdMemberDetail,
     AdMemberList,
     AdRepairList,
@@ -67,7 +69,10 @@ import {
     AUBoardInsert,
     AUBoardUpdate,
     AUMeetingSummary,
-    OCRFileUploadForm
+    OCRFileUploadForm,
+    AUMeetingList,
+    AUMeetingDetail,
+    AUMeetingForm
 } from './access/AccessUserProtectedComponent';
 
 function App() {
@@ -104,6 +109,8 @@ function App() {
                                 <Route path="/vehicleForm" element={<AdVehicleForm />} />
                                 <Route path="/vehicleRepairForm" element={<AdVehicleRepairForm />} />
                                 <Route path="/repairList" element={<AdRepairList />} />
+                                <Route path="/coworkAdList" element={<AdCoWorkList />} />
+                                <Route path="/coworkAdForm" element={<AdCoWorkForm />} />
 
                                 {/* User Protected Routes Continued */}
                                 <Route path="/boardList" element={<AUBoardList />} />
@@ -125,31 +132,18 @@ function App() {
                                 <Route path="/coWorkMap" element={<AUCoWorkMap />} />
                                 <Route path="/documentAppList" element={<AUDocumentApp />} />
                                 <Route path="/documentDetail/:edocCode" element={<AUDocumentDetail />} />
-                                <Route path="/documentAppDetail/:edocCode" element={<AUDocumentAppDetail />} />
+                                <Route path="/documentAppDetail/:edocCode/:status" element={<AUDocumentAppDetail />} />
                                 <Route path="/documentInsert" element={<AUDocumentInsert />} />
                                 <Route path="/documentList" element={<AUDocumentList />} />
                                 <Route path="/documentTempDetail/:edocCode" element={<AUDocumentTempDetail />} />
                                 <Route path="/documentTempList" element={<AUDocumentTempList />} />
                                 <Route path="/expenseApproval" element={<AUExpenseApproval />} />
                                 <Route path="/vacationDoc" element={<AUVacationDoc />} />
-                                <Route path="/fDeliveryCalRsvList" element={<AUFDeliveryCalRsvList />} />
-                                <Route path="/fDeliveryDetail/:fdelcode" element={<AUFDeliveryDetail />} />
-                                <Route path="/fDeliveryList" element={<AUFDeliveryList />} />
-                                <Route path="/fDeliveryNowDetail/:fdelcode" element={<AUFDeliveryNowDetail />} />
-                                <Route path="/fDeliveryNowList" element={<AUFDeliveryNowList />} />
-                                <Route path="/fDeliveryRsvForm" element={<AUFDeliveryRsvForm />} />
-                                <Route path="/fDeliveryRsvList" element={<AUFDeliveryRsvList />} />
-                                <Route path="/fVehicleDetail/:fvehiclecode" element={<AUFVehicleDetail />} />
-                                <Route path="/fVehicleForm" element={<AUFVehicleForm />} />
-                                <Route path="/fVehicleList" element={<AUFVehicleList />} />
-                                <Route path="/meetingSummary" element={<AUMeetingSummary />} />
-
                                 <Route path="/meetingSummary" element={<AUMeetingList />} />
                                 <Route path="/minutesDetail/:minutesCode" element={<AUMeetingDetail />} />
                                 <Route path="/minutesForm" element={<AUMeetingForm />} />
-
                                 <Route path='/ocrFileUpload' element={<OCRFileUploadForm />} />
-                                
+
                                 {/* Fallback Route */}
                                 <Route path="/*" element={<Error404Component />} />
                             </Routes>

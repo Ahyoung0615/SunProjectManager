@@ -79,7 +79,10 @@ const HeaderSideComponent = () => {
                             <Link className='nav-link' to='/vehicleRentList'>배차관리</Link>
                         </nav>
                     </div>
-                    
+                    <Link className='nav-link' to='/coworkAdList'>
+                        <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-buildings-fill"></i></div>
+                        협력사관리
+                    </Link>
                     <div className="sb-sidenav-menu-heading" style={{ fontSize: 15, marginLeft: 10, color: 'white' }}>SUN</div>
                     <Link className='nav-link' to='/boardList'>
                         <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-exclamation-diamond-fill"></i></div>

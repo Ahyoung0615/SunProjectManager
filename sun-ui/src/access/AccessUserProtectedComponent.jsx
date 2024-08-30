@@ -25,16 +25,6 @@ import DocumentTempDetailComponent from '../document/DocumentTempDetailComponent
 import DocumentTempListComponent from '../document/DocumentTempListComponent';
 import ExpenseApprovalComponent from '../document/ExpenseApprovalComponent';
 import VacationDocComponent from '../document/VacationDocComponent';
-import FDeliveryCalRsvListComponent from '../fdelivery/FDeliveryCalRsvListComponent';
-import FDeliveryDetailComponent from '../fdelivery/FDeliveryDetailComponent';
-import FDeliveryListComponent from '../fdelivery/FDeliveryListComponent';
-import FDeliveryNowDetailComponent from '../fdelivery/FDeliveryNowDetailComponent';
-import FDeliveryNowListComponent from '../fdelivery/FDeliveryNowListComponent';
-import FDeliveryRsvFormComponent from '../fdelivery/FDeliveryRsvFormComponent';
-import FDeliveryRsvListComponent from '../fdelivery/FDeliveryRsvListComponent';
-import FVehicleDetailComponent from '../fvehicle/FVehicleDetailComponent';
-import FVehicleFormComponent from '../fvehicle/FVehicleFormComponent';
-import FVehicleListComponent from '../fvehicle/FVehicleListComponent';
 import MainContentComponent from '../maincontent/MainContentComponent';
 import MyPageComponent from '../mypage/MyPageComponent';
 import TimeTableListComponent from '../timetable/TimeTableListComponent';
@@ -214,67 +204,6 @@ export const AUVacationDoc = () => (
         <VacationDocComponent />
     </AccessUserComponent>
 );
-
-export const AUFDeliveryCalRsvList = () => (
-    <AccessUserComponent>
-        <FDeliveryCalRsvListComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryDetail = () => (
-    <AccessUserComponent>
-        <FDeliveryDetailComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryList = () => (
-    <AccessUserComponent>
-        <FDeliveryListComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryNowDetail = () => (
-    <AccessUserComponent>
-        <FDeliveryNowDetailComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryNowList = () => (
-    <AccessUserComponent>
-        <FDeliveryNowListComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryRsvForm = () => (
-    <AccessUserComponent>
-        <FDeliveryRsvFormComponent />
-    </AccessUserComponent>
-);
-
-export const AUFDeliveryRsvList = () => (
-    <AccessUserComponent>
-        <FDeliveryRsvListComponent />
-    </AccessUserComponent>
-);
-
-export const AUFVehicleDetail = () => (
-    <AccessUserComponent>
-        <FVehicleDetailComponent />
-    </AccessUserComponent>
-);
-
-export const AUFVehicleForm = () => (
-    <AccessUserComponent>
-        <FVehicleFormComponent />
-    </AccessUserComponent>
-);
-
-export const AUFVehicleList = () => (
-    <AccessUserComponent>
-        <FVehicleListComponent />
-    </AccessUserComponent>
-);
-
 export const AUMainContent = () => (
     <AccessUserComponent>
         <MainContentComponent />

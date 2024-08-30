@@ -3,7 +3,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import HeaderSearchComponent from './HeaderSearchComponent';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ChatSunComponent from '../chat/ChatSunComponent'; // Import ChatSunComponent
+import ChatSunComponent from '../chat/ChatSunComponent';
 
 const HeaderTopComponent = () => {
   const navigate = useNavigate();
@@ -11,17 +11,16 @@ const HeaderTopComponent = () => {
   const [userName, setUserName] = useState(null);
   const [isChatModalOpen, setIsChatModalOpen] = useState(false); // Modal state
 
-  // 세션에서 유저 정보를 가져오는 함수
   const fetchUserInfo = useCallback(() => {
     const userInfo = window.sessionStorage.getItem('user');
     if (userInfo) {
       setUserName(JSON.parse(userInfo));
     }
   }, []);
-
   useEffect(() => {
     fetchUserInfo();
   }, [fetchUserInfo]);
+
 
   useEffect(() => {
     const sidebarToggle = document.body.querySelector('#sidebarToggle');
