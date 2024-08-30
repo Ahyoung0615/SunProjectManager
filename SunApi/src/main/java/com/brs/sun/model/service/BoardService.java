@@ -26,7 +26,7 @@ public class BoardService {
 	private final BoardDao dao;
 	
 	
-    private String uploadDir = "C:\\SunPj_File\\boardFile";
+    private String uploadDir = "src/main/resources/static/boardFile";
 	
 	public BoardService(BoardDao dao) {
 		this.dao = dao;

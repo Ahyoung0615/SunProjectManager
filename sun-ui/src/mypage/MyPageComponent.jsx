@@ -175,9 +175,7 @@ const MyPageComponent = () => {
                         {emp.empImg ? (
                             <img src={`http://localhost:8787/memberImage/${emp.empImg}`} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
                         ) : (
-                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}>
-                                이미지 없음
-                            </div>
+                            <img src="/img/noimages.png" alt="기본 이미지" style={{ width: "100%", height: "100%" }} />
                         )}
                     </div>
                     <label>파일 업로드:</label>
