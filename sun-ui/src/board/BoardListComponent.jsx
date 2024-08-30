@@ -114,9 +114,11 @@ const BoardListComponent = () => {
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <h2>게시판 목록 
+                {emp.authorities === "[ROLE_A]" && 
                 <button className="btn btn-primary" onClick={handleNewBoard} style={{ position: 'absolute', right: '190px' }}>
                     게시글 쓰기
                 </button>
+                }
             </h2>
             <div style={{ height: '670px' }}>
             <table className="table table-bordered">

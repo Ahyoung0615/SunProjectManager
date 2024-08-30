@@ -18,7 +18,6 @@ const MemberListComponent = () => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        // 선택된 상태에 따라 API 호출
         const fetchData = async () => {
             let url = 'http://localhost:8787/memberDetail'; // 기본 URL
             if (selectedStatus === '2') {
@@ -48,11 +47,7 @@ const MemberListComponent = () => {
     };
 
     const handleNewEmp = () => {
-        window.open(
-            '/memberAdd',
-            '신규사원등록',
-            'width=500,height=600'
-        );
+        setShowModal(true); // 모달 열기
     };
 
     useEffect(() => {
@@ -165,6 +160,31 @@ const MemberListComponent = () => {
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
 
+    const handleAddSuccess = () => {
+        // 사원 추가 성공 후 리스트 새로고침
+        const fetchData = async () => {
+            let url = 'http://localhost:8787/memberDetail'; // 기본 URL
+            if (selectedStatus === '2') {
+                url = 'http://localhost:8787/memberDetail1'; // 퇴사
+            } else if (selectedStatus === '3') {
+                url = 'http://localhost:8787/memberDetail2'; // 휴가
+            }
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setEmployee(data);
+            } catch (error) {
+                console.error('Error fetching employee list:', error);
+            }
+        };
+
+        fetchData();
+    };
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <br />
@@ -195,7 +215,7 @@ const MemberListComponent = () => {
             <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '190px' }}>
                 사원 등록
             </button>
-            <MemberAddModal show={showModal} handleClose={handleClose} />
+            <MemberAddModal show={showModal} handleClose={handleClose} onSuccess={handleAddSuccess} />
         </div>
     );
 };
