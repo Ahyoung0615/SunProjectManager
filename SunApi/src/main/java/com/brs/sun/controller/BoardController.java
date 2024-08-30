@@ -44,9 +44,9 @@ public class BoardController {
 
 	private final BoardService service;
 
-	private String uploadDir = "C:\\SunPj_File\\boardFile";
+	private String uploadDir = "src/main/resources/static/boardFile";
 
-	String uploadDir2 = "C:\\Users\\GDJ\\git\\SunProjectManager\\SunApi\\src\\main\\webapp\\memberImage\\";
+	String uploadDir2 = "src/main/resources/static/memberImage";
 	
 	@PostMapping("/insertBoard")
 	public ResponseEntity<String> insertBoard(@RequestParam("notiTitle") String notiTitle,
@@ -168,7 +168,7 @@ public class BoardController {
 
             // 파일 접근 가능한 URL 생성
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/uploads/")
+                    .path("/memberImage/")
                     .path(fileName)
                     .toUriString();
             System.out.println("File path: " + filePath.toString());
