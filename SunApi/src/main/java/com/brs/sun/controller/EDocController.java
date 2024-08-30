@@ -2,6 +2,7 @@ package com.brs.sun.controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.request.EDocRejectRequestDTO;
 import com.brs.sun.dto.request.TempEDocUpdateRequestDTO;
@@ -316,4 +318,45 @@ public class EDocController {
 		}
 		return "ok";
 	}
+	
+	// 사인 이미지 파일 업로드
+	@PostMapping("/empSigUpload")
+	public String empSigFileUpload(@RequestParam MultipartFile file) {
+		try {
+			if(!file.getContentType().startsWith("image/")) {
+				return "이미지 파일이 아닙니다";
+			}
+			
+			// 이미지 파일 byte 배열로 변환
+			byte[] fileBytes = file.getBytes();
+			
+			// byte 배열을 Base64 문자열 변환
+			 String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
+			 return base64Encoded;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "파일 업로드 실패: " + e.getMessage();
+		}
+	}
+	
+	
+//	// 사인 이미지 파일 업로드 (base64 변경)
+//	@PostMapping("/empSigUpload")
+//	public String empSigFileUpload(@RequestParam MultipartFile file) {
+//		try {
+//			if(!file.getContentType().startsWith("image/")) {
+//				return "이미지 파일이 아닙니다";
+//			}
+//			
+//			// 이미지 파일 byte 배열로 변환
+//			byte[] fileBytes = file.getBytes();
+//			
+//			// byte 배열을 Base64 문자열 변환
+//			String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
+//			return base64Encoded;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return "파일 업로드 실패: " + e.getMessage();
+//		}
+//	}
 }
