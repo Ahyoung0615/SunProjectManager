@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
-const MemberAddModal = ({ show, handleClose }) => {
+const MemberAddModal = ({ show, handleClose, onSuccess }) => {
     const [emp, setEmp] = useState({
         EmpName: '',
         EmpJob: '',
@@ -79,6 +79,7 @@ const MemberAddModal = ({ show, handleClose }) => {
             });
             console.log(response.data); // 서버에서 반환한 데이터를 로그로 출력합니다.
             alert('사원 등록이 완료되었습니다.');
+            onSuccess(); // 등록 성공 후 onSuccess 호출
             handleClose(); // 모달 닫기
         } catch (error) {
             console.error('사원 등록 중 오류가 발생했습니다:', error);

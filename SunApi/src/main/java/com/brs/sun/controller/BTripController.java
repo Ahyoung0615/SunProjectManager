@@ -29,9 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 public class BTripController {
 	
 	private final BTripService service;
-	
+	  
 	@GetMapping("/btrip/{empCode}")
 	public List<BTripVo> getMyBTrip(@PathVariable String empCode){
+		
 		log.info("getMyBTrip 요청 사원번호 : {}", empCode);
 		return service.getMyBTrip(empCode);
 	}
