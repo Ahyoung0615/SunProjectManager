@@ -1,5 +1,7 @@
 package com.brs.sun.vo;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,4 +25,12 @@ public class CoWorkVo {
 	private String cowAddress;
 	// 협력체 전화번호
 	private String cowTel;
+	// 협력업체 담당자 이름
+	private String cowManager;
+	// 협력업체 담당자 직급
+	private String cowMgrjob;
+	// 협력업체 등록일자
+	private LocalDate cowRegdate;
+	// 협력업체 삭제 여부
+	private String cowDelflag;
 }

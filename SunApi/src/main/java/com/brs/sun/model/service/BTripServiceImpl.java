@@ -125,4 +125,24 @@ public class BTripServiceImpl implements BTripService {
 		return dao.insertReVehicleRsc(requestDto);
 	}
 
+	@Override
+	public int insertCoWork(CoWorkVo vo) {
+		return dao.insertCoWork(vo);
+	}
+
+	@Override
+	public int deleteCoWork(String cowCode) {
+		return dao.deleteCoWork(cowCode);
+	}
+
+	@Override
+	public int updateCoWork(CoWorkVo vo) {
+		return dao.updateCoWork(vo);
+	}
+
+	@Override
+	public CoWorkVo getOneCowork(String cowCode) {
+		return dao.getOneCowork(cowCode);
+	}
+
 }

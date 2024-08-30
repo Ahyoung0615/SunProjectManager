@@ -130,4 +130,32 @@ public interface BTripService {
 	 * @return VehicleRentDTO
 	 */
 	public int insertReVehicleRsc(VehicleRentDTO requestDto);
+	
+	/**
+	 * 협력사 등록
+	 * @param vo
+	 * @return CoWorkVo
+	 */
+	public int insertCoWork(CoWorkVo vo);
+	
+	/**
+	 * 협력사 삭제
+	 * @param cowCode
+	 * @return 0 또는 1
+	 */
+	public int deleteCoWork(String cowCode);
+	
+	/**
+	 * 협력사 정보 수정
+	 * @param vo
+	 * @return 0 또는 1
+	 */
+	public int updateCoWork(CoWorkVo vo);
+	
+	/**
+	 * 협력사 상세보기
+	 * @param cowCode
+	 * @return CoWorkVo
+	 */
+	public CoWorkVo getOneCowork(String cowCode);
 }

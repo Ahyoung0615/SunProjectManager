@@ -5,25 +5,25 @@
 
 <mapper namespace="com.brs.sun.model.dao.BTripDao">
 
-<resultMap id="VehicleRsvMap"
-    type="com.brs.sun.dto.response.VehicleRentDTO">
-    <result property="vrsvCode" column="vrsvCode" />
-    <result property="bTripCode" column="bTripCode" />
-    <result property="empCode" column="empCode" />
-    <result property="empName" column="empName" />
-    <result property="jobName" column="jobName" />
-    <result property="deptName" column="deptName" />
-    <result property="vehicleCode" column="vehicleCode" />
-    <result property="vehicleModel" column="vehicleModel" />
-    <result property="vehicleSize" column="vehicleSize" />
-    <result property="vehicleNo" column="vehicleNo" />
-    <result property="vrsvDetail" column="vrsvDetail" />
-    <result property="vrsvReply" column="vrsvReply" />
-    <result property="startDate" column="startDate" />
-    <result property="endDate" column="endDate" />
-    <result property="bTripDepart" column="bTripDepart" />
-    <result property="bTripArrival" column="bTripArrival" />
-</resultMap>
+	<resultMap id="VehicleRsvMap"
+		type="com.brs.sun.dto.response.VehicleRentDTO">
+		<result property="vrsvCode" column="vrsvCode" />
+		<result property="bTripCode" column="bTripCode" />
+		<result property="empCode" column="empCode" />
+		<result property="empName" column="empName" />
+		<result property="jobName" column="jobName" />
+		<result property="deptName" column="deptName" />
+		<result property="vehicleCode" column="vehicleCode" />
+		<result property="vehicleModel" column="vehicleModel" />
+		<result property="vehicleSize" column="vehicleSize" />
+		<result property="vehicleNo" column="vehicleNo" />
+		<result property="vrsvDetail" column="vrsvDetail" />
+		<result property="vrsvReply" column="vrsvReply" />
+		<result property="startDate" column="startDate" />
+		<result property="endDate" column="endDate" />
+		<result property="bTripDepart" column="bTripDepart" />
+		<result property="bTripArrival" column="bTripArrival" />
+	</resultMap>
 	<!-- 배차 신청 리스트 전체 조회(관리자), 페이징, 날짜검색 getAllVehicleRsv -->
 	<select id="getAllVehicleRsv" resultMap="VehicleRsvMap">
     <![CDATA[
@@ -116,15 +116,19 @@
 		((SELECT NVL(MAX(VRSV_CODE), 0) + 1 FROM VEHICLERESERVATION),
 		#{bTripCode}, #{vehicleCode}, #{vrsvDate}, #{vrsvDetail}, 'W', '')
 	</insert>
-	
-		<!-- 배차 신청서 재등록 insertReVehicleRsc -->
+
+	<!-- 배차 신청서 재등록 insertReVehicleRsc -->
 	<insert id="insertReVehicleRsc">
-		INSERT INTO VEHICLERESERVATION (VRSV_CODE, BTRIP_CODE,
+		INSERT INTO VEHICLERESERVATION (VRSV_CODE,
+		BTRIP_CODE,
 		VEHICLE_CODE,
-		VRSV_DATE, VRSV_DETAIL, VRSV_STATUS, VRSV_REPLY)
+		VRSV_DATE, VRSV_DETAIL, VRSV_STATUS,
+		VRSV_REPLY)
 		VALUES
-		((SELECT NVL(MAX(VRSV_CODE), 0) + 1 FROM VEHICLERESERVATION),
-		#{bTripCode}, #{vehicleCode}, #{vrsvDate}, #{vrsvDetail}, 'W', '')
+		((SELECT NVL(MAX(VRSV_CODE), 0) + 1 FROM
+		VEHICLERESERVATION),
+		#{bTripCode}, #{vehicleCode}, #{vrsvDate},
+		#{vrsvDetail}, 'W', '')
 	</insert>
 
 	<!-- 출장 내역 상세 조회 getOneBTrip -->
@@ -164,9 +168,16 @@
 		COW_NAME,
 		COW_ADDRESS,
 		COW_TEL,
-		ROW_NUMBER() OVER (ORDER BY COW_CODE ASC) AS rn
+		COW_MANAGER,
+		COW_MGRJOB,
+		COW_REGDATE,
+		COW_DELFLAG,
+		ROW_NUMBER() OVER
+		(ORDER
+		BY COW_CODE ASC) AS rn
 		FROM COWORK c
 		<where>
+		AND COW_DELFLAG = 'N'
 			<if test="cowName != null and cowName != ''">
 				AND COW_NAME LIKE '%' || #{cowName} || '%'
 			</if>
@@ -178,7 +189,21 @@
 		WHERE rn BETWEEN #{first} AND #{last}
 	</select>
 
-
+	<!-- 협력사 상세 조회 -->
+	<select id="getOneCowork" resultType="CoWorkVo">
+		SELECT
+		COW_CODE,
+		COW_NAME,
+		COW_ADDRESS,
+		COW_TEL,
+		COW_MANAGER,
+		COW_MGRJOB,
+		COW_REGDATE,
+		COW_DELFLAG
+		FROM COWORK
+		WHERE COW_DELFLAG = 'N' AND COW_CODE = #{cowCode}
+	</select>
+	
 	<!-- 협력사 출력 갯수 -->
 	<select id="countCoWork" resultType="int">
 		SELECT COUNT(*)
@@ -192,6 +217,51 @@
 			</if>
 		</where>
 	</select>
+
+	<!-- 협력사 등록 -->
+	<insert id="insertCoWork">
+		INSERT INTO COWORK (COW_CODE, COW_NAME, COW_ADDRESS,
+		COW_TEL,
+		COW_MANAGER, COW_MGRJOB, COW_REGDATE, COW_DELFLAG)
+		VALUES((SELECT MAX(NVL(COW_CODE, 0))+1 FROM COWORK), #{cowName},
+		#{cowAddress}, #{cowTel}, #{cowManager},
+		#{cowMgrjob}, #{cowRegdate},
+		'N')
+	</insert>
+
+	<!-- 협력사 삭제 -->
+	<update id="deleteCoWork">
+		UPDATE COWORK SET COW_DELFLAG='Y'
+		WHERE
+		COW_CODE=#{cowCode}
+	</update>
+
+	<!-- 협력사 정보 수정 -->
+	<update id="updateCoWork">
+		UPDATE COWORK
+		SET
+		<if test="cowName != null">
+			COW_NAME = #{cowName},
+		</if>
+		<if test="cowAddress != null">
+			COW_ADDRESS = #{cowAddress},
+		</if>
+		<if test="cowTel != null">
+			COW_TEL = #{cowTel},
+		</if>
+		<if test="cowManager != null">
+			COW_MANAGER = #{cowManager},
+		</if>
+		<if test="cowMgrjob != null">
+			COW_MGRJOB = #{cowMgrjob},
+		</if>
+		<if test="cowRegdate != null">
+			COW_REGDATE = #{cowRegdate},
+		</if>
+		COW_DELFLAG = 'N'
+		WHERE COW_CODE = #{cowCode}
+	</update>
+
 
 	<!-- 배차신청서 갯수 -->
 	<select id="countVehicleRsv" resultType="int">
@@ -272,48 +342,53 @@
 	</update>
 
 
-<!-- 배차 신청 상세 조회 getOneVehicleRsv -->
-<select id="getOneVehicleRsv" resultMap="VehicleRsvMap">
-    SELECT
-        v.VRSV_CODE AS vrsvCode,
-        v.BTRIP_CODE AS bTripCode,
-        v.VEHICLE_CODE AS vehicleCode,
-        jt.START_DATE AS startDate,
-        jt.END_DATE AS endDate,
-        v.VRSV_DETAIL AS vrsvDetail,
-        v.VRSV_STATUS AS vrsvStatus,
-        v.VRSV_REPLY AS vrsvReply,
-        b.BTRIP_DEPART AS bTripDepart,
-        b.BTRIP_ARRIVAL AS bTripArrival,
-        e.EMP_NAME AS empName,
-        j.JOB_NAME AS jobName,
-        d.DEPT_NAME AS deptName,
-        veh.VEHICLE_MODEL AS vehicleModel,
-        veh.VEHICLE_SIZE AS vehicleSize,
-        veh.VEHICLE_NO AS vehicleNo
-    FROM
-        VEHICLERESERVATION v
-    JOIN
-        BTRIP b ON v.BTRIP_CODE = b.BTRIP_CODE
-    JOIN
-        EMPLOYEE e ON b.EMP_CODE = e.EMP_CODE
-    JOIN
-        JOB j ON e.JOB_CODE = j.JOB_CODE
-    JOIN
-        DEPARTMENT d ON e.DEPT_CODE = d.DEPT_CODE
-    JOIN
-        VEHICLE veh ON v.VEHICLE_CODE = veh.VEHICLE_CODE
-    JOIN
-        JSON_TABLE(
-            v.VRSV_DATE,
-            '$'
-            COLUMNS (
-                START_DATE VARCHAR2(50) PATH '$.start',
-                END_DATE VARCHAR2(50) PATH '$.end'
-            )
-        ) jt ON 1 = 1
-    WHERE
-        v.VRSV_CODE = #{vrsvCode}
-</select>
+	<!-- 배차 신청 상세 조회 getOneVehicleRsv -->
+	<select id="getOneVehicleRsv" resultMap="VehicleRsvMap">
+		SELECT
+		v.VRSV_CODE AS
+		vrsvCode,
+		v.BTRIP_CODE AS bTripCode,
+		v.VEHICLE_CODE AS vehicleCode,
+		jt.START_DATE AS startDate,
+		jt.END_DATE AS endDate,
+		v.VRSV_DETAIL AS
+		vrsvDetail,
+		v.VRSV_STATUS AS vrsvStatus,
+		v.VRSV_REPLY AS vrsvReply,
+		b.BTRIP_DEPART AS bTripDepart,
+		b.BTRIP_ARRIVAL AS bTripArrival,
+		e.EMP_NAME AS empName,
+		j.JOB_NAME AS jobName,
+		d.DEPT_NAME AS deptName,
+		veh.VEHICLE_MODEL AS vehicleModel,
+		veh.VEHICLE_SIZE AS vehicleSize,
+		veh.VEHICLE_NO AS vehicleNo
+		FROM
+		VEHICLERESERVATION v
+		JOIN
+		BTRIP b ON
+		v.BTRIP_CODE = b.BTRIP_CODE
+		JOIN
+		EMPLOYEE e ON b.EMP_CODE = e.EMP_CODE
+		JOIN
+		JOB j ON e.JOB_CODE = j.JOB_CODE
+		JOIN
+		DEPARTMENT d ON e.DEPT_CODE =
+		d.DEPT_CODE
+		JOIN
+		VEHICLE veh ON v.VEHICLE_CODE = veh.VEHICLE_CODE
+		JOIN
+		JSON_TABLE(
+		v.VRSV_DATE,
+		'$'
+		COLUMNS (
+		START_DATE VARCHAR2(50) PATH
+		'$.start',
+		END_DATE VARCHAR2(50) PATH '$.end'
+		)
+		) jt ON 1 = 1
+		WHERE
+		v.VRSV_CODE = #{vrsvCode}
+	</select>
 
 </mapper>

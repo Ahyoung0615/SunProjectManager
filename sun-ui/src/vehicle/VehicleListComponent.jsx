@@ -2,7 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
+import DocumentListPaginationComponent from "../document/DocumentListPaginationComponent ";
+import styles from '../css/DocumentListComponent.module.css';
 const VehicleListComponent = () => {
   const [vehiclelist, setVehiclelist] = useState([]);
   const [vehicleType, setVehicleType] = useState("");
@@ -72,6 +73,7 @@ const VehicleListComponent = () => {
       </div>
 
       {/* 차량 관리 테이블 */}
+      <div style={{minHeight:500}}>
       <table className="table table-bordered table-hover" style={{ textAlign: "center" }}>
         <thead style={{ backgroundColor: "#f2f2f2" }}>
           <tr>
@@ -110,73 +112,15 @@ const VehicleListComponent = () => {
           ))}
         </tbody>
       </table>
-
-      {/* 페이지네이션 버튼 */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-        <button
-          onClick={() => handlePageChange(0)}
-          disabled={currentPage === 0 || isEmpty}
-          style={{
-            margin: '0 5px',
-            padding: '5px 10px',
-            cursor: 'pointer',
-            border: '1px solid #ddd',
-            backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-            color: currentPage === 0 ? '#000' : '#fff',
-            borderRadius: "4px"
-          }}
-        >
-          처음
-        </button>
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 0 || isEmpty}
-          style={{
-            margin: '0 5px',
-            padding: '5px 10px',
-            cursor: 'pointer',
-            border: '1px solid #ddd',
-            backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-            color: currentPage === 0 ? '#000' : '#fff',
-            borderRadius: "4px"
-          }}
-        >
-          이전
-        </button>
-        <span style={{ alignSelf: "center", margin: "0 10px" }}>
-          페이지 {currentPage + 1} / {displayTotalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage + 1 >= totalPages || isEmpty}
-          style={{
-            margin: '0 5px',
-            padding: '5px 10px',
-            cursor: 'pointer',
-            border: '1px solid #ddd',
-            backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-            color: currentPage + 1 >= totalPages ? '#000' : '#fff',
-            borderRadius: "4px"
-          }}
-        >
-          다음
-        </button>
-        <button
-          onClick={() => handlePageChange(totalPages - 1)}
-          disabled={currentPage + 1 >= totalPages || isEmpty}
-          style={{
-            margin: '0 5px',
-            padding: '5px 10px',
-            cursor: 'pointer',
-            border: '1px solid #ddd',
-            backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-            color: currentPage + 1 >= totalPages ? '#000' : '#fff',
-            borderRadius: "4px"
-          }}
-        >
-          마지막
-        </button>
       </div>
+      <div className={styles['pagination-wrapper']}>
+                    <DocumentListPaginationComponent
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isEmpty={isEmpty}
+                    />
+                </div>
 
       {/* 차량 등록 버튼 */}
       <div style={{ display: "flex", marginTop: 50, justifyContent: "center", marginBottom: 20 }}>

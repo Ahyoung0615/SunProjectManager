@@ -48,8 +48,8 @@ const VacationListComponent = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>{dayOff.dayOffLeft + dayOff.dayOffUsed} 일</td>
                             <td>{dayOff.dayOffLeft} 일</td>
+                            <td>{dayOff.dayOffLeft - dayOff.dayOffUsed} 일</td>
                             <td>{dayOff.dayOffUsed} 일</td>
                         </tr>
                     </tbody>

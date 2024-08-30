@@ -12,6 +12,8 @@ import VehicleRentDetailComponent from '../vehicle/VehicleRentDetailComponent';
 import VehicleRentFormComponent from '../vehicle/VehicleRentFormComponent';
 import VehicleRentListComponent from '../vehicle/VehicleRentListComponent';
 import VehicleRepairFormComponent from '../vehicle/VehicleRepairFormComponent';
+import CoWorkFormComponent from '../cowork/CoWorkFormComponent';
+import CoWorkListComponent from '../cowork/CoWorkListComponent';
 
 export const AdMemberDetail = () => (
     <AdminComponent>
@@ -72,5 +74,18 @@ export const AdVehicleRentList = () => (
 export const AdVehicleRepairForm = () => (
     <AdminComponent>
         <VehicleRepairFormComponent />
+    </AdminComponent>
+);
+
+
+export const AdCoWorkList = () => (
+    <AdminComponent>
+        <CoWorkListComponent />
+    </AdminComponent>
+);
+
+export const AdCoWorkForm = () => (
+    <AdminComponent>
+        <CoWorkFormComponent />
     </AdminComponent>
 );
