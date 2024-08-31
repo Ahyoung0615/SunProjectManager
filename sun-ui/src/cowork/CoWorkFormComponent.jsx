@@ -47,7 +47,7 @@ const CoWorkFormComponent = () => {
     };
 
     return (
-        <div style={{ width: '40%', margin: '0 auto', marginTop: '70px', padding: 40, backgroundColor: '#DBE9EF', borderRadius: 30 }}>
+        <div style={{ width: '40%', margin: '0 auto', marginTop: '70px', marginBottom:'70px', padding: 40, backgroundColor: '#DBE9EF', borderRadius: 30 }}>
             <h4 style={{ textAlign: 'center' }}>협력사 신규 등록</h4>
             <br></br>
             <form onSubmit={handleSubmit}>

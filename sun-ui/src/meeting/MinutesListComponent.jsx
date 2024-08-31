@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import DocumentListPaginationComponent from '../commodule/DocumentListPaginationComponent';
+import styles from '../css/DocumentListComponent.module.css';
 
 const MinutesListComponent = () => {
     const [employee, setEmployee] = useState(null);
@@ -57,7 +59,7 @@ const MinutesListComponent = () => {
         <div className="container" style={{ marginTop: 30 }}>
             <br></br>
             <h4 style={{ marginBottom: "30px" }}>회의록 관리</h4>
-            <Link to='/minutesForm'><button className="btn btn-secondary" style={{ marginLeft: 1180, marginTop:-50}}>신규 작성</button></Link>
+            <Link to='/minutesForm'><button className="btn btn-secondary" style={{ marginLeft: 1180, marginTop: -50 }}>신규 작성</button></Link>
             <table className="table table-bordered table-hover" style={{ textAlign: "center" }}>
                 <thead style={{ backgroundColor: "#f2f2f2" }}>
                     <tr>
@@ -86,7 +88,7 @@ const MinutesListComponent = () => {
                                             .join(', ')
                                     }
                                 </td>
-                                <td>{employeeName}</td> 
+                                <td>{employeeName}</td>
                                 <td>{item.minutesSubject}</td>
                             </tr>
                         );
@@ -94,74 +96,18 @@ const MinutesListComponent = () => {
                 </tbody>
 
             </table>
-
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-                <button
-                    onClick={() => handlePageChange(0)}
-                    disabled={currentPage === 0 || isEmpty}
-                    style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-                        color: currentPage === 0 ? '#000' : '#fff',
-                        borderRadius: "4px"
-                    }}
-                >
-                    처음
-                </button>
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 0 || isEmpty}
-                    style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage === 0 ? '#f2f2f2' : '#007bff',
-                        color: currentPage === 0 ? '#000' : '#fff',
-                        borderRadius: "4px"
-                    }}
-                >
-                    이전
-                </button>
-                <span style={{ alignSelf: "center", margin: "0 10px" }}>
-                    페이지 {currentPage + 1} / {displayTotalPages}
-                </span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage + 1 >= totalPages || isEmpty}
-                    style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-                        color: currentPage + 1 >= totalPages ? '#000' : '#fff',
-                        borderRadius: "4px"
-                    }}
-                >
-                    다음
-                </button>
-                <button
-                    onClick={() => handlePageChange(totalPages - 1)}
-                    disabled={currentPage + 1 >= totalPages || isEmpty}
-                    style={{
-                        margin: '0 5px',
-                        padding: '5px 10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ddd',
-                        backgroundColor: currentPage + 1 >= totalPages ? '#f2f2f2' : '#007bff',
-                        color: currentPage + 1 >= totalPages ? '#000' : '#fff',
-                        borderRadius: "4px"
-                    }}
-                >
-                    마지막
-                </button>
-                
+            <div className={styles['table-container']}>
+                <div className={styles['pagination-wrapper']}>
+                    <DocumentListPaginationComponent
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isEmpty={isEmpty}
+                    />
+                </div>
             </div>
-            
+
+
         </div>
     );
 };

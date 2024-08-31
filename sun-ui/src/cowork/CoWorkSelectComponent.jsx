@@ -1,10 +1,10 @@
-import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import CoWorkMapComponent from './CoWorkMapComponent';
 import DocumentListPaginationComponent from '../commodule/DocumentListPaginationComponent';
 import styles from '../css/DocumentListComponent.module.css';
 
-const CoWorkComponent = ({ onSelectOne }) => {
+const CoWorkSelectComponent = ({ onAddressSelect }) => {
     const [coworkList, setCoworkList] = useState([]);
     const [searchType, setSearchType] = useState("cowName");
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -42,10 +42,9 @@ const CoWorkComponent = ({ onSelectOne }) => {
         fetchCoWorkList(0);
     };
 
-    const getcowOneAddress = (cowCode, cowAddress) => {
-        setSelectedAddress(cowAddress);
-        if (onSelectOne) {
-            onSelectOne(cowCode);
+    const handleAddressClick = (address) => {
+        if (onAddressSelect) {
+            onAddressSelect(address); // 주소를 부모 컴포넌트로 전달
         }
     };
 
@@ -135,7 +134,7 @@ const CoWorkComponent = ({ onSelectOne }) => {
                                         <td>{item.cowCode}</td>
                                         <td>{item.cowName}</td>
                                         <td>
-                                            <button type="button" className="btn btn-link" style={{ padding: 0 }} onClick={() => getcowOneAddress(item.cowCode, item.cowAddress)}>
+                                            <button type="button" className="btn btn-link" style={{ padding: 0 }} onClick={() => handleAddressClick(item.cowAddress)}>
                                                 {item.cowAddress}
                                             </button>
                                         </td>
@@ -147,19 +146,19 @@ const CoWorkComponent = ({ onSelectOne }) => {
                     </table>
 
                     <div className={styles['table-container']}>
-                <div className={styles['pagination-wrapper']}>
-                    <DocumentListPaginationComponent
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        isEmpty={isEmpty}
-                    />
-                </div>
-            </div>
+                        <div className={styles['pagination-wrapper']}>
+                            <DocumentListPaginationComponent
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                isEmpty={isEmpty}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-export default CoWorkComponent;
+export default CoWorkSelectComponent;
