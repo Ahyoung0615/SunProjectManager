@@ -46,8 +46,9 @@ const VacationDocComponent = () => {
     const [reason, setReason] = useState('');
     const [docTitle, setDocTitle] = useState('');
     const [dayOffLeft, setDayOffLeft] = useState(null);
-    const [remainingDays, setRemainingDays] = useState(null); // 잔여 연차 표시
-    const [balanceError, setBalanceError] = useState(''); // 잔여 연차 오류 메시지
+    const [remainingDays, setRemainingDays] = useState(null); 
+    const [balanceError, setBalanceError] = useState(''); 
+    const [signatureImage, setSignatureImage] = useState();
 
     useEffect(() => {
         const today = new Date();
@@ -97,30 +98,28 @@ const VacationDocComponent = () => {
         try {
             const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
             const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff",{ params: { empCode } });
-            const empData = response.data;
-            const dayOff = dayOffData.data;
-            console.log("dayOff:", dayOff);
-            setDayOffLeft(dayOff);
-            setEmpInfo(empData);
-            setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
+            const getEmpSig = await axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + empCode);
+            console.log("dayOff:", dayOffData.data);
+            setDayOffLeft(dayOffData.data);
+            setEmpInfo(response.data);
+            setSignatureImage(getEmpSig.data);
+            setEmpDeptCodeToText(deptCodeToText(response.data.deptCode));
         } catch (error) {
             console.error("Error fetching employee info:", error);
         }
-        
-        
     };
 
     const koreanHolidays = useMemo(() => {
         const year = new Date().getFullYear();
         return [
-            new Date(year, 0, 1),   // 신정
-            new Date(year, 2, 1),   // 삼일절
-            new Date(year, 4, 5),   // 어린이날
-            new Date(year, 5, 6),   // 현충일
-            new Date(year, 7, 15),  // 광복절
-            new Date(year, 9, 3),   // 개천절
-            new Date(year, 9, 9),   // 한글날
-            new Date(year, 11, 25)  // 성탄절
+            new Date(year, 0, 1),   
+            new Date(year, 2, 1),   
+            new Date(year, 4, 5),   
+            new Date(year, 5, 6),   
+            new Date(year, 7, 15),  
+            new Date(year, 9, 3),   
+            new Date(year, 9, 9),   
+            new Date(year, 11, 25)  
         ];
     }, []);
 
@@ -273,7 +272,7 @@ const VacationDocComponent = () => {
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                     {approver.empCode == sessionEmpCode ? (
                                         <img 
-                                            src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png' 
+                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                             alt='싸인' 
                                             style={{ 
                                                 width: '80px', 

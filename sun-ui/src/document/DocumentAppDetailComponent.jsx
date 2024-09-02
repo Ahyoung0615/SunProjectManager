@@ -21,6 +21,7 @@ const DocumentAppDetailComponent = () => {
     const [rejectReason, setRejectReason] = useState('');
     const [sessionEmp, setSessionEmp] = useState();
     const [docEmpCode, setDocEmpCode] = useState();
+    const [signatureImage, setSignatureImage] = useState({});
 
 
     useEffect(() => {
@@ -66,7 +67,12 @@ const DocumentAppDetailComponent = () => {
                     if (sessionEmpCode) {
                         const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
                         const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
-                        setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+
+                        axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
+                            setSignatureImage(res.data);
+
+                            setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+                        });
                     } else {
                         setSelectedApprovers(approvers);
                     }
@@ -176,7 +182,6 @@ const DocumentAppDetailComponent = () => {
                 }
             />
             <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
-            d: {status}
             <form>
                 <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
                     <thead>
@@ -194,7 +199,7 @@ const DocumentAppDetailComponent = () => {
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                     {approver.edclStatus === 'S' ? (
                                         <img
-                                            src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png'
+                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                             alt='싸인'
                                             style={{
                                                 width: '80px',

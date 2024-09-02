@@ -1,10 +1,17 @@
 package com.brs.sun.model.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
@@ -12,6 +19,7 @@ import com.brs.sun.dto.response.TempEDocDetailResponseDTO;
 import com.brs.sun.model.dao.EDocDao;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
+import com.brs.sun.vo.EmployeeVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class EDocServiceImpl implements EDocService {
 
 	private final EDocDao dao;
+	
+	private final String path = "src/main/resources/static/empSigImage";
 	
 	@Override
 	public List<EDocVo> selectAppEmp(int empCode) {
@@ -126,6 +136,61 @@ public class EDocServiceImpl implements EDocService {
 		int totalApp = dao.appTotalCount(edocCode);
 		int remApp = dao.appRemCount(edocCode);
 		return totalApp - remApp;
+	}
+	
+	public Map<Integer, String> selectEmployeeSignatures(List<Integer> empCodes) {
+        Map<Integer, String> map = new HashMap<>();
+        List<EmployeeVo> empList = dao.selectEmployeeSignatures(empCodes);
+        System.out.println("empList "+empList);
+
+        for (EmployeeVo employeeVo : empList) {
+            if (employeeVo.getEmpSig() != null) {
+                File empSigFile = new File(path + "/" + employeeVo.getEmpSig());
+                try (FileInputStream fileInputStream = new FileInputStream(empSigFile)) {
+                    byte[] empSigBytes = new byte[(int) empSigFile.length()];
+                    fileInputStream.read(empSigBytes);
+
+                    String base64Encoded = Base64.getEncoder().encodeToString(empSigBytes);
+                    
+                    String empSigBase64 = "data:image/" + (employeeVo.getEmpSig().substring(employeeVo.getEmpSig().lastIndexOf(".") + 1)) +";base64," + base64Encoded;
+                    map.put(employeeVo.getEmpCode(), empSigBase64);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                map.put(employeeVo.getEmpCode(), employeeVo.getEmpSig());
+            }
+        }
+        System.out.println("map "+map);
+        return map;
+	}
+	
+	@Override
+	public boolean updateEmpSig(int empCode, MultipartFile empSig) {
+		try {
+			if(!empSig.getContentType().startsWith("image/")) {
+				return false;
+			}
+			
+			String originalFileName = empSig.getOriginalFilename();
+			String fileName = empCode + originalFileName.substring(originalFileName.lastIndexOf("."));
+			
+			File filePath = new File(path);
+			
+			if(!filePath.exists()) {
+				filePath.mkdirs();
+			}
+			
+			FileOutputStream outputStream = new FileOutputStream(new File(path + "/" + fileName));
+			outputStream.write(empSig.getBytes());
+			outputStream.flush();
+			outputStream.close();
+		
+			return dao.updateEmpSig(empCode, fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 }

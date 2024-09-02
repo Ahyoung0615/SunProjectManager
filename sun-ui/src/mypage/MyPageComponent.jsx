@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import MyPageUpdateModal from './MyPageUpdateModal';
 import ChangePasswordModal from './ChangePasswordModal';
+import axios from 'axios';
 
 const MyPageComponent = () => {
     const [employee, setEmployee] = useState(null);
@@ -9,7 +10,15 @@ const MyPageComponent = () => {
     const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${emp.empImg}`);
     const [showModal, setShowModal] = useState(false);
     const [showModal1, setShowModal1] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null); 
+    const [previewImage, setPreviewImage] = useState(null);
+
+    // 사인 등록
+    const [sigFile, setSigFile] = useState();
+    const [sigErrorMessage, setSigErrorMessage] = useState();
+    const [sigPreview, setSigPreview] = useState();
+    const [sigImg, setSigImg] = useState();
+    const [isEditingSig, setIsEditingSig] = useState(false);
+
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
     const handleShow1 = () => setShowModal1(true);
@@ -41,6 +50,20 @@ const MyPageComponent = () => {
         }
     }, [employee]);
 
+    useEffect(() => {
+        if (employee && employee.empcode) {
+            console.log('사원 코드:', employee.empcode); // 디버깅을 위한 로그
+            axios.get(`http://localhost:8787/api/edoc/getEmpSignatures?empCodes=${employee.empcode}`)
+                .then((res) => {
+                    console.log(res.data);
+                    setSigImg(Object.values(res.data)[0]);
+                })
+                .catch((error) => {
+                    console.error('사인 정보 조회 중 오류:', error);
+                });
+        }
+    }, [employee]);    
+
     const handleUpdateSuccess = () => {
         fetch(`http://localhost:8787/memberDetail/${employee.empcode}`)
             .then(response => {
@@ -56,7 +79,6 @@ const MyPageComponent = () => {
                 console.error('Error:', error);
             });
     };
-
 
     const getJobTitle = (jobCode) => {
         switch (jobCode) {
@@ -81,19 +103,19 @@ const MyPageComponent = () => {
         }
     };
 
-    const getGender = (gender) =>{
-        switch(gender){
-            case 'F': 
+    const getGender = (gender) => {
+        switch (gender) {
+            case 'F':
                 return '여성';
-            case 'M': 
+            case 'M':
                 return '남성';
             default:
                 return '성별 미정';
         }
     }
 
-    const getStatus = (empStatus) =>{
-        switch(empStatus){
+    const getStatus = (empStatus) => {
+        switch (empStatus) {
             case 'Y':
                 return '재직';
             case 'N':
@@ -106,7 +128,7 @@ const MyPageComponent = () => {
     }
 
     const getDeptTitle = (deptCode) => {
-        switch (deptCode){
+        switch (deptCode) {
             case 1:
                 return '경영총괄';
             case 11:
@@ -132,49 +154,89 @@ const MyPageComponent = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("empCode", emp.empCode);
-    
+
         fetch('http://localhost:8787/uploadImage', {
             method: 'POST',
             body: formData
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`Network response was not ok: ${text}`);
-                });
-            }
-            return response.text();  // 응답을 텍스트로 받아옵니다.
-        })
-        .then(text => {
-            try {
-                // 응답이 비어있을 수도 있으므로, JSON으로 파싱을 시도합니다.
-                const data = text ? JSON.parse(text) : {};
-                console.log(data);
-                alert(data.message || '파일 업로드 성공');
-                setEmpImg(`http://localhost:8787/memberImage/${emp.empImg}`);
-                handleUpdateSuccess();
-            } catch (error) {
-                throw new Error('Invalid JSON format');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('파일 업로드 중 오류가 발생했습니다.');
-        });
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Network response was not ok: ${text}`);
+                    });
+                }
+                return response.text();
+            })
+            .then(text => {
+                try {
+                    const data = text ? JSON.parse(text) : {};
+                    console.log(data);
+                    alert(data.message || '파일 업로드 성공');
+                    setEmpImg(`http://localhost:8787/memberImage/${emp.empImg}`);
+                    handleUpdateSuccess();
+                } catch (error) {
+                    throw new Error('Invalid JSON format');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('파일 업로드 중 오류가 발생했습니다.');
+            });
     };
 
     const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0]; // 파일을 선택합니다.
+        const selectedFile = e.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-
-            // 기존의 객체 URL을 해제하여 메모리 누수 방지
             if (previewImage) {
                 URL.revokeObjectURL(previewImage);
             }
-
             const objectURL = URL.createObjectURL(selectedFile);
             setPreviewImage(objectURL);
+        }
+    };
+
+    const handleEmpSigFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile && selectedFile.type.startsWith('image/')) {
+            setSigFile(selectedFile);
+            setSigErrorMessage('');
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setSigPreview(reader.result);
+            };
+            reader.readAsDataURL(selectedFile);
+        } else {
+            setSigFile(null);
+            setSigPreview('');
+            setSigErrorMessage('이미지 파일만 업로드 해주세요 (jpg, png, etc.)');
+        }
+    };
+
+    const handleEmpSigUpload = async () => {
+        if (!sigFile) {
+            alert('파일이 없습니다');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('empSig', sigFile);
+        formData.append('empCode', employee.empcode);
+        try {
+            await axios.post('http://localhost:8787/api/edoc/empSigUpload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }).then((res) => {
+                console.log(res.data);
+                setSigImg(res.data);
+                setSigErrorMessage('');
+                setIsEditingSig(false); // 업로드 후 isEditingSig 상태 초기화
+                setSigPreview('');
+                handleUpdateSuccess(); // 업로드 후 정보 업데이트
+            });
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setSigErrorMessage('등록에 실패하였습니다');
         }
     };
 
@@ -195,7 +257,7 @@ const MyPageComponent = () => {
                     <label>파일 업로드:</label>
                     <input type="file" accept="image/*" onChange={handleFileChange} />
                     <br />
-                    <button className="btn btn-primary" onClick={handleUpload} style={{alignItems: "center"}}>업로드</button>
+                    <button className="btn btn-primary" onClick={handleUpload} style={{ alignItems: "center" }}>업로드</button>
                 </div>
                 <div style={{ flex: 2 }}>
                     <table className="table table-bordered">
@@ -242,25 +304,42 @@ const MyPageComponent = () => {
                             </tr>
                             <tr>
                                 <td>사인</td>
-                                <td> {
-                                    emp.empSig ? (
-                                        <img
-                                            src={emp.empSig}
-                                            alt="사인"
-                                            style={{ maxWidth: '100px', maxHeight: '50px' }}
-                                        />
+                                <td>
+                                    {isEditingSig ? (
+                                        <div>
+                                            <input type="file" accept="image/*" onChange={handleEmpSigFileChange} />
+                                            <button className="btn btn-primary" onClick={handleEmpSigUpload}>등록</button>
+                                            {sigErrorMessage && <p style={{ color: 'red' }}>{sigErrorMessage}</p>}
+                                        </div>
+                                    ) : emp.empSig ? (
+                                        <div>
+                                            <img
+                                                src={sigImg}
+                                                alt="사인"
+                                                style={{ maxWidth: '100px', maxHeight: '50px', marginRight : '15px'}}
+                                            />
+                                            <button className="btn btn-secondary" onClick={() => setIsEditingSig(true)}>수정</button>
+                                        </div>
                                     ) : (
                                         <div>
-                                            <span>등록하세요</span>
-                                            <button
-                                                onClick={() => alert('등록 버튼 클릭됨')}
-                                                style={{ marginLeft: '10px' }}
-                                            >
-                                                등록
-                                            </button>
+                                            <input type="file" accept="image/*" onChange={handleEmpSigFileChange} />
+                                            <button className="btn btn-primary" onClick={handleEmpSigUpload}>등록</button>
+                                            {sigErrorMessage && <p style={{ color: 'red' }}>{sigErrorMessage}</p>}
                                         </div>
-                                    )
-                                }</td>
+                                    )}
+                                </td>
+                                <td>
+                                    {sigPreview && (
+                                        <div>
+                                            <h3>미리보기:</h3>
+                                            <img
+                                                src={sigPreview}
+                                                alt="File Preview"
+                                                style={{ maxWidth: '100%', height: 'auto' }}
+                                            />
+                                        </div>
+                                    )}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
