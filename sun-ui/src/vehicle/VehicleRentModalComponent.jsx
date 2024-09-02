@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 
-const VehicleRentModalComponent = ({btripCode}) => {
+const VehicleRentModalComponent = ({ btripCode, closeModal }) => {
   const [rentStartDate, setRentStartDate] = useState("");
   const [rentEndDate, setRentEndDate] = useState("");
   const [reason, setReason] = useState(""); 
@@ -67,32 +67,32 @@ const VehicleRentModalComponent = ({btripCode}) => {
       return;
     }
 
-// 시작일과 종료일을 변수에 저장
-const startDate = rentStartDate; // 예: "2024-05-18"
-const endDate = rentEndDate; // 예: "2024-05-19"
+    // 확인창에서 확인을 누르면 제출 진행
+    if (window.confirm("배차 신청을 제출하시겠습니까?")) {
+      // 시작일과 종료일을 변수에 저장
+      const startDate = rentStartDate;
+      const endDate = rentEndDate;
 
-// JSON 형식으로 vrsvDate 생성
-const vrsvDate = JSON.stringify({ start: startDate, end: endDate });
+      // JSON 형식으로 vrsvDate 생성
+      const vrsvDate = JSON.stringify({ start: startDate, end: endDate });
 
-// vehicleData 객체 생성
-const vehicleData = {
-  vrsvDate: vrsvDate,
-  vehicleCode: selectedVehicle,
-  vrsvDetail: reason,
-  btripCode: btripCode,
-};
+      // vehicleData 객체 생성
+      const vehicleData = {
+        vrsvDate: vrsvDate,
+        vehicleCode: selectedVehicle,
+        vrsvDetail: reason,
+        btripCode: btripCode,
+      };
 
-// vehicleData 출력 (디버깅 용도로)
-console.log(vehicleData);
-
-
-    try {
-      const response = await axios.post("http://localhost:8787/api/reVehicleRsv", vehicleData);
-      if (response.status === 200) {
-        alert("배차 신청이 완료되었습니다.");
+      try {
+        const response = await axios.post("http://localhost:8787/api/reVehicleRsv", vehicleData);
+        if (response.status === 200) {
+          alert("배차 신청이 완료되었습니다.");
+          closeModal(); // 모달 닫기
+        }
+      } catch (error) {
+        console.error('배차 신청 실패', error);
       }
-    } catch (error) {
-      console.error('배차 신청 실패', error);
     }
   };
 
