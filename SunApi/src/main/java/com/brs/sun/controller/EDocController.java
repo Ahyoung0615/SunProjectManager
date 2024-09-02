@@ -1,5 +1,9 @@
 package com.brs.sun.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -7,9 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.request.EDocRejectRequestDTO;
+import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.request.TempEDocUpdateRequestDTO;
 import com.brs.sun.dto.request.VacationRequestDTO;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
@@ -41,6 +49,8 @@ public class EDocController {
 
 	private final DayOffService dayOffService;
 	private final EDocService docService;
+	
+//	private final String path = "src/main/resources/static/empSigImage";
 	
 	// 결재 승인
 	@PostMapping("/appSuccess")
@@ -321,42 +331,24 @@ public class EDocController {
 	
 	// 사인 이미지 파일 업로드
 	@PostMapping("/empSigUpload")
-	public String empSigFileUpload(@RequestParam MultipartFile file) {
-		try {
-			if(!file.getContentType().startsWith("image/")) {
-				return "이미지 파일이 아닙니다";
-			}
+	public String empSigFileUpload(@RequestParam MultipartFile empSig, 
+            					   @RequestParam int empCode) throws IOException {
+		boolean updateCheck = docService.updateEmpSig(empCode, empSig);
+		
+		if(updateCheck) {
+			byte[] empSigBytes = empSig.getBytes();
 			
-			// 이미지 파일 byte 배열로 변환
-			byte[] fileBytes = file.getBytes();
-			
-			// byte 배열을 Base64 문자열 변환
-			 String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-			 return base64Encoded;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "파일 업로드 실패: " + e.getMessage();
+			String base64Encoded = Base64.getEncoder().encodeToString(empSigBytes);
+			return "data:" + empSig.getContentType() + ";base64," + base64Encoded;
+		} else {
+			return "fail";
 		}
 	}
 	
+	@GetMapping("/getEmpSignatures")
+	public Map<Integer, String> getSignatures(@RequestParam List<Integer> empCodes) {
+		Map<Integer, String> map = docService.selectEmployeeSignatures(empCodes);
+		return map;
+	}
 	
-//	// 사인 이미지 파일 업로드 (base64 변경)
-//	@PostMapping("/empSigUpload")
-//	public String empSigFileUpload(@RequestParam MultipartFile file) {
-//		try {
-//			if(!file.getContentType().startsWith("image/")) {
-//				return "이미지 파일이 아닙니다";
-//			}
-//			
-//			// 이미지 파일 byte 배열로 변환
-//			byte[] fileBytes = file.getBytes();
-//			
-//			// byte 배열을 Base64 문자열 변환
-//			String base64Encoded = Base64.getEncoder().encodeToString(fileBytes);
-//			return base64Encoded;
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return "파일 업로드 실패: " + e.getMessage();
-//		}
-//	}
 }

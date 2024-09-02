@@ -3,12 +3,18 @@ package com.brs.sun.model.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
+import com.brs.sun.vo.EmployeeVo;
 
 public interface EDocDao {
 
+	List<EmployeeVo> selectEmployeeSignatures(List<Integer> empCodes);
+	
 	List<EDocVo> selectAppEmp(int empCode);
 	
 	List<EDocVo> selectMyAppSuccessList(int empCode);
@@ -48,4 +54,7 @@ public interface EDocDao {
 	
 	// 남은 결재자 수
 	int appRemCount (int edocCode);
+	
+	// 사인 이미지 업데이트
+	boolean updateEmpSig(int empCode, String empSig);
 }

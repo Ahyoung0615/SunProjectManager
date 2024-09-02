@@ -10,7 +10,6 @@ const DocumentTempDetailComponent = () => {
     const navigate = useNavigate();
     const { edocCode } = useParams();
 
-    const [docDate, setDocDate] = useState();
     const [sessionEmpCode, setSessionEmpCode] = useState(null);
     const [empInfo, setEmpInfo] = useState({});
     const [empDeptCodeToText, setEmpDeptCodeToText] = useState('');
@@ -18,6 +17,7 @@ const DocumentTempDetailComponent = () => {
     const [weekdayCount, setWeekdayCount] = useState(null);
     const [dateError, setDateError] = useState('');
     const [selectedApprovers, setSelectedApprovers] = useState([]);
+    const [signatureImage, setSignatureImage] = useState({});
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [reason, setReason] = useState('');
@@ -96,7 +96,14 @@ const DocumentTempDetailComponent = () => {
                     if (sessionEmpCode) {
                         const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
                         const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
-                        setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+
+                        axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
+                            setSignatureImage(res.data);
+
+                            setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+                        });
+
+                        
                     } else {
                         setSelectedApprovers(approvers);
                     }
@@ -110,11 +117,12 @@ const DocumentTempDetailComponent = () => {
         try {
             const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
             const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff", { params: { empCode } });
-            const empData = response.data;
-            const dayOff = dayOffData.data;
-            setDayOffLeft(dayOff);
-            setEmpInfo(empData);
-            setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
+            const getEmpSig = await axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + empCode);
+            console.log("dayOff:", dayOffData.data);
+            setDayOffLeft(dayOffData.data);
+            setEmpInfo(response.data);
+            setSignatureImage(getEmpSig.data);
+            setEmpDeptCodeToText(deptCodeToText(response.data.deptCode));
         } catch (error) {
             console.error("Error fetching employee info:", error);
         }
@@ -282,10 +290,10 @@ const DocumentTempDetailComponent = () => {
                     <tbody>
                         <tr>
                             {selectedApprovers.map((approver) => (
-                                <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                    {approver.edclStatus === 'S' ? (
+                                <td key={approver.empCode} empNo={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                    {approver.edclStatus === 'S' || approver.empCode == sessionEmpCode ? (
                                         <img
-                                            src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png'
+                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                             alt='싸인'
                                             style={{
                                                 width: '80px',

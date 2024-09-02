@@ -1,14 +1,17 @@
 package com.brs.sun.model.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
+import com.brs.sun.vo.EmployeeVo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +22,11 @@ public class EDocDaoImpl implements EDocDao {
 	private final SqlSessionTemplate template;
 	
 	private final String NS = "com.brs.sun.model.dao.EDocDao.";
+	
+	@Override
+	public List<EmployeeVo> selectEmployeeSignatures(List<Integer> empCodes) {
+		return template.selectList(NS + "selectEmployeeSignatures", empCodes);
+	}
 	
 	@Override
 	public List<EDocVo> selectAppEmp(int empCode) {
@@ -113,5 +121,14 @@ public class EDocDaoImpl implements EDocDao {
 	@Override
 	public int appRemCount(int edocCode) {
 		return template.selectOne(NS + "appRemCount", edocCode);
+	}
+	
+	@Override
+	public boolean updateEmpSig(int empCode, String empSig) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("empCode", empCode);
+		map.put("empSig", empSig);
+		
+		return (template.update(NS + "updateEmpSig", map) > 0);
 	}
 }

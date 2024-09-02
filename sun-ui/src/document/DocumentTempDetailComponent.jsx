@@ -26,6 +26,7 @@ const DocumentTempDetailComponent = () => {
     const [balanceError, setBalanceError] = useState('');
     const [isEditMode, setIsEditMode] = useState(false);
     const [docCode, setDocCode] = useState();
+    const [signatureImage, setSignatureImage] = useState();
 
     useEffect(() => {
         const today = new Date();
@@ -101,12 +102,12 @@ const DocumentTempDetailComponent = () => {
         try {
             const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
             const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff", { params: { empCode } });
-            const empData = response.data;
-            const dayOff = dayOffData.data;
-            console.log("dayOff:", dayOff);
-            setDayOffLeft(dayOff);
-            setEmpInfo(empData);
-            setEmpDeptCodeToText(deptCodeToText(empData.deptCode));
+            const getEmpSig = await axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + empCode);
+            console.log("dayOff:", dayOffData.data);
+            setDayOffLeft(dayOffData.data);
+            setEmpInfo(response.data);
+            setSignatureImage(getEmpSig.data);
+            setEmpDeptCodeToText(deptCodeToText(response.data.deptCode));
         } catch (error) {
             console.error("Error fetching employee info:", error);
         }
@@ -257,7 +258,7 @@ const DocumentTempDetailComponent = () => {
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                     {approver.empCode == sessionEmpCode ? (
                                         <img
-                                            src='https://data1.pokemonkorea.co.kr/newdata/pokedex/mid/008003.png'
+                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                             alt='싸인'
                                             style={{
                                                 width: '80px',

@@ -125,17 +125,17 @@ const DocumentListComponent = () => {
                                 결재완료
                             </button>
                             <button
-                                className={classNames('btn', { 'btn-primary': clickedButton === 'R', 'btn-secondary': clickedButton !== 'R' })}
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'C', 'btn-secondary': clickedButton !== 'C' })}
                                 style={{ borderRadius: '2px' }}
-                                value="R"
+                                value="C"
                                 onClick={handleStatusChange}
                             >
                                 회수
                             </button>
                             <button
-                                className={classNames('btn', { 'btn-primary': clickedButton === 'C', 'btn-secondary': clickedButton !== 'C' })}
+                                className={classNames('btn', { 'btn-primary': clickedButton === 'R', 'btn-secondary': clickedButton !== 'R' })}
                                 style={{ borderRadius: '2px' }}
-                                value="C"
+                                value="R"
                                 onClick={handleStatusChange}
                             >
                                 반려
