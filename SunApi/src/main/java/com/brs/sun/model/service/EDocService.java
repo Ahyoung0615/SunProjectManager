@@ -3,13 +3,19 @@ package com.brs.sun.model.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
 import com.brs.sun.dto.response.TempEDocDetailResponseDTO;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
+import com.brs.sun.vo.EmployeeVo;
 
 public interface EDocService {
+	
+	Map<Integer, String> selectEmployeeSignatures(List<Integer> empCodes);
 
 	List<EDocVo> selectAppEmp(int empCode);
 	
@@ -40,4 +46,6 @@ public interface EDocService {
 	boolean updateRejectDocStatus(EDocVo vo);
 	
 	int chkApp(int edocCode);
+	
+	boolean updateEmpSig(int empCode, MultipartFile empSig);
 }

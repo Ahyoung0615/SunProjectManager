@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import DocumentListPaginationComponent from "../document/DocumentListPaginationComponent ";
+import DocumentListPaginationComponent from "../commodule/DocumentListPaginationComponent";
 import styles from '../css/DocumentListComponent.module.css';
 const VehicleListComponent = () => {
   const [vehiclelist, setVehiclelist] = useState([]);

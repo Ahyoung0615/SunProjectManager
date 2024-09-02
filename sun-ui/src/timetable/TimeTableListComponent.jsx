@@ -5,7 +5,6 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ModalComponent from '../commodule/ModalComponent';
-import { param } from 'jquery';
 
 const TimeTableListComponent = () => {
     const apiKey = 'AIzaSyAMJA5opuUkb9_PAOeE2qaGiPPoWz-ryJE';
@@ -17,8 +16,8 @@ const TimeTableListComponent = () => {
     const [modalContent, setModalContent] = useState({ title: '', body: '' });
     const [formData, setFormData] = useState({
         meetroomCode: '',
-        startTime: '',
-        endTime: ''
+        startTime: new Date().toISOString().slice(0, 16), // 현재 시간으로 초기화
+        endTime: new Date().toISOString().slice(0, 16)    // 현재 시간으로 초기화
     });
     const [meetroomList, setMeetroomList] = useState([]);
 
@@ -81,7 +80,6 @@ const TimeTableListComponent = () => {
         const { event } = info;
         axios.get(`http://localhost:8787/api/mrReservation/getReservationDetail?mrrCode=${event.id}`)
             .then((res) => {
-                console.log(res.data);
                 const startTime = formatDate(res.data.start);
                 const endTime = res.data.end ? formatDate(res.data.end) : '';
                 setModalContent({
@@ -106,7 +104,6 @@ const TimeTableListComponent = () => {
                                             cursor: 'pointer',
                                             fontSize: '14px'
                                         }} />
-
                                 </div>
                             )}
                         </div>
@@ -143,6 +140,13 @@ const TimeTableListComponent = () => {
             ...prevFormData,
             [name]: value
         }));
+        // 종료 시간이 시작 시간보다 이전일 수 없게 설정
+        if (name === 'startTime' && new Date(formData.endTime) < new Date(value)) {
+            setFormData(prevFormData => ({
+                ...prevFormData,
+                endTime: value
+            }));
+        }
     };
 
     const handleFormSubmit = (e) => {
@@ -191,10 +195,9 @@ const TimeTableListComponent = () => {
     };
 
     const deleteReservation = (mrrCode) => {
-        console.log(mrrCode);
         axios.delete(`http://localhost:8787/api/mrReservation/deleteReservation/${mrrCode}`)
             .then((response) => {
-                if(response.status == 200) {
+                if (response.status == 200) {
                     setShowFormModal(false);
                     setReservationList(null);
                     // 리스트 새로 불러오기
@@ -217,7 +220,7 @@ const TimeTableListComponent = () => {
                 console.error(error);
             });
     };
-    
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <br />
@@ -303,6 +306,7 @@ const TimeTableListComponent = () => {
                                     type="datetime-local"
                                     name="startTime"
                                     value={formData.startTime}
+                                    min={new Date().toISOString().slice(0, 16)} // 과거 날짜 선택 불가
                                     onChange={handleFormChange}
                                     required
                                 />
@@ -315,6 +319,7 @@ const TimeTableListComponent = () => {
                                     type="datetime-local"
                                     name="endTime"
                                     value={formData.endTime}
+                                    min={formData.startTime} // 시작 시간보다 이전 시간 선택 불가
                                     onChange={handleFormChange}
                                     required
                                 />

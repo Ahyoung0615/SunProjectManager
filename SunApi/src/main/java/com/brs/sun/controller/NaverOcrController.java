@@ -23,7 +23,7 @@ public class NaverOcrController {
 
 	private final NaverOcrApi naverOcrApi;
 	
-	@Value("${naver.service.secretKey}")
+	@Value("${clova.ocr.secretkey}")
 	private String secretKey;
 	
 	@GetMapping("/naverOCR")
