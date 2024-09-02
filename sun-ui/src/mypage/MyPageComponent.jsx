@@ -62,7 +62,7 @@ const MyPageComponent = () => {
                     console.error('사인 정보 조회 중 오류:', error);
                 });
         }
-    }, [employee]);    
+    }, [employee]);
 
     const handleUpdateSuccess = () => {
         fetch(`http://localhost:8787/memberDetail/${employee.empcode}`)
@@ -316,7 +316,7 @@ const MyPageComponent = () => {
                                             <img
                                                 src={sigImg}
                                                 alt="사인"
-                                                style={{ maxWidth: '100px', maxHeight: '50px', marginRight : '15px'}}
+                                                style={{ maxWidth: '100px', maxHeight: '50px', marginRight: '15px' }}
                                             />
                                             <button className="btn btn-secondary" onClick={() => setIsEditingSig(true)}>수정</button>
                                         </div>
@@ -328,8 +328,11 @@ const MyPageComponent = () => {
                                         </div>
                                     )}
                                 </td>
-                                <td>
-                                    {sigPreview && (
+                            </tr>
+                            {sigPreview && (
+                                <tr>
+                                    <td colSpan="2">
+
                                         <div>
                                             <h3>미리보기:</h3>
                                             <img
@@ -338,9 +341,9 @@ const MyPageComponent = () => {
                                                 style={{ maxWidth: '100%', height: 'auto' }}
                                             />
                                         </div>
-                                    )}
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                     <button className="btn btn-primary" onClick={handleShow} style={{ position: 'absolute', right: '350px' }}>사원 정보 수정</button>
