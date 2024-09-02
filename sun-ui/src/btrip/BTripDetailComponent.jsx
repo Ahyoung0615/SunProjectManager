@@ -17,7 +17,7 @@ const BTripDetailComponent = () => {
     const sessionUser = sessionStorage.getItem("user");
     if (sessionUser) {
       const parsedUser = JSON.parse(sessionUser);
-      console.log("접속자 사번 : ", parsedUser.empcode)
+      console.log("접속자 사번 : ", parsedUser.empcode);
       setSessionEmp(parsedUser.empcode);
     }
   }, []);
@@ -51,7 +51,9 @@ const BTripDetailComponent = () => {
 
     getBtripDetail();
     getVrsvDetail();
-  }, [sessionEmp, btripCode]);
+  }, [sessionEmp, btripCode, isModalOpen]);
+
+  const hasApprovedStatus = vrsvDetail && vrsvDetail.some(item => item.vrsvStatus === 'Y' || item.vrsvStatus === 'W');
 
   if (!btripDetail) {
     return <div>Loading...</div>; // 데이터가 로드되기 전까지 로딩 상태를 표시합니다.
@@ -68,8 +70,6 @@ const BTripDetailComponent = () => {
   const handleRouteClick = () => {
     setShowRoute(true); // 버튼 클릭 시 경로보기 활성화
   };
-
-  
 
   return (
     <div className="container" style={{ marginTop: 30 }}>
@@ -159,7 +159,25 @@ const BTripDetailComponent = () => {
       </div>
 
       <div style={{ marginTop: 50 }}>
-        <h4>차량 배차 신청 내역</h4>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <h4>차량 배차 신청 내역</h4>
+          {!hasApprovedStatus && (
+            <button
+              type="button"
+              className="btn btn-dark"
+              onClick={openModal}
+              style={{marginRight:970, marginBottom:20, marginTop:17,
+                padding: '5px 10px',   // 버튼 안쪽 여백 줄이기
+                fontSize: '0.8rem',    // 글자 크기 줄이기
+                lineHeight: 1,         // 줄 높이 조절
+                minWidth: '80px',      // 최소 너비 설정 (선택 사항)
+                minHeight: '30px'      // 최소 높이 설정 (선택 사항)
+              }}
+            >
+              <b>재신청</b>
+            </button>
+          )}
+        </div>
         <table className="table table-bordered">
           <thead>
             <tr style={{ backgroundColor: '#f2f2f2' }}>
@@ -168,36 +186,24 @@ const BTripDetailComponent = () => {
               <th style={{ textAlign: "center" }}>배차사유</th>
               <th style={{ textAlign: "center" }}>배차승인여부</th>
               <th style={{ textAlign: "center" }}>반려사유</th>
-              <th style={{ textAlign: "center" }}>비고</th>
             </tr>
           </thead>
           <tbody>
             {vrsvDetail && vrsvDetail.length > 0 ? (
               vrsvDetail.map((item, index) => (
                 <tr key={index}>
-                   <td style={{ textAlign: "center" }}>{item.vrsvCode}</td>
-  <td style={{ textAlign: "center" }}>{item.vehicleCode}</td>
-  <td style={{ textAlign: "center" }}>{item.vrsvDetail}</td>
-  <td style={{ textAlign: "center" }}>
-    {item.vrsvStatus === 'W' ? "승인대기중" :
-      item.vrsvStatus === 'Y' ? "승인" :
-        <>
-          반려
-        </>
-    }
-  </td>
-  <td style={{ textAlign: "center" }}>{item.vrsvReply === null ? "-" : item.vrsvReply}</td>
-  <td style={{ textAlign: "center" }}>  {/* 중앙 정렬을 위한 스타일 추가 */}
-    {item.vrsvStatus === 'N' && (
-      <button
-        type="button"
-        className="btn btn-warning"
-        style={{ padding: '3px 8px', transform: 'scale(0.8)' }}
-        onClick={openModal}
-      >
-        재신청
-      </button>
-                          )}</td>
+                  <td style={{ textAlign: "center" }}>{item.vrsvCode}</td>
+                  <td style={{ textAlign: "center" }}>{item.vehicleCode}</td>
+                  <td style={{ textAlign: "center" }}>{item.vrsvDetail}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {item.vrsvStatus === 'W' ? "승인대기중" :
+                      item.vrsvStatus === 'Y' ? "승인" :
+                        <>
+                          반려
+                        </>
+                    }
+                  </td>
+                  <td style={{ textAlign: "center" }}>{item.vrsvReply === null ? "-" : item.vrsvReply}</td>
                 </tr>
               ))
             ) : (
@@ -213,7 +219,7 @@ const BTripDetailComponent = () => {
         open={isModalOpen}
         close={closeModal}
         title="배차 신청서 작성"
-        body={<VehicleRentModalComponent btripCode={btripCode} />}
+        body={<VehicleRentModalComponent btripCode={btripCode} closeModal={closeModal}/>}
         size="lg"
       />
 

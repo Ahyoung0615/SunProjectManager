@@ -77,6 +77,8 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
     onInfoChange("vehicleCode", selectedVehicleCode);
   };
 
+  const isCheckAvailableButtonDisabled = !info.rentStartDate || !info.rentEndDate || !formValid;
+
   return (
     <div className="container" style={{ marginTop: 30 }}>
       <h4>배차 신청서 작성</h4>
@@ -115,7 +117,18 @@ const VehicleRentFormComponent = ({ onInfoChange, info }) => {
             </tbody>
           </table>
           {errorMessage && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
-          <button style={{ display: 'block', margin: '20px auto' }} className="btn btn-primary" onClick={handleCheckAvailability} disabled={!formValid}>
+          <button
+            style={{
+              display: 'block',
+              margin: '20px auto',
+              backgroundColor: isCheckAvailableButtonDisabled ? '#d3e0ea' : '#007bff', // 연한 하늘색으로 변경
+              color: isCheckAvailableButtonDisabled ? '#6c757d' : '#fff', // 비활성화 시 회색 글자
+              cursor: isCheckAvailableButtonDisabled ? 'not-allowed' : 'pointer',border: 'none',borderRadius: '4px',
+            }}
+            className="btn btn-primary"
+            onClick={handleCheckAvailability}
+            disabled={isCheckAvailableButtonDisabled} // 버튼 비활성화 상태 설정
+          >
             차량 조회
           </button>
         </div>
