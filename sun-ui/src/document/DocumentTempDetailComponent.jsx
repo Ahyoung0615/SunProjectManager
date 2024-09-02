@@ -26,7 +26,7 @@ const DocumentTempDetailComponent = () => {
     const [balanceError, setBalanceError] = useState('');
     const [isEditMode, setIsEditMode] = useState(false);
     const [docCode, setDocCode] = useState();
-    const [signatureImage, setSignatureImage] = useState();
+    const [signatureImage, setSignatureImage] = useState({});
 
     useEffect(() => {
         const today = new Date();
