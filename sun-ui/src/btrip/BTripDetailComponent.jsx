@@ -69,6 +69,8 @@ const BTripDetailComponent = () => {
     setShowRoute(true); // 버튼 클릭 시 경로보기 활성화
   };
 
+  
+
   return (
     <div className="container" style={{ marginTop: 30 }}>
       <h4>출장 상세</h4>

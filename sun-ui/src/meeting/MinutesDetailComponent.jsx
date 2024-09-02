@@ -76,6 +76,17 @@ const MinutesDetailComponent = () => {
                     </tr>
                 </tbody>
             </table>
+            <div style={{padding:30, marginTop:-20}}>
+            {minutesDetail.minutesSummary !== null &&
+                <div>
+                    <button onClick={openSammary}>AI 요약 보기 ▼ </button>
+                    <br></br> <br></br>
+                    {sammary &&
+                        minutesDetail.minutesSummary
+                    }
+                </div>
+            }
+            </div>
             <table className="table table-bordered" style={{ marginBottom: 20, textAlign: "center" }}>
                 <tbody>
                     <tr>
@@ -90,17 +101,8 @@ const MinutesDetailComponent = () => {
                     </tr>
                 </tbody>
             </table>
-            {minutesDetail.minutesSummary !== null &&
-                <div>
-                    <button onClick={openSammary}>AI 요약 보기 ▼ </button>
-                    <br></br> <br></br>
-                    {sammary &&
-                        minutesDetail.minutesSummary
-                    }
-                </div>
-            }
             <br></br>
-            <Link to='/meetingSummary'><button className="btn btn-secondary" style={{ marginLeft: 600, marginBottom:30 }}>목록</button></Link>
+            <Link to='/meetingSummary'><button className="btn btn-secondary" style={{ marginLeft: 600, marginBottom:50 }}>목록</button></Link>
         </div>
     );
 };

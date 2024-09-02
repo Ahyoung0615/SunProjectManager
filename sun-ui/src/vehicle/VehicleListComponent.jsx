@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import DocumentListPaginationComponent from "../document/DocumentListPaginationComponent ";
+import DocumentListPaginationComponent from "../commodule/DocumentListPaginationComponent";
 import styles from '../css/DocumentListComponent.module.css';
 const VehicleListComponent = () => {
   const [vehiclelist, setVehiclelist] = useState([]);
@@ -113,6 +113,7 @@ const VehicleListComponent = () => {
         </tbody>
       </table>
       </div>
+      <div className={styles['table-container']}>
       <div className={styles['pagination-wrapper']}>
                     <DocumentListPaginationComponent
                         currentPage={currentPage}
@@ -120,7 +121,8 @@ const VehicleListComponent = () => {
                         onPageChange={handlePageChange}
                         isEmpty={isEmpty}
                     />
-                </div>
+       </div>
+       </div>
 
       {/* 차량 등록 버튼 */}
       <div style={{ display: "flex", marginTop: 50, justifyContent: "center", marginBottom: 20 }}>
