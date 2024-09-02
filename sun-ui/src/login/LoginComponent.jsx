@@ -12,15 +12,16 @@ const LoginComponent = () => {
     const [user, setUser] = useState(initialUser);
     const [rememberMe, setRememberMe] = useState(false);
     let stompClient;
-
+    
     useEffect(() => {
         const checkRememberMe = async () => {
             try {
                 const response = await axios.get('http://localhost:8787/checkRememberMe', { withCredentials: true });
                 if (response.status === 200 && response.data.empcode) {
                     window.sessionStorage.setItem("user", JSON.stringify(response.data));
-                    navigate('/access', { state: { userData: response.data } });
+                    navigate('/home', { state: { userData: response.data } });
                     connectWebSocket(response.data.empcode);
+                    window.location.reload();
                 }
             } catch (error) {
                 console.error('자동 로그인 체크 실패:', error);
@@ -59,7 +60,7 @@ const LoginComponent = () => {
                 data: formData,
                 withCredentials: true,
             });
-
+    
             if (response.status === 200) {
                 alert('로그인 성공!');
                 const userData = {
@@ -72,11 +73,13 @@ const LoginComponent = () => {
                 window.sessionStorage.setItem("user", JSON.stringify(userData));
                 connectWebSocket(response.data.empcode);
                 navigate('/home', { state: { userData: response.data } });
+                window.location.reload(); // 페이지 강제 리로드 (권장하지 않음, 단순한 예시)
             }
         } catch (error) {
             alert('로그인 실패');
         }
     };
+    
 
     return (
         <div className="login-container">
