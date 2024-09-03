@@ -53,7 +53,7 @@ public class SecurityConfig{
                         .requestMatchers("/user/**").authenticated()    // 인증된 사용자만 /user/** 경로에 접근 가능
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/member").permitAll()     // 이미지 미리보기 허용
-                        .requestMatchers("/memberImage").permitAll()
+                        .requestMatchers("/memberImage/**").permitAll()
                         .requestMatchers("src/main/resources/static/boardFile").permitAll()       
                         .anyRequest().permitAll()                      // 그 외의 모든 요청은 누구나 접근 가능
                 )

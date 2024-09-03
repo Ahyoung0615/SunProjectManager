@@ -69,10 +69,8 @@ const HeaderTopComponent = () => {
             chat.forEach((room) => {
                 client.subscribe(`/topic/chatRoom/${room.chatroomCode}`, (message) => {
                     try {
-                      
                         const parsedMessage = JSON.parse(message.body);                        
                         if (parsedMessage.chatSender !== userName.empName && isChatModalOpen == false) { // 필터링 조건
-                          
                           handleNewMessage();
                         }
                     } catch (error) {
@@ -107,24 +105,18 @@ const HeaderTopComponent = () => {
 }, [chat, isChatModalOpen]);
 
 
-const handleChatRoomCreated = async () => {
-
-  try {
-      const chatResponse = await fetch(`http://localhost:8787/api/chatList2?empCode=${userName.empcode}`);
-      if (!chatResponse.ok) {
-          throw new Error('Network response was not ok');
-      }
-      const chatData = await chatResponse.json();
-      setChat(chatData);
-
-
-      
-
-  } catch (error) {
-      console.error('Error fetching chat list:', error);
-  }
-
-};
+  const handleChatRoomCreated = async () => {
+    try {
+        const chatResponse = await fetch(`http://localhost:8787/api/chatList2?empCode=${userName.empcode}`);
+        if (!chatResponse.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const chatData = await chatResponse.json();
+        setChat(chatData);
+    } catch (error) {
+        console.error('Error fetching chat list:', error);
+    }
+  };
   const handleToggleClick = useCallback((event) => {
     event.preventDefault();
     setIsToggled((prevState) => !prevState);

@@ -57,6 +57,7 @@ public class LoginController {
 		
         return ResponseEntity.ok(login);
 	}
+	//로그인 웹소켓
 	@MessageMapping("/login")
     @SendTo("/topic/login")
     public Map<String, String> handleLoginMessage(Map<String, String> message) {
@@ -69,6 +70,7 @@ public class LoginController {
         log.info("로그아웃 성공");
         return "succes";
     }
+	//로그아웃 쿠키삭제
 	@PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
@@ -90,6 +92,7 @@ public class LoginController {
         log.info("로그아웃 완료 {}", cookie);
         return ResponseEntity.ok().build();
     }
+	//세션에 다음 유저 정보 생성
 	private Map<String, String> createUserInfo(String empcode, String authorities, String empName, String jobCode, String deptCode) {
         Map<String, String> userInfo = new HashMap<>();
         userInfo.put("empcode", empcode);

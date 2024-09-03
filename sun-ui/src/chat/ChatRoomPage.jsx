@@ -136,7 +136,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode ,onUpdateChatRoomList}) 
                             if (!prevMessages.some(msg => msg.chatCode === parsedMessage.chatCode)) {
                                 return [...prevMessages, parsedMessage];
                             }
-                            fetchMessages();
+                            
                             return prevMessages;
                         });
                     } catch (error) {

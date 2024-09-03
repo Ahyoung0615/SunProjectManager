@@ -29,117 +29,126 @@ import lombok.extern.slf4j.Slf4j;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
-	
-	@GetMapping(value="/memberDetail")
+
+	// 사원리스트 불러오기1
+	@GetMapping(value = "/memberDetail")
 	public List<EmployeeVo> getAllEmployees() {
-        return employeeService.empList();
-    }
-	@GetMapping(value="/memberDetail1")
+		return employeeService.empList();
+	}
+
+	// 사원리스트 불러오기2
+	@GetMapping(value = "/memberDetail1")
 	public List<EmployeeVo> getAllEmployees1() {
-        return employeeService.empList1();
-    }
-	@GetMapping(value="/memberDetail2")
+		return employeeService.empList1();
+	}
+
+	// 사원리스트 불러오기3
+	@GetMapping(value = "/memberDetail2")
 	public List<EmployeeVo> getAllEmployees2() {
-        return employeeService.empList2();
-    }
-	@GetMapping(value="/memberDetail/{empCode}")
+		return employeeService.empList2();
+	}
+
+	// 사원 상세보기
+	@GetMapping(value = "/memberDetail/{empCode}")
 	public EmployeeVo getOneEmployee(@PathVariable String empCode) {
 		return employeeService.getOneMember(empCode);
 	}
-	
+
+	// 사원 이미지 업로드
 	@PostMapping("/uploadImage")
-	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("empCode") String empCode) {
-	    Map<String, String> response = new HashMap<>();
-	    try {
-	        employeeService.saveImage(file, empCode);
-	        response.put("message", "이미지 파일 업로드 성공");
-	        return ResponseEntity.ok(response);
-	    } catch (Exception e) {
-	        response.put("message", "이미지 파일 업로드 실패: " + e.getMessage());
-	        return ResponseEntity.status(500).body(response);
-	    }
+	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file,
+			@RequestParam("empCode") String empCode) {
+		Map<String, String> response = new HashMap<>();
+		try {
+			employeeService.saveImage(file, empCode);
+			response.put("message", "이미지 파일 업로드 성공");
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			response.put("message", "이미지 파일 업로드 실패: " + e.getMessage());
+			return ResponseEntity.status(500).body(response);
+		}
 	}
+
+	// 사원 비밀번호 초기화
 	@PostMapping("/resetPassword/{empCode}")
-    public ResponseEntity<String> resetPassword(@PathVariable String empCode) {
+	public ResponseEntity<String> resetPassword(@PathVariable String empCode) {
 		int result = employeeService.passwordReset(empCode);
-        if (result == 1) {
-            return ResponseEntity.ok("비밀번호가 초기화되었습니다.'1234'.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reset password.");
-        }
-    }
-	
-	@PostMapping("/memberUpdate/{empCode}")
-	public ResponseEntity<String> updateMember(@PathVariable String empCode,
-			@RequestParam("EmpJob") String empJob,
-	        @RequestParam("EmpDept") String empDept,
-	        @RequestParam("EmpTel") String empTel,
-	        @RequestParam("EmpEmail") String empEmail,
-	        @RequestParam("EmpAddress") String empAddress,
-	        @RequestParam("EmpStatus") String empStatus){
-		int empJobStr = Integer.parseInt(empJob);
-	    int empDeptStr = Integer.parseInt(empDept);
-	    int empCodeStr = Integer.parseInt(empCode);
-		
-		EmployeeVo employeeVo = new EmployeeVo();
-	    employeeVo.setEmpCode(empCodeStr);
-	    employeeVo.setJobCode(empJobStr);
-	    employeeVo.setDeptCode(empDeptStr);
-	    employeeVo.setEmpTel(empTel);
-	    employeeVo.setEmpEmail(empEmail);
-	    employeeVo.setEmpAddress(empAddress);
-	    employeeVo.setEmpStatus(empStatus);
-
-	    int result = employeeService.updateMember(employeeVo);
 		if (result == 1) {
-            return ResponseEntity.ok("사원정보가 수정 되었습니다");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원정보가 수정 실패했습니다.");
-        }
+			return ResponseEntity.ok("비밀번호가 초기화되었습니다.'1234'.");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to reset password.");
+		}
 	}
-	 @PostMapping("/NewEmp")
-	    public ResponseEntity<String> registerEmployee(
-	            @RequestParam("EmpName") String empName,
-	            @RequestParam("EmpJob") String empJob,
-	            @RequestParam("EmpDept") String empDept,
-	            @RequestParam("Gender") String gender,
-	            @RequestParam("EmpTel") String empTel,
-	            @RequestParam("EmpEmail") String empEmail,
-	            @RequestParam("EmpAddress") String empAddress) {
+
+	// 사원 정보 수정
+	@PostMapping("/memberUpdate/{empCode}")
+	public ResponseEntity<String> updateMember(@PathVariable String empCode, @RequestParam("EmpJob") String empJob,
+			@RequestParam("EmpDept") String empDept, @RequestParam("EmpTel") String empTel,
+			@RequestParam("EmpEmail") String empEmail, @RequestParam("EmpAddress") String empAddress,
+			@RequestParam("EmpStatus") String empStatus) {
+		int empJobStr = Integer.parseInt(empJob);
+		int empDeptStr = Integer.parseInt(empDept);
+		int empCodeStr = Integer.parseInt(empCode);
+
+		EmployeeVo employeeVo = new EmployeeVo();
+		employeeVo.setEmpCode(empCodeStr);
+		employeeVo.setJobCode(empJobStr);
+		employeeVo.setDeptCode(empDeptStr);
+		employeeVo.setEmpTel(empTel);
+		employeeVo.setEmpEmail(empEmail);
+		employeeVo.setEmpAddress(empAddress);
+		employeeVo.setEmpStatus(empStatus);
+
+		int result = employeeService.updateMember(employeeVo);
+		if (result == 1) {
+			return ResponseEntity.ok("사원정보가 수정 되었습니다");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사원정보가 수정 실패했습니다.");
+		}
+	}
+
+	// 새로운 사원 추가
+	@PostMapping("/NewEmp")
+	public ResponseEntity<String> registerEmployee(@RequestParam("EmpName") String empName,
+			@RequestParam("EmpJob") String empJob, @RequestParam("EmpDept") String empDept,
+			@RequestParam("Gender") String gender, @RequestParam("EmpTel") String empTel,
+			@RequestParam("EmpEmail") String empEmail, @RequestParam("EmpAddress") String empAddress) {
 		// String 값을 int로 변환
-		    int empJobStr = Integer.parseInt(empJob);
-		    int empDeptStr = Integer.parseInt(empDept);
-		 // EmployeeVo 객체 생성
-		    EmployeeVo employeeVo = new EmployeeVo();
-		    if(empDept.equals("1") || empDept.equals("11")) {
-		    	employeeVo.setEmpAuth("A");
-		    }else {
-		    	employeeVo.setEmpAuth("U");
-		    }
-		    employeeVo.setEmpName(empName);
-		    employeeVo.setDeptCode(empDeptStr);
-		    employeeVo.setJobCode(empJobStr);
-		    employeeVo.setGender(gender);
-		    employeeVo.setEmpTel(empTel);
-		    employeeVo.setEmpEmail(empEmail);
-		    employeeVo.setEmpAddress(empAddress);
+		int empJobStr = Integer.parseInt(empJob);
+		int empDeptStr = Integer.parseInt(empDept);
+		// EmployeeVo 객체 생성
+		EmployeeVo employeeVo = new EmployeeVo();
+		if (empDept.equals("1") || empDept.equals("11")) {
+			employeeVo.setEmpAuth("A");
+		} else {
+			employeeVo.setEmpAuth("U");
+		}
+		employeeVo.setEmpName(empName);
+		employeeVo.setDeptCode(empDeptStr);
+		employeeVo.setJobCode(empJobStr);
+		employeeVo.setGender(gender);
+		employeeVo.setEmpTel(empTel);
+		employeeVo.setEmpEmail(empEmail);
+		employeeVo.setEmpAddress(empAddress);
 
-		    // Employee 등록 서비스 호출
-		    employeeService.registerEmployee(employeeVo);
+		// Employee 등록 서비스 호출
+		employeeService.registerEmployee(employeeVo);
 
-		    // 성공 메시지 반환
-		    return ResponseEntity.ok("사원 등록이 완료되었습니다.");
-	    }
-	 
-	 @PostMapping("/updatePassword/{empCode}")
-	 public ResponseEntity<String> changerPassword(@PathVariable String empCode, String CurrentPassword, String ChangePassword){
-		 boolean success = employeeService.changePassword(empCode, CurrentPassword, ChangePassword);
-		 if(success) {
-			 return ResponseEntity.ok("비밀번호 변경완료");
-		 }else {
-	        	return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                    .body("비밀번호 변경 실패: 현재 비밀번호가 올바르지 않거나 사용자 정보를 찾을 수 없습니다.");
-	        }
-	 }
-	
+		// 성공 메시지 반환
+		return ResponseEntity.ok("사원 등록이 완료되었습니다.");
+	}
+
+	// 사원 비밀번호 수정
+	@PostMapping("/updatePassword/{empCode}")
+	public ResponseEntity<String> changerPassword(@PathVariable String empCode, String CurrentPassword,
+			String ChangePassword) {
+		boolean success = employeeService.changePassword(empCode, CurrentPassword, ChangePassword);
+		if (success) {
+			return ResponseEntity.ok("비밀번호 변경완료");
+		} else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("비밀번호 변경 실패: 현재 비밀번호가 올바르지 않거나 사용자 정보를 찾을 수 없습니다.");
+		}
+	}
+
 }
