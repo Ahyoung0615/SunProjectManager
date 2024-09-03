@@ -44,10 +44,12 @@ public class BoardController {
 
 	private final BoardService service;
 
+	//게시글 파일 저장소
 	private String uploadDir = "src/main/resources/static/boardFile";
-
+	//게시글 이미지 미리보기 저장소
 	String uploadDir2 = "src/main/resources/static/memberImage";
 	
+	//게시글 입력
 	@PostMapping("/insertBoard")
 	public ResponseEntity<String> insertBoard(@RequestParam("notiTitle") String notiTitle,
 			@RequestParam("notiContent") String notiContent, @RequestParam("empCode") String empCode,
@@ -77,7 +79,7 @@ public class BoardController {
 			return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
 		}
 	}
-	
+	//파일 다운로드
 	@GetMapping("/files/download/{nfileFakename}")
 	public ResponseEntity<PathResource> downloadFile(@PathVariable String nfileFakename) {
 		try {
@@ -102,18 +104,18 @@ public class BoardController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-
+	//게시글 리스트 불러오기
 	@GetMapping("/boardList")
 	public List<NoticeVo> boardList() {
 		return service.boardList();
 	}
-
+	//게시글 파일 불러오기
 	@GetMapping("/files/{notiCode}")
 	public List<NoticeFileVo> getFile(@PathVariable String notiCode) {
 		int notiCodeStr = Integer.parseInt(notiCode);
 		return service.getFile(notiCodeStr);
 	}
-
+	//게시글 수정
 	@PostMapping("updateBoard/{notiCode}")
 	public ResponseEntity<String> updateBoard(@PathVariable String notiCode,
 			@RequestParam("notiTitle") String notiTitle, @RequestParam("notiContent") String notiContent,
@@ -140,7 +142,7 @@ public class BoardController {
 		service.updateBoard(vo, files);
 		return ResponseEntity.ok("게시글이 수정 되었습니다");
 	}
-
+	//게시글 삭제(소프트)
 	@PostMapping("/deleteBoard/{notiCode}")
 	public ResponseEntity<String> deleteBoard(@RequestParam String notiCode) {
 		int notiCodeStr = Integer.parseInt(notiCode);
@@ -150,12 +152,12 @@ public class BoardController {
 		service.deleteFile(notiCodeStr);
 		return ResponseEntity.ok("게시글이 삭제되었습니다");
 	}
-
+	//게시글 상세보기
 	@GetMapping("/boardDetail/{notiCode}")
 	public NoticeVo boardDetail(@PathVariable String notiCode) {
 		return service.boardDetail(notiCode);
 	}
-	
+	//게시글 이미지 업로드
 	@PostMapping("/uploadImageBoard")
     public ResponseEntity<?> uploadImage(@RequestParam("upload") MultipartFile file) {
         try {

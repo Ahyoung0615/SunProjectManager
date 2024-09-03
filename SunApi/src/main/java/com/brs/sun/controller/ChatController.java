@@ -42,6 +42,7 @@ public class ChatController {
 	
     private final SimpMessagingTemplate messagingTemplate;
 
+    //채팅방 만들기
     @PostMapping("/api/chat")
     public ResponseEntity<String> createChatRoom(@RequestBody List<String> empCodes) {
         
@@ -69,6 +70,7 @@ public class ChatController {
         return ResponseEntity.ok("채팅방 생성되었습니다");
     }
 	
+    //채티방목록 불러오기
     @GetMapping("/api/chatList")
     public List<ChatRoomVo> getChatList(@RequestParam("empCode") String empCode) {
         EmployeeVo emp = employeeDao.Info(empCode);
@@ -77,10 +79,12 @@ public class ChatController {
         //log.info("Employee code: {}", empCodeString);
         return chatService.chatList(empCodeString);
     }
+    //채팅방 참여자 불러오기
     @GetMapping("/api/partiList")
     public List<ChatRoomVo> partiList(@RequestParam("chatroomCode") String chatroomCode) {
         return chatService.partiList(chatroomCode);
     }
+    //채팅 내용 불러오기
     @GetMapping("/api/chatList2")
     public List<ChatRoomVo> getChatList2(@RequestParam("empCode") String empCode) {
         EmployeeVo emp = employeeDao.Info(empCode);
@@ -89,6 +93,7 @@ public class ChatController {
         //log.info("Employee code: {}", empCodeString);
         return chatService.chatingList(empCodeString);
     }
+    //직무, 부서정보 불러오기
     @GetMapping("/api/employee/{empCode}")
     public ResponseEntity<EmployeeVo> getEmployeeInfo(@PathVariable("empCode") String empCode) {
         EmployeeVo employee = employeeService.getOneMember(empCode);
@@ -97,6 +102,7 @@ public class ChatController {
         }
         return ResponseEntity.ok(employee);
     }
+    //메세지 받고 저장
     @MessageMapping("/chat.sendMessage/{chatroomCode}")
     @SendTo("/topic/chatRoom/{chatroomCode}")
     public ChatVo sendMessage(@DestinationVariable String chatroomCode, ChatVo message) {
@@ -118,17 +124,18 @@ public class ChatController {
         log.info("Returning chat messages: {}", chatParti);
         return ResponseEntity.ok(chatParti);
     }
-    @GetMapping("/getLastChatMessage")
-    public ResponseEntity<String> getLastChatMessage(@RequestParam("chatroomCode") String chatroomCode) {
-        try {
-            String lastChat = chatService.getLastChatMessage(chatroomCode);
-            log.info("마지막 메세지 {}", lastChat);
-            return ResponseEntity.ok(lastChat);
-        } catch (Exception e) {
-            log.error("Error getting last chat message", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving last chat message");
-        }
-    }
+    //마지막메세지 불러오기(안씀)
+//    @GetMapping("/getLastChatMessage")
+//    public ResponseEntity<String> getLastChatMessage(@RequestParam("chatroomCode") String chatroomCode) {
+//        try {
+//            String lastChat = chatService.getLastChatMessage(chatroomCode);
+//            log.info("마지막 메세지 {}", lastChat);
+//            return ResponseEntity.ok(lastChat);
+//        } catch (Exception e) {
+//            log.error("Error getting last chat message", e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving last chat message");
+//        }
+//    }
     
     
 }
