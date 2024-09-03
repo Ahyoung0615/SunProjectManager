@@ -18,11 +18,6 @@ const HeaderSideComponent = () => {
         <nav className="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div className="sb-sidenav-menu">
                 <div className="nav">
-                    <div className="sb-sidenav-menu-heading" style={{ fontSize: 15, marginLeft: 10, color: 'white' }}>근태관리</div>
-                    <Link className='nav-link' to='/vacationList'>
-                        <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-calendar2-check"></i></div>
-                        연가관리
-                    </Link>
                     <div className="sb-sidenav-menu-heading" style={{ fontSize: 15, marginLeft: 10, color: 'white' }}>근무관리</div>
 
                     <Link className='nav-link' to='/timeTableList'>
@@ -82,6 +77,10 @@ const HeaderSideComponent = () => {
                     <Link className='nav-link' to='/coworkAdList'>
                         <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-buildings-fill"></i></div>
                         협력사관리
+                    </Link>
+                    <Link className='nav-link' to='/vacationList'>
+                        <div className="sb-nav-link-icon"><i style={{ color: 'gray' }} className="bi bi-calendar2-check"></i></div>
+                        공휴일관리
                     </Link>
                     <div className="sb-sidenav-menu-heading" style={{ fontSize: 15, marginLeft: 10, color: 'white' }}>SUN</div>
                     <Link className='nav-link' to='/boardList'>
