@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
+import com.brs.sun.vo.EDocFileVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -22,6 +23,8 @@ public interface EDocDao {
 	List<EDocVo> selectMyAppRejectList(int empCode);
 	
 	boolean insertEDoc(EDocVo vo);
+	
+	boolean insertEDocFile(int edocCode, String efileName);
 	
 	boolean insertEDocLine(List<EDocLineVo> vo);
 	

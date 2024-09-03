@@ -17,6 +17,7 @@ import com.brs.sun.dto.response.EDocDetailResponseDTO;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
 import com.brs.sun.dto.response.TempEDocDetailResponseDTO;
 import com.brs.sun.model.dao.EDocDao;
+import com.brs.sun.vo.EDocFileVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -29,7 +30,8 @@ public class EDocServiceImpl implements EDocService {
 
 	private final EDocDao dao;
 	
-	private final String path = "src/main/resources/static/empSigImage";
+	private final String empSigPath = "src/main/resources/static/empSigImage";
+	private final String eodcFilePath = "src/main/resources/static/edocFile";
 	
 	@Override
 	public List<EDocVo> selectAppEmp(int empCode) {
@@ -138,6 +140,7 @@ public class EDocServiceImpl implements EDocService {
 		return totalApp - remApp;
 	}
 	
+	@Override
 	public Map<Integer, String> selectEmployeeSignatures(List<Integer> empCodes) {
         Map<Integer, String> map = new HashMap<>();
         List<EmployeeVo> empList = dao.selectEmployeeSignatures(empCodes);
@@ -145,7 +148,7 @@ public class EDocServiceImpl implements EDocService {
 
         for (EmployeeVo employeeVo : empList) {
             if (employeeVo.getEmpSig() != null) {
-                File empSigFile = new File(path + "/" + employeeVo.getEmpSig());
+                File empSigFile = new File(empSigPath + "/" + employeeVo.getEmpSig());
                 try (FileInputStream fileInputStream = new FileInputStream(empSigFile)) {
                     byte[] empSigBytes = new byte[(int) empSigFile.length()];
                     fileInputStream.read(empSigBytes);
@@ -175,13 +178,13 @@ public class EDocServiceImpl implements EDocService {
 			String originalFileName = empSig.getOriginalFilename();
 			String fileName = empCode + originalFileName.substring(originalFileName.lastIndexOf("."));
 			
-			File filePath = new File(path);
+			File filePath = new File(empSigPath);
 			
 			if(!filePath.exists()) {
 				filePath.mkdirs();
 			}
 			
-			FileOutputStream outputStream = new FileOutputStream(new File(path + "/" + fileName));
+			FileOutputStream outputStream = new FileOutputStream(new File(empSigPath + "/" + fileName));
 			outputStream.write(empSig.getBytes());
 			outputStream.flush();
 			outputStream.close();
@@ -191,6 +194,34 @@ public class EDocServiceImpl implements EDocService {
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	@Override
+	public boolean insertEDocFile(int edocCode, MultipartFile efileName) {
+		try {
+			if(!efileName.getContentType().startsWith("image/")) {
+				return false;
+			}
+			
+			String originalFileName = efileName.getOriginalFilename();
+			String fileName = edocCode + originalFileName.substring(originalFileName.lastIndexOf("."));
+			
+			File filePath = new File(eodcFilePath);
+			
+			if(!filePath.exists()) {
+				filePath.mkdirs();
+			}
+			
+			FileOutputStream outputStream = new FileOutputStream(new File(eodcFilePath + "/" + fileName));
+			outputStream.write(efileName.getBytes());
+			outputStream.flush();
+			outputStream.close();
+			
+			return dao.insertEDocFile(edocCode, fileName);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} 
 	}
 	
 }

@@ -78,6 +78,12 @@
 		VALUES(#{edocCode}, #{edocType}, #{edocTitle}, #{edocContent}, #{empCode}, #{edocDate}, #{edocStatus})
 	</insert>
 	
+	<insert id="insertEDocFile">
+		INSERT INTO EDOCFILE
+		(EFILE_CODE, EDOC_CODE, EFILE_NAME, EFILE_DELFLAG)
+		VALUES((SELECT NVL(MAX(EFILE_CODE), 0) + 1 AS EFILE_CODE  FROM EDOCFILE), #{edocCode}, #{efileName}, 'N')
+	</insert>
+	
 	<!-- 결재라인 insert -->
 	<insert id="insertEDocLine">
 		INSERT INTO EDOCLINE

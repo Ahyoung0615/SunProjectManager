@@ -18,9 +18,9 @@ public class ClovaOcrController {
 
 	private final ClovaOcrService service;
 	
-	@PostMapping
-	public Map<String, Object> test(@RequestParam MultipartFile image) throws IOException{
-		return service.recognizeText(image);
+	@PostMapping("/setReceipt")
+	public Map<String, Object> docReceiptImage(@RequestParam MultipartFile receipt) throws IOException{
+		return service.recognizeText(receipt);
 	}
 
 }
