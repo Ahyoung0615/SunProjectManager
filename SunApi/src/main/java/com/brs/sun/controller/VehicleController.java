@@ -63,6 +63,12 @@ public class VehicleController {
 	    return service.getOneVehicle(vehicleCode);
 	}
 	
+	@GetMapping("/vehicleImages/{vehicleCode}")
+	public String selectVehicleImages(@PathVariable String vehicleCode) {
+		log.info("선택된 vehicleCode : {}", vehicleCode);
+		return service.selectVehicleImages(vehicleCode);
+	}
+	
 	@GetMapping("/repair/{vehicleCode}")
 	public List<RepairVo> getAllRepair(@PathVariable String vehicleCode) {
 		log.info("선택된 repair vehicleCode : {}", vehicleCode);

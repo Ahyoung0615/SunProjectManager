@@ -27,6 +27,13 @@
 		)
 		WHERE rn BETWEEN #{first} AND #{last}
 	</select>
+	
+	<!-- 차량 이미지 불러오기 -->
+	<select id="selectVehicleImages" resultType="VehicleVo">
+		SELECT VEHICLE_IMG
+		FROM VEHICLE
+		WHERE VEHICLE_CODE = #{vehicleCode}
+	</select>
 
 
 	<!-- 조회하는 차량 총 갯수 -->

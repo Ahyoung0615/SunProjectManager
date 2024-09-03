@@ -6,6 +6,7 @@ import BTripCalComponent from './BTripCalComponent';
 
 const BTripListComponent = () => {
     const [bTripList, setBTripList] = useState([]);
+    const [holidays, setHolidays] = useState([]);
     const [sessionEmp, setSessionEmp] = useState(null);
     const [clickedButton, setClickedButton] = useState('list'); 
     const [showlist, setShowlist] = useState(true);
@@ -34,8 +35,21 @@ const BTripListComponent = () => {
             }
         };
         getBTrip(sessionEmp);
-        
     }, [sessionEmp]);
+
+    useEffect(() => {
+        const fetchHolidays = async () => {
+            try {
+                const response = await axios.get('http://localhost:8787/api/holidays');
+                console.log('Fetched holidays:', response.data);
+                setHolidays(response.data);
+            } catch (error) {
+                console.error("Failed to fetch holidays", error);
+            }
+        };
+
+        fetchHolidays();
+    }, []);
 
     const handleButtonClick = (buttonType) => {
         setClickedButton(buttonType);
@@ -90,7 +104,7 @@ const BTripListComponent = () => {
                     </table>
                 </div>
             ) : (
-                <BTripCalComponent bTripList={bTripList} />
+                <BTripCalComponent bTripList={bTripList} holidays={holidays} />
             )}
             <div style={{ marginTop: '50px', marginBottom: '80px' }}>
                 <CoWorkComponent />

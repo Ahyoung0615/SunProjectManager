@@ -30,4 +30,6 @@ public interface VehicleDao {
 	public int updateVehicleStatusI(String RepairCode);
 	
 	public int countVehicle(String vehicleType);
+	
+	public VehicleVo selectVehicleImages(String vehicleCode);
 }

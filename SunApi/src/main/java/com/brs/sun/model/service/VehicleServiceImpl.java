@@ -1,7 +1,10 @@
 package com.brs.sun.model.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class VehicleServiceImpl implements VehicleService {
 
 	private final VehicleDao dao;
+	private final String path = "src/main/resources/static/vehicleImage";
 
 	@Override
 	public List<VehicleVo> getAllVehicle(int first, int last, String vehicleType) {
@@ -38,30 +42,20 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public int insertVehicle(VehicleVo vo, MultipartFile file) throws Exception {
 
-		String uploadDir = "C:\\Users\\codew\\git\\SunProjectManager\\SunApi\\src\\main\\webapp\\vehicleImage\\";
-		
 		String fileName = "";
 		if (file != null) {
 
-			File dir = new File(uploadDir);
+			File dir = new File(path);
 			if (!dir.exists()) {
 				dir.mkdirs();
 			}
 
 			fileName = vo.getVehicleCode() + "_" + file.getOriginalFilename();
-			File saveFile = new File(uploadDir + fileName);
+			FileOutputStream outputStream = new FileOutputStream(new File(path + "/" + fileName));
+			outputStream.write(file.getBytes());
+			outputStream.flush();
+			outputStream.close();
 
-			try {
-				try {
-					file.transferTo(saveFile);
-				} catch (IOException e) {
-					throw new Exception("Failed to save file", e);
-				}
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 		VehicleVo newVehicle = VehicleVo.builder().vehicleNo(vo.getVehicleNo()).vehicleModel(vo.getVehicleModel())
 				.vehicleRegdate(vo.getVehicleRegdate()).vehicleType(vo.getVehicleType())
@@ -73,21 +67,16 @@ public class VehicleServiceImpl implements VehicleService {
 	@Override
 	public int updateVehicleImage(String vehicleCode, MultipartFile file) throws Exception {
 
-		String uploadDir = "C:\\Users\\codew\\git\\SunProjectManager\\SunApi\\src\\main\\webapp\\vehicleImage\\";
-
-		File dir = new File(uploadDir);
+		File dir = new File(path);
 		if (!dir.exists()) {
 			dir.mkdirs();
 		}
 
 		String fileName = vehicleCode + "_" + file.getOriginalFilename();
-		File saveFile = new File(uploadDir + fileName);
-
-		try {
-			file.transferTo(saveFile);
-		} catch (IOException e) {
-			throw new Exception("Failed to save file", e);
-		}
+		FileOutputStream outputStream = new FileOutputStream(new File(path + "/" + fileName));
+		outputStream.write(file.getBytes());
+		outputStream.flush();
+		outputStream.close();
 
 		return dao.updateVehicleImage(vehicleCode, fileName);
 	}
@@ -132,4 +121,30 @@ public class VehicleServiceImpl implements VehicleService {
 		return dao.countVehicle(vehicleType);
 	}
 
+	@Override
+	public String selectVehicleImages(String vehicleCodes) {
+
+		VehicleVo vehicleImage = dao.selectVehicleImages(vehicleCodes);
+		String vehicleImgBase64 = "";
+			if (vehicleImage != null && vehicleImage.getVehicleImg() != null) {
+				File vehicleImgFile = new File(path + "/" + vehicleImage.getVehicleImg());
+				try (FileInputStream fileInputStream = new FileInputStream(vehicleImgFile)) {
+					byte[] vehicleImgBytes = new byte[(int) vehicleImgFile.length()];
+					fileInputStream.read(vehicleImgBytes);
+
+					// Base64로 인코딩
+					String base64Encoded = Base64.getEncoder().encodeToString(vehicleImgBytes);
+					vehicleImgBase64 = "data:image/"
+							+ (vehicleImage.getVehicleImg().substring(vehicleImage.getVehicleImg().lastIndexOf(".") + 1))
+							+ ";base64," + base64Encoded;
+					return vehicleImgBase64;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				return "";
+			}
+			return vehicleImgBase64;
+			
+	}
 }

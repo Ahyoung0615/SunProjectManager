@@ -90,4 +90,9 @@ public class VehicleDaoImpl implements VehicleDao {
 		return template.selectOne(NS + "countVehicle",vehicleType);
 	}
 
+	@Override
+	public VehicleVo selectVehicleImages(String vehicleCode) {
+		return template.selectOne(NS + "selectVehicleImages",vehicleCode);
+	}
+
 }

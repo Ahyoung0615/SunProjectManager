@@ -86,4 +86,11 @@ public interface VehicleService {
 	 * @return int
 	 */
 	public int countVehicle(String vehicleType);
+	
+	/**
+	 * 차량 이미지 조회
+	 * @param vehicleCode
+	 * @return VehicleVo
+	 */
+	public String selectVehicleImages(String vehicleCode);
 }
