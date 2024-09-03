@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
+import com.brs.sun.vo.EDocFileVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -46,6 +48,15 @@ public class EDocDaoImpl implements EDocDao {
 	@Override
 	public boolean insertEDoc(EDocVo vo) {
 		return (template.insert(NS + "insertEDoc", vo) > 0) ? true : false;
+	}
+	
+	@Override
+	public boolean insertEDocFile(int edocCode, String efileName) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("edocCode", edocCode);
+		map.put("efileName", efileName);
+		
+		return (template.insert(NS + "insertEDocFile", map) > 0) ? true : false;
 	}
 	
 	@Override

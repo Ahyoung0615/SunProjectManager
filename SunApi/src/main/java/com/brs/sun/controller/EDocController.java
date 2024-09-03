@@ -1,8 +1,5 @@
 package com.brs.sun.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,12 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.brs.sun.dto.request.EDocRejectRequestDTO;
-import com.brs.sun.dto.request.EmpSigFileRequest;
+import com.brs.sun.dto.request.ExpenseDocRequest;
+import com.brs.sun.dto.request.ExpenseSubResultRequest;
 import com.brs.sun.dto.request.TempEDocUpdateRequestDTO;
 import com.brs.sun.dto.request.VacationRequestDTO;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
@@ -34,8 +29,10 @@ import com.brs.sun.dto.response.TempEDocDetailResponseDTO;
 import com.brs.sun.model.service.DayOffService;
 import com.brs.sun.model.service.EDocService;
 import com.brs.sun.vo.DayOffVo;
+import com.brs.sun.vo.EDocFileVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import lombok.RequiredArgsConstructor;
@@ -49,8 +46,6 @@ public class EDocController {
 
 	private final DayOffService dayOffService;
 	private final EDocService docService;
-	
-//	private final String path = "src/main/resources/static/empSigImage";
 	
 	// 결재 승인
 	@PostMapping("/appSuccess")
@@ -231,6 +226,80 @@ public class EDocController {
 			return "fail";
 		}
 	}
+	
+	@PostMapping("/insertExpenseApp")
+	public ResponseEntity<Integer> insertExpenseApp(@RequestBody ExpenseDocRequest request){
+		log.info("list : {}", request);
+		
+		String date = String.valueOf(request.getUploadDate());
+		LocalDate updateDate = LocalDate.parse(date);
+		
+		List<ExpenseSubResultRequest> list = request.getItems();
+		JsonArray jsonArray = new JsonArray();
+		for (ExpenseSubResultRequest subResultRequest : list) {
+			JsonObject jsonItem = new JsonObject();
+			jsonItem.addProperty("count", subResultRequest.getCount());
+			jsonItem.addProperty("name", subResultRequest.getName());
+			jsonItem.addProperty("price", subResultRequest.getPrice());
+			jsonArray.add(jsonItem);
+		}
+		
+		JsonObject jsonContent = new JsonObject();
+		jsonContent.addProperty("startDate", request.getStartDate());
+		jsonContent.addProperty("reason", request.getReason());
+		jsonContent.addProperty("totalPrice", request.getTotalPrice());
+		jsonContent.addProperty("storeInfo", request.getStoreInfo());
+		jsonContent.add("items", jsonArray);
+		log.info("jsonData: {}", jsonContent);
+		
+		EDocVo vo = EDocVo.builder()
+						  .edocType(request.getDocType())
+						  .edocTitle(request.getDocTitle())
+						  .edocContent(jsonContent.toString())
+						  .empCode(request.getEmpCode())
+						  .edocDate(updateDate)
+						  .edocStatus(request.getDocStatus())
+						  .build();
+		
+		List<Integer> approvers = request.getApprovers();
+		
+		List<EDocLineVo> edocLine = new ArrayList<EDocLineVo>();
+		for (int i = 0; i < approvers.size(); i++) {
+			EDocLineVo ev = new EDocLineVo();
+			ev.setEmpCode(approvers.get(i));
+			edocLine.add(ev);
+		}
+		docService.insertTransaction(vo, edocLine);
+		docService.updateMyAppStatus(vo);
+		
+		return ResponseEntity.ok(vo.getEdocCode());
+	}
+	
+	@PostMapping("/insertEDocFile")
+	public ResponseEntity<String> insertEDocFile(@RequestParam int edocCode, @RequestParam MultipartFile receipt) throws IOException{
+		log.info("code: {}, receipt: {}", edocCode, receipt);
+		
+		/*
+		 * boolean updateCheck = docService.updateEmpSig(empCode, empSig);
+		
+		if(updateCheck) {
+			byte[] empSigBytes = empSig.getBytes();
+			
+			String base64Encoded = Base64.getEncoder().encodeToString(empSigBytes);
+			return "data:" + empSig.getContentType() + ";base64," + base64Encoded;
+		} else {
+			return "fail";
+		}
+		 */
+		
+		boolean insertEDocFileChk = docService.insertEDocFile(edocCode, receipt);
+		
+		if (insertEDocFileChk) {
+			return ResponseEntity.ok("잘 했어요");
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("못했어요");
+		}
+	}
 
 	// 임시 문서 작성
 	@PostMapping("/insertTempVacation")
@@ -350,5 +419,4 @@ public class EDocController {
 		Map<Integer, String> map = docService.selectEmployeeSignatures(empCodes);
 		return map;
 	}
-	
 }

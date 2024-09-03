@@ -9,6 +9,7 @@ import com.brs.sun.dto.request.EmpSigFileRequest;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
 import com.brs.sun.dto.response.EDocLineResponseDTO;
 import com.brs.sun.dto.response.TempEDocDetailResponseDTO;
+import com.brs.sun.vo.EDocFileVo;
 import com.brs.sun.vo.EDocLineVo;
 import com.brs.sun.vo.EDocVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -24,6 +25,8 @@ public interface EDocService {
 	List<EDocVo> selectMyAppRejectList(int empCode);
 	
 	boolean insertTransaction(EDocVo vo, List<EDocLineVo> edocLineList);
+	
+	boolean insertEDocFile(int edocCode, MultipartFile efileName);
 	
 	boolean updateEDoc(EDocVo vo, List<EDocLineVo> edocLineList);
 	

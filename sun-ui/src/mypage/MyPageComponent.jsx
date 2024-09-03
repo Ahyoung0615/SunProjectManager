@@ -322,7 +322,7 @@ const MyPageComponent = () => {
                                         </div>
                                     ) : (
                                         <div>
-                                            <input type="file" accept="image/*" onChange={handleEmpSigFileChange} />
+                                            <input type="file" accept="image/jpg, image/png" onChange={handleEmpSigFileChange} />
                                             <button className="btn btn-primary" onClick={handleEmpSigUpload}>등록</button>
                                             {sigErrorMessage && <p style={{ color: 'red' }}>{sigErrorMessage}</p>}
                                         </div>
