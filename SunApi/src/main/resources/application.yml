@@ -17,6 +17,11 @@ spring:
   web:
     websocket:
       enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1004
 
   servlet:
     multipart:

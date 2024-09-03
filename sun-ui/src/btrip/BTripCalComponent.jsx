@@ -25,23 +25,30 @@ const BTripCalComponent = ({ bTripList, holidays }) => {
         }
     }));
 
-    // 공휴일 데이터를 FullCalendar 이벤트로 변환
-    const holidayEvents = holidays.map((holiday, index) => {
-        const event = {
-            id: holiday.id || `holiday-${index}`,
-    title: holiday.summary,
-    start: new Date(holiday.start.date.value).toISOString().split('T')[0],  // 날짜를 ISO 형식으로 변환
-    end: new Date(holiday.end.date.value).toISOString().split('T')[0],      // 날짜를 ISO 형식으로 변환
-    display: 'background',
-    backgroundColor: '#EBA7A8',
-    textColor: 'red',
-        };
+// 공휴일 데이터를 FullCalendar 이벤트로 변환
+const holidayEvents = holidays.map((holiday, index) => {
+    const event = {
+        id: holiday.id || `holiday-${index}`,
+        title: holiday.summary || 'Unnamed Holiday',
+        // start 및 end 속성이 존재하는지 확인 후 처리
+        start: holiday.start && holiday.start.date ? new Date(holiday.start.date.value).toISOString().split('T')[0] : null,
+        end: holiday.end && holiday.end.date ? new Date(holiday.end.date.value).toISOString().split('T')[0] : null,
+        display: 'background',
+        backgroundColor: '#EBA7A8',
+        textColor: 'red',
+    };
 
-        // 이벤트 데이터 콘솔에 출력
-        console.log('Holiday Event:', event);
+    // start가 null인 경우 해당 이벤트를 건너뜁니다.
+    if (!event.start) {
+        console.warn(`Skipping holiday event due to missing start date: ${holiday.summary}`);
+        return null; // null을 반환하여 이 이벤트를 무시합니다.
+    }
 
-        return event;
-    });
+    // 이벤트 데이터 콘솔에 출력
+    console.log('Holiday Event:', event);
+
+    return event;
+}).filter(event => event !== null); // null 값을 필터링하여 제외합니다.
 
     // 일정 클릭 시 디테일 화면으로 이동
     const handleDetail = (clickInfo) => {
