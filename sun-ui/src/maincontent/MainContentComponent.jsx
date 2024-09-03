@@ -14,7 +14,6 @@ const MainContentComponent = () => {
     
     if(sessionUser){
       const parsedUser = JSON.parse(sessionUser);
-      console.log("접속자 사번 : ", parsedUser.empcode)
       setSessionEmp(parsedUser.empcode);
     }
   }, []);

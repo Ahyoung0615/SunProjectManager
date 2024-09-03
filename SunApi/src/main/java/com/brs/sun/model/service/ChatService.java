@@ -20,6 +20,10 @@ public class ChatService {
 	public List<ChatRoomVo> chatList(String empCode){
 		return chatDao.findChatRoom(empCode);
 	}
+
+	public boolean chatRoom(String empCodes){
+		return chatDao.findRoom(empCodes);
+	}
 	
 	public List<ChatRoomVo> chatingList(String empCode){
 		return chatDao.findChatRoom2(empCode);
@@ -33,6 +37,7 @@ public class ChatService {
         this.chatDao = chatDao;
     }
 
+    
     public void createChatRoom(String empCodes) {
         chatDao.createChatRoom(empCodes);
     }

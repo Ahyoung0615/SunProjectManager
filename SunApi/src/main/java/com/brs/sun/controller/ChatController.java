@@ -1,12 +1,16 @@
 package com.brs.sun.controller;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,12 +40,33 @@ public class ChatController {
 	private final EmployeeDao employeeDao;
 	private final EmployeeService employeeService;
 	
+    private final SimpMessagingTemplate messagingTemplate;
+
     @PostMapping("/api/chat")
     public ResponseEntity<String> createChatRoom(@RequestBody List<String> empCodes) {
-        // 배열을 쉼표로 구분된 문자열로 변환
-        String empCodesStr = String.join(",", empCodes);
+        
+    	List<String> sortedEmpCodes = empCodes.stream()
+    	        .map(Integer::parseInt)      // String -> Integer 변환
+    	        .sorted()                    // 오름차순 정렬
+    	        .map(String::valueOf)        // Integer -> String 변환
+    	        .collect(Collectors.toList());
+    	// 배열을 쉼표로 구분된 문자열로 변환
+        String empCodesStr = String.join(",", sortedEmpCodes);
+        
+        
+        // 중복 검사
+        boolean roomExists = chatService.chatRoom(empCodesStr);
+        if (roomExists) {
+            // 채팅방이 이미 존재하는 경우
+        	log.info("채팅방존재");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("채팅방이 존재합니다");
+        }
+        
         chatService.createChatRoom(empCodesStr);
-        return ResponseEntity.ok("Chat room created successfully");
+        // 새 채팅방이 생성되었음을 알리는 메시지 전송
+        messagingTemplate.convertAndSend("/topic/newChat", "새 채팅방이 생성되었습니다");
+        
+        return ResponseEntity.ok("채팅방 생성되었습니다");
     }
 	
     @GetMapping("/api/chatList")

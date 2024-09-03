@@ -10,7 +10,11 @@
 		VALUES(
 		(SELECT NVL(MAX(CHATROOM_CODE), 0) + 1 FROM CHATROOM),#{empCodes},SYSDATE)
 	</insert>
-	
+	<select id="findRoom"  resultType="boolean">
+	    SELECT CASE WHEN COUNT(*) > 0 THEN 'true' ELSE 'false' END
+	    FROM CHATROOM 
+	    WHERE CHATROOM_PARTI = #{empCodes}
+	</select>
 	<select id="findChatRoom" resultType="ChatRoomVo">
 	    SELECT CHATROOM_CODE, REGEXP_REPLACE(CHATROOM_PARTI, '^'||#{empCode}||'(,|$)|(,)'||#{empCode}||'(,|$)', '') AS CHATROOM_PARTI
 	    FROM CHATROOM
