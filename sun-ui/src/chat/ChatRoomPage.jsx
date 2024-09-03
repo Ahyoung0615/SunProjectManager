@@ -24,6 +24,7 @@ const ChatRoomPage = ({ show, handleClose, chatroomCode ,onUpdateChatRoomList}) 
         }
         console.log(chatroomCode);
         fetchParticipants();
+        
     }, []);
 
     const fetchMessages = async () => {

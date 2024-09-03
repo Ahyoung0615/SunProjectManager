@@ -12,6 +12,10 @@ const MyPageComponent = () => {
     const [showModal1, setShowModal1] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
 
+    //연차관리
+    const [sessionEmp, setSessionEmp] = useState(null);
+    const [dayOff, setDayOff] = useState(null);
+
     // 사인 등록
     const [sigFile, setSigFile] = useState();
     const [sigErrorMessage, setSigErrorMessage] = useState();
@@ -26,10 +30,16 @@ const MyPageComponent = () => {
 
     useEffect(() => {
         const value = window.sessionStorage.getItem('user');
+        const sessionUser = sessionStorage.getItem('user');
+        if (sessionUser) {
+            const parsedUser = JSON.parse(sessionUser);
+            setSessionEmp(parsedUser.empcode);
+        }
         if (value) {
             setEmployee(JSON.parse(value));
         }
     }, []);
+    
 
     useEffect(() => {
         if (employee && employee.empcode) {
@@ -240,6 +250,27 @@ const MyPageComponent = () => {
         }
     };
 
+    //연차관리
+    useEffect(() => {
+        if (!sessionEmp) return;
+
+        const getDayOff = async (empCode) => {
+            try {
+                const response = await axios.get(`http://localhost:8787/api/dayOff/${empCode}`);
+                setDayOff(response.data);
+            } catch (error) {
+                alert("연차 조회 실패", error);
+            }
+        };
+
+        getDayOff(sessionEmp);
+    }, [sessionEmp]);
+
+    // sessionEmp와 dayOff가 모두 준비될 때만 렌더링
+    if (!sessionEmp || !dayOff) {
+        return null; // 로딩 중이거나 데이터가 없을 때는 아무것도 렌더링하지 않음
+    }
+
     return (
         <div className="container" style={{ marginTop: 30 }}>
             <h1>마이페이지</h1>
@@ -258,52 +289,73 @@ const MyPageComponent = () => {
                     <input type="file" accept="image/*" onChange={handleFileChange} />
                     <br />
                     <button className="btn btn-primary" onClick={handleUpload} style={{ alignItems: "center" }}>업로드</button>
+                    {/* 연차관리 */}
+                    <div style={{ marginTop: 0 }}>
+                        <br />
+                        <h4>나의 연차 관리</h4>
+                        <table className="table table-bordered" style={{ maxWidth: 600 }}>
+                            <thead>
+                                <tr>
+                                    <th>총 연차 개수</th>
+                                    <th>사용 가능 연차</th>
+                                    <th>사용한 연차</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{dayOff.dayOffLeft} 일</td>
+                                    <td>{dayOff.dayOffLeft - dayOff.dayOffUsed} 일</td>
+                                    <td>{dayOff.dayOffUsed} 일</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div style={{ flex: 2 }}>
                     <table className="table table-bordered">
                         <tbody>
                             <tr>
-                                <td>사번</td>
+                                <th>사번</th>
                                 <td>{emp.empCode}</td>
                             </tr>
                             <tr>
-                                <td>이름</td>
+                                <th>이름</th>
                                 <td>{emp.empName}</td>
                             </tr>
                             <tr>
-                                <td>직급</td>
+                                <th>직급</th>
                                 <td>{getJobTitle(emp.jobCode)}</td>
                             </tr>
                             <tr>
-                                <td>부서</td>
+                                <th>부서</th>
                                 <td>{getDeptTitle(emp.deptCode)}</td>
                             </tr>
                             <tr>
-                                <td>성별</td>
+                                <th>성별</th>
                                 <td>{getGender(emp.gender)}</td>
                             </tr>
                             <tr>
-                                <td>전화번호</td>
+                                <th>전화번호</th>
                                 <td>{emp.empTel}</td>
                             </tr>
                             <tr>
-                                <td>이메일</td>
+                                <th>이메일</th>
                                 <td>{emp.empEmail}</td>
                             </tr>
                             <tr>
-                                <td>주소</td>
+                                <th>주소</th>
                                 <td>{emp.empAddress}</td>
                             </tr>
                             <tr>
-                                <td>입사일</td>
+                                <th>입사일</th>
                                 <td>{emp.joindate}</td>
                             </tr>
                             <tr>
-                                <td>근무현황</td>
+                                <th>근무현황</th>
                                 <td>{getStatus(emp.empStatus)}</td>
                             </tr>
                             <tr>
-                                <td>사인</td>
+                                <th>사인</th>
                                 <td>
                                     {isEditingSig ? (
                                         <div>

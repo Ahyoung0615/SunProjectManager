@@ -13,6 +13,8 @@ public interface ChatDao {
 
 	void createChatRoom(@Param("empCodes") String empCodes);
 	
+	boolean findRoom(@Param("empCodes") String empCodes);
+	
 	List<ChatRoomVo> findChatRoom(@Param("empCode") String empCode);
 	
 	List<ChatRoomVo> findChatRoom2(@Param("empCode") String empCode);

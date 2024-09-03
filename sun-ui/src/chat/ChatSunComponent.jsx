@@ -13,6 +13,7 @@ const ChatSunComponent = () => {
     const [employeeData, setEmployeeData] = useState({});
     const [lastMessage, setLastMessage] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newMessageCounts, setNewMessageCounts] = useState({});
     const [selectedChatroomCode, setSelectedChatroomCode] = useState(null);
     const [socket, setSocket] = useState(null);
 
@@ -49,15 +50,26 @@ const ChatSunComponent = () => {
                 heartbeatOutgoing: 4000,
                 onConnect: () => {
                     console.log('STOMP connected');
-                    client.subscribe(`/topic/chatRoom/${selectedChatroomCode}`, (message) => {
-                        try {
-                            // 채팅방 메시지 수신 후 채팅방 목록을 업데이트합니다.
-                            console.log('Received message:', message.body);
-                            updateChatRoomList();
-                        } catch (error) {
-                            console.error('Error processing STOMP message:', error);
-                        }
+                    chat.forEach((room) => {
+                        client.subscribe(`/topic/chatRoom/${room.chatroomCode}`, (message) => {
+                            try {
+                                
+                                const parsedMessage = JSON.parse(message.body);                        
+                                if (parsedMessage.chatSender !== emp.empName) { // 필터링 조건
+                                    handleNewMessage(room.chatroomCode);
+                                }
+                                updateChatRoomList();
+
+                            } catch (error) {
+                                console.error('Error processing STOMP message:', error);
+                            }
+                        });
                     });
+                    client.subscribe('/topic/newChat', (message) => {
+                        console.log('New chat room created:', message.body);
+                        updateChatRoomList(); // 새로운 채팅방이 생성되면 채팅방 목록 갱신
+                    });
+
                 },
                 onStompError: (frame) => {
                     console.error('STOMP error:', frame.headers['message']);
@@ -77,8 +89,14 @@ const ChatSunComponent = () => {
                 }
             };
         }
-    }, [emp]);
+    }, [emp, chat]);
     
+    const handleNewMessage = (chatroomCode) => { 
+        setNewMessageCounts(prevCounts => ({
+            ...prevCounts,
+            [chatroomCode]: (prevCounts[chatroomCode] || 0) + 1
+        }));
+    };
     
     // 채팅방 생성 후 호출되는 함수
     const handleChatRoomCreated = async () => {
@@ -122,6 +140,10 @@ const ChatSunComponent = () => {
     // 채팅방 페이지로 이동 대신 모달 열기
     const handleChatRoomClick = (chatroomCode) => {
         setIsModalOpen(false);
+        setNewMessageCounts(prevCounts => ({
+            ...prevCounts,
+            [chatroomCode]: 0 // 클릭 시 알림 수를 0으로 초기화
+        }));
         setSelectedChatroomCode(chatroomCode);
         setIsModalOpen(true);
     };
@@ -154,6 +176,7 @@ const ChatSunComponent = () => {
                 mappingUrl="chat" 
                 onChatRoomCreated={handleChatRoomCreated} 
                 onClose={closeModal}
+                maxSelection="1"
             />
             <div 
                 className="list-group" 
@@ -195,6 +218,11 @@ const ChatSunComponent = () => {
                             <small style={{ color: item.chatroomCode === selectedChatroomCode ? '#ffffff' : '#8e8e8e' }}>
                                 {item.chatTime}
                             </small>
+                            {newMessageCounts[item.chatroomCode] > 0 && (
+                                <span className="badge bg-danger" style={{ position: 'absolute', top: '0px', right: '0px', fontSize: '0.6rem' }}>
+                                    {newMessageCounts[item.chatroomCode]}
+                                </span>
+                            )}
                         </div>
                     </button>
                 ))}

@@ -102,7 +102,7 @@ const OrgChatComponent = (props) => {
         : serverDataArr;
         console.log(finalDataArr);
         
-        if (finalDataArr.length > 0) {
+        if (finalDataArr.length > 1) {
             try {
                 const res = await axios.post(`${serverUrl}${props.mappingUrl}`, finalDataArr, {
                     headers: { 'Content-Type': 'application/json' },
@@ -115,7 +115,7 @@ const OrgChatComponent = (props) => {
                     props.onChatRoomCreated(); // 채팅방 생성 후 콜백 호출
                 }
             } catch (error) {
-                console.log("error", error.message);
+                alert('채팅방이 이미 존재합니다.');
             }
         } else {
             console.log("빈 요소");
