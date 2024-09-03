@@ -150,13 +150,20 @@
 			<artifactId>google-http-client-gson</artifactId>
 			<version>1.40.1</version>
 		</dependency>
-		
+
 		<!-- GoogleCredentials -->
 		<dependency>
 			<groupId>com.google.auth</groupId>
 			<artifactId>google-auth-library-oauth2-http</artifactId>
 			<version>1.15.0</version>
 		</dependency>
+		
+		<!-- Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
 
 		<!-- Test -->
 		<dependency>

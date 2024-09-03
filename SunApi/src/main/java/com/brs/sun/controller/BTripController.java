@@ -5,6 +5,8 @@ import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,15 +44,13 @@ public class BTripController {
 		return service.getMyBTrip(empCode);
 	}
 
-	@GetMapping("/holidays")
-	public List<Event> getHolidays() {
-		try {
-			return holidayService.getHolidays();
-		} catch (GeneralSecurityException | IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+	 @GetMapping("/holidays")
+	    public ResponseEntity<List<Event>> getHolidays() throws GeneralSecurityException, IOException {
+	        log.info("holidays 구글 공휴일 호출");
+	        // Redis에서 모든 공휴일 정보를 가져옵니다.
+			List<Event> holidays = holidayService.getAllHolidaysFromRedisAsEvents();
+			return new ResponseEntity<>(holidays, HttpStatus.OK);
+	    }
 
 	@GetMapping("/btripDetail/{btripCode}")
 	public BTripVo getOneBTrip(@PathVariable("btripCode") String bTripCode, @RequestParam String empCode) {
