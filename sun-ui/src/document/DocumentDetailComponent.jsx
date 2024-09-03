@@ -90,38 +90,38 @@ const DocumentTempDetailComponent = () => {
                 })
                 .catch((error) => console.log(error));
 
-            axios.get("http://localhost:8787/api/edoc/getEDocAppList", { params: { edocCode } })
-                .then((res) => {
-                    const approvers = res.data;
-                    if (sessionEmpCode) {
-                        const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
-                        const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
+                axios.get("http://localhost:8787/api/edoc/getEDocAppList", { params: { edocCode } })
+                    .then((res) => {
+                        const approvers = res.data;
+                        if (sessionEmpCode) {
+                            const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
+                            const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
 
-                        axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
-                            setSignatureImage(res.data);
+                            axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
+                                setSignatureImage(res.data);
 
-                            setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
-                        });
+                                setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+                            });
 
-                        
-                    } else {
-                        setSelectedApprovers(approvers);
-                    }
-                })
-                .catch((error) => console.log(error));
-            setDocCode(edocCode);
-        }
+                            
+                        } else {
+                            setSelectedApprovers(approvers);
+                        }
+                    })
+                    .catch((error) => console.log(error));
+                setDocCode(edocCode);
+            }
     }, [edocCode, sessionEmpCode]);
 
     const employeeInfo = async (empCode) => {
         try {
             const response = await axios.get("http://localhost:8787/api/jpa/edoc/employeeInfo", { params: { empCode } });
             const dayOffData = await axios.get("http://localhost:8787/api/edoc/getDayOff", { params: { empCode } });
-            const getEmpSig = await axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + empCode);
+            // const getEmpSig = await axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + empCode);
             console.log("dayOff:", dayOffData.data);
             setDayOffLeft(dayOffData.data);
             setEmpInfo(response.data);
-            setSignatureImage(getEmpSig.data);
+            // setSignatureImage(getEmpSig.data);
             setEmpDeptCodeToText(deptCodeToText(response.data.deptCode));
         } catch (error) {
             console.error("Error fetching employee info:", error);

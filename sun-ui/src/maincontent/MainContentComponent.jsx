@@ -11,6 +11,7 @@ const MainContentComponent = () => {
 
   useEffect(()=>{
     const sessionUser = sessionStorage.getItem("user");
+    
     if(sessionUser){
       const parsedUser = JSON.parse(sessionUser);
       console.log("접속자 사번 : ", parsedUser.empcode)
