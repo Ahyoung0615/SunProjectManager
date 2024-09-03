@@ -125,16 +125,52 @@
 
 		<!-- naver OCR 필요 라이브러리 -->
 		<dependency>
-		    <groupId>org.springframework.cloud</groupId>
-		    <artifactId>spring-cloud-starter-openfeign</artifactId>
-		    <version>4.1.2</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>4.1.2</version>
 		</dependency>
 		<dependency>
-	        <groupId>com.fasterxml.jackson.core</groupId>
-	        <artifactId>jackson-databind</artifactId>
-	    </dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!-- Google API Client -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.33.0</version>
+		</dependency>
+
+		<!-- Google OAuth Client -->
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client-jetty</artifactId>
+			<version>1.33.0</version>
+		</dependency>
+
+		<!-- Google Calendar API -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-calendar</artifactId>
+			<version>v3-rev411-1.25.0</version>
+		</dependency>
+
+		<!-- GsonFactory -->
+		<dependency>
+			<groupId>com.google.http-client</groupId>
+			<artifactId>google-http-client-gson</artifactId>
+			<version>1.40.1</version>
+		</dependency>
+		
+		<!-- GoogleCredentials -->
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.15.0</version>
+		</dependency>
 
 
+		<!-- Test -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
