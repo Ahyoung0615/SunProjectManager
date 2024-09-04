@@ -1,5 +1,6 @@
 package com.brs.sun.controller;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,12 +62,20 @@ public class EmployeeController {
 		Map<String, String> response = new HashMap<>();
 		try {
 			employeeService.saveImage(file, empCode);
-			response.put("message", "이미지 파일 업로드 성공");
+			byte[] memberImageBytes = file.getBytes();
+			
+			String base64Encoded = Base64.getEncoder().encodeToString(memberImageBytes);
+			response.put("ImageToBase64", base64Encoded);
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			response.put("message", "이미지 파일 업로드 실패: " + e.getMessage());
 			return ResponseEntity.status(500).body(response);
 		}
+	}
+	
+	@GetMapping("/getMemberImage")
+	public String getMemberImage(@RequestParam String empCode) {
+		return employeeService.getMemberImage(empCode);
 	}
 
 	// 사원 비밀번호 초기화
