@@ -7,7 +7,7 @@ const MyPageComponent = () => {
     const [employee, setEmployee] = useState(null);
     const [emp, setEmp] = useState({});
     const [file, setFile] = useState(null);
-    const [empImg, setEmpImg] = useState(`http://localhost:8787/memberImage/${emp.empImg}`);
+    const [empImg, setEmpImg] = useState();
     const [showModal, setShowModal] = useState(false);
     const [showModal1, setShowModal1] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
@@ -51,6 +51,8 @@ const MyPageComponent = () => {
                     return response.json();
                 })
                 .then(data => {
+                    axios.get(`http://localhost:8787/getMemberImage?empCode=${employee.empcode}`)
+                    .then((res) => setEmpImg(res.data))
                     setEmp(data);
                     setPreviewImage(null); // 기존 이미지 로드 후 미리보기 초기화
                 })
@@ -77,6 +79,7 @@ const MyPageComponent = () => {
     const handleUpdateSuccess = () => {
         fetch(`http://localhost:8787/memberDetail/${employee.empcode}`)
             .then(response => {
+                console.log(response.data)
                 if (!response.ok) {
                     throw new Error('사원정보못받아옴');
                 }
@@ -182,7 +185,7 @@ const MyPageComponent = () => {
                     const data = text ? JSON.parse(text) : {};
                     console.log(data);
                     alert(data.message || '파일 업로드 성공');
-                    setEmpImg(`http://localhost:8787/memberImage/${emp.empImg}`);
+                    setEmpImg(data);
                     handleUpdateSuccess();
                 } catch (error) {
                     throw new Error('Invalid JSON format');
@@ -280,7 +283,7 @@ const MyPageComponent = () => {
                         {previewImage ? (
                             <img src={previewImage} alt="미리보기 이미지" style={{ width: "100%", height: "100%" }} />
                         ) : emp.empImg ? (
-                            <img src={`http://localhost:8787/memberImage/${emp.empImg}`} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
+                            <img src={empImg} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
                         ) : (
                             <img src="/img/noimages.png" alt="기본 이미지" style={{ width: "100%", height: "100%" }} />
                         )}

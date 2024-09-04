@@ -1,8 +1,11 @@
 package com.brs.sun.model.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +27,8 @@ public class EmployeeService {
 
 	private final EmployeeDao employeeDao;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	private final String memberImagePath = "src/main/resources/static/memberImage";
 
 	public List<EmployeeVo> empList(){
 		log.info("사원 리스트 조회");
@@ -43,24 +48,44 @@ public class EmployeeService {
 	}
 
 	public void saveImage(MultipartFile file, String empCode) throws IOException {
-        // 이미지 저장 디렉토리 설정
-		String uploadDir =  System.getProperty("user.dir") +"src/main/resources/static/memberImage/";
 
-	    // 디렉토리가 존재하지 않으면 생성
-	    File dir = new File(uploadDir);
-	    if (!dir.exists()) {
-	        dir.mkdirs();  // 디렉토리 및 하위 디렉토리 생성
-	    }
-	    // 파일명 설정
-	    String fileName = empCode + "_" + file.getOriginalFilename();
-	    File saveFile = new File(uploadDir + fileName);
-
-	    // 파일 저장
-	    file.transferTo(saveFile);
-
-	    // DB에 파일명 업데이트
+		String originalFileName = file.getOriginalFilename();
+		String fileName = empCode + originalFileName.substring(originalFileName.lastIndexOf("."));
+		
+		File filePath = new File(memberImagePath);
+		
+		if(!filePath.exists()) {
+			filePath.mkdirs();
+		}
+		
+		FileOutputStream fileOutputStream = new FileOutputStream(new File(memberImagePath + "/" + fileName));
+		fileOutputStream.write(file.getBytes());
+		fileOutputStream.flush();
+		fileOutputStream.close();
+		
 	    employeeDao.updateImage(empCode, fileName);
     }
+	
+	public String getMemberImage(String empCode) {
+		EmployeeVo vo = employeeDao.getMemberImage(empCode);
+		
+		if(vo.getEmpImg() != null) {
+			File empImage = new File(memberImagePath + "/" + vo.getEmpImg());
+			try (FileInputStream fileInputStream = new FileInputStream(empImage)){
+				byte[] empImageByte = new byte[(int) empImage.length()];
+				fileInputStream.read(empImageByte);
+				
+				String base64Encoded = Base64.getEncoder().encodeToString(empImageByte);
+				String empImageToBase64 = "data:image/" + (vo.getEmpImg().substring(vo.getEmpImg().lastIndexOf(".") + 1)) + ";base64," + base64Encoded;
+				
+				return empImageToBase64;
+			}catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		} 
+		return null;
+	}
 	
 	
 	public int updateMember(EmployeeVo employeeVo) {
