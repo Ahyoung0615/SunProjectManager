@@ -54,6 +54,13 @@
 		WHERE EDOC_CODE=#{edocCode}
 	</update>
 	
+	<!-- 파일 업데이트 -->
+	<update id="updateEDocFile">
+		UPDATE EDOCFILE 
+		SET EFILE_NAME = #{efileName}	
+		WHERE EDOC_CODE = #{edocCode}
+	</update>
+	
 	<!-- 기존 설정되어있던 결재라인 삭제 -->
 	<delete id="deleteAppList">
 		DELETE FROM EDOCLINE e WHERE EDOC_CODE = #{edocCode}
@@ -173,6 +180,12 @@
 	<select id="selectAppDocDetail" resultType="EDocVo">
 		SELECT *
 		FROM EDOC e
+		WHERE EDOC_CODE = #{edocCode}
+	</select>
+	
+	<select id="selectDocFile" resultType="EDocFileVo">
+		SELECT *
+		FROM EDOCFILE e 
 		WHERE EDOC_CODE = #{edocCode}
 	</select>
 	

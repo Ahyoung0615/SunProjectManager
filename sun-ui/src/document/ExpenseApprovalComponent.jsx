@@ -46,28 +46,33 @@ const ExpenseApprovalComponent = () => {
     const [storeInfo, setStoreInfo] = useState();
     const [totalPrice, setTotalPrice] = useState();
 
-    const [items,setItems] = useState({
+    const [items, setItems] = useState({
         name: [],
         price: [],
         count: []
     });
 
     const handleItemChange = (index, field, value) => {
-        console.log(items);
         const updatedItems = [...items];
-        updatedItems[index] = {
-            ...updatedItems[index],
-            [field]: value
-        };
+        
+        // price와 같이 중첩된 구조인 필드의 경우 추가로 처리
+        if (field === 'price') {
+            updatedItems[index].price.price = value.price;
+        } else {
+            updatedItems[index][field] = value;
+        }
+        
+        console.log(updatedItems)
         setItems(updatedItems);
     };
+
 
     useEffect(() => {
         const today = new Date();
         const formattedDate = formatLocalDate(today);
         setCurrentDate(formattedDate);
     }, []);
-    
+
     useEffect(() => {
         const sessionStorageInfo = window.sessionStorage.getItem("user");
         if (sessionStorageInfo) {
@@ -182,12 +187,12 @@ const ExpenseApprovalComponent = () => {
                 console.log(res.data.images[0].receipt.result);
                 const result = res.data.images[0].receipt.result;
                 setStoreInfo(result.storeInfo.name.text);
-                
+
                 setStartDate(formatLocalDate(createDateFromObject(result.paymentInfo.date.formatted))); // Date 객체로 설정
-    
+
                 console.log(formatLocalDate(createDateFromObject(result.paymentInfo.date.formatted)));
                 setTotalPrice(result.totalPrice.price.text);
-                if(result.subResults[0] != null){
+                if (result.subResults[0] != null) {
                     setItems(result.subResults[0].items);
                 }
                 setReceiptImageErrorMessage('');
@@ -203,7 +208,7 @@ const ExpenseApprovalComponent = () => {
             alert("필수값을 모두 입력해 주세요");
             return;
         }
-        
+
         const date = new Date();
         const serverSendDate = formatLocalDate(date);
 
@@ -235,7 +240,7 @@ const ExpenseApprovalComponent = () => {
         })
             .then((res) => {
                 console.log(res.data);
-                
+
                 const fileFormData = new FormData();
                 fileFormData.append("edocCode", res.data);
                 fileFormData.append("receipt", receiptImage);
@@ -243,8 +248,9 @@ const ExpenseApprovalComponent = () => {
                 axios.post("http://localhost:8787/api/edoc/insertEDocFile", fileFormData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    }})
-                .then((res) => navigate('/documentList'))
+                    }
+                })
+                    .then((res) => navigate('/documentList'))
             })
             .catch((error) => console.log(error));
     };
@@ -283,7 +289,7 @@ const ExpenseApprovalComponent = () => {
         })
             .then((res) => {
                 console.log(res.data);
-                
+
                 const fileFormData = new FormData();
                 fileFormData.append("edocCode", res.data);
                 fileFormData.append("receipt", receiptImage);
@@ -291,13 +297,14 @@ const ExpenseApprovalComponent = () => {
                 axios.post("http://localhost:8787/api/edoc/insertEDocFile", fileFormData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    }})
-                .then((res) => navigate('/documentList'))
-            }) 
+                    }
+                })
+                    .then((res) => navigate('/documentList'))
+            })
             .catch((error) => console.log(error));
     };
 
-    
+
 
     return (
         <div className={styles.vacationDocContainer}>
@@ -310,7 +317,7 @@ const ExpenseApprovalComponent = () => {
             <h1 className={styles.vacationDocHeader}>지출 결의서</h1>
 
             <form>
-                <table className={styles.vacationDocTable} 
+                <table className={styles.vacationDocTable}
                     style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
                     <thead>
                         <tr>
@@ -323,26 +330,26 @@ const ExpenseApprovalComponent = () => {
                     </thead>
                     <tbody>
                         <tr>
-                        {selectedApprovers.map((approver) => (
+                            {selectedApprovers.map((approver) => (
                                 <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                     {approver.empCode == sessionEmpCode ? (
-                                        <img 
+                                        <img
                                             src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
-                                            alt='싸인' 
-                                            style={{ 
-                                                width: '80px', 
-                                                height: 'auto', 
+                                            alt='싸인'
+                                            style={{
+                                                width: '80px',
+                                                height: 'auto',
                                                 objectFit: 'contain',
                                                 minHeight: '50px', // 최소 높이 설정
                                                 maxHeight: '50px'  // 최대 높이 설정
-                                            }} 
+                                            }}
                                         />
                                     ) : (
-                                        <div 
-                                            style={{ 
-                                                width: '80px', 
+                                        <div
+                                            style={{
+                                                width: '80px',
                                                 height: '50px' // 빈 공간을 위한 최소 높이
-                                            }} 
+                                            }}
                                         />
                                     )}
                                 </td>
@@ -355,11 +362,11 @@ const ExpenseApprovalComponent = () => {
                     <tbody>
                         <tr>
                             <th>문서 제목</th>
-                            <td><input type='text' onChange={(e) => setDocTitle(e.target.value)}/></td>
+                            <td><input type='text' onChange={(e) => setDocTitle(e.target.value)} /></td>
                         </tr>
                         <tr>
                             <th>사용처</th>
-                            <td><input type='text' value={storeInfo} onChange={(e) => setStoreInfo(e.target.value)}/></td>
+                            <td><input type='text' value={storeInfo} onChange={(e) => setStoreInfo(e.target.value)} /></td>
                         </tr>
                         <tr>
                             <th>지출일</th>
@@ -381,7 +388,7 @@ const ExpenseApprovalComponent = () => {
                         </tr>
                         <tr>
                             <th>결제 금액</th>
-                            <td><input type='text' value={totalPrice} onChange={(e) => setTotalPrice(e.target.value)}/></td>
+                            <td><input type='text' value={totalPrice} onChange={(e) => setTotalPrice(e.target.value)} /></td>
                         </tr>
                         {items.length > 0 && (
                             <tr>
@@ -391,9 +398,13 @@ const ExpenseApprovalComponent = () => {
                                         <tbody>
                                             {items.map((item, index) => (
                                                 <tr key={index}>
-                                                    <td><input type='text' value={item.name.text} onChange={(e) => handleItemChange(index, 'name', { text: e.target.value })}/></td>
-                                                    <td>{item.price.price.text}원</td>
-                                                    <td>{item.count.text}개</td>
+                                                    <td><input type='text' value={item.name.text} onChange={(e) => handleItemChange(index, 'name', { text: e.target.value })} /></td>
+                                                    <td><input type='text' value={item.price.price.text} onChange={(e) =>
+                                                        handleItemChange(index, 'price', {
+                                                            price: { ...item.price.price, text: e.target.value }
+                                                        })
+                                                    } /></td>
+                                                    <td><input type='text' value={item.count.text} onChange={(e) => handleItemChange(index, 'count', { text: e.target.value })} /></td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -404,25 +415,25 @@ const ExpenseApprovalComponent = () => {
                         <tr>
                             <th>영수증</th>
                             <td>
-                                <input type='file' accept="image/jpg, image/png" onChange={handleReceiptFileChange}/>
+                                <input type='file' accept="image/jpg, image/png" onChange={handleReceiptFileChange} />
                                 <button type='button' className="btn btn-primary" onClick={handleReceiptUpload}>등록</button>
                                 {receiptImageErrorMessage && <p style={{ color: 'red' }}>{receiptImageErrorMessage}</p>}
                             </td>
                         </tr>
                         {receiptImagePreview && (
-                                <tr>
-                                    <td colSpan="2">
-                                        <div>
-                                            <h5>영수증</h5>
-                                            <img
-                                                src={receiptImagePreview}
-                                                alt="receipt Preview"
-                                                style={{ maxWidth: '50%', height: 'auto' }}
-                                            />
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
+                            <tr>
+                                <td colSpan="2">
+                                    <div>
+                                        <h5>영수증</h5>
+                                        <img
+                                            src={receiptImagePreview}
+                                            alt="receipt Preview"
+                                            style={{ maxWidth: '50%', height: 'auto' }}
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </form>

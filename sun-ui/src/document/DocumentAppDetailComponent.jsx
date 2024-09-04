@@ -22,6 +22,11 @@ const DocumentAppDetailComponent = () => {
     const [sessionEmp, setSessionEmp] = useState();
     const [docEmpCode, setDocEmpCode] = useState();
     const [signatureImage, setSignatureImage] = useState({});
+    const [docType, setDocType] = useState();
+    const [items, setItems] = useState([]);
+    const [totalPrice, setTotalPrice] = useState();
+    const [storeInfo, setStoreInfo] = useState();
+    const [receiptImage, setReceiptImage] = useState();
 
 
     useEffect(() => {
@@ -51,12 +56,23 @@ const DocumentAppDetailComponent = () => {
                 .then((res) => {
                     console.log(res.data);
                     const tempJsonData = JSON.parse(res.data.edocContent);
+                    console.log(tempJsonData);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
                     setReason(tempJsonData.reason);
                     setWeekdayCount(tempJsonData.weekdayCount);
                     setDocTitle(res.data.edocTitle);
                     setDocEmpCode(res.data.empCode);
+                    setDocType(res.data.edocType);
+                    setItems(tempJsonData.items);
+                    setTotalPrice(tempJsonData.totalPrice);
+                    setStoreInfo(tempJsonData.storeInfo);
+                    if (res.data.edocType == 'E') {
+                        axios.get("http://localhost:8787/api/edoc/getDocFile", { params: { edocCode } })
+                            .then((res) => {
+                                setReceiptImage(res.data);
+                            }).catch((error) => console.error(error))
+                    }
                 })
                 .catch((error) => console.log(error));
 
@@ -181,87 +197,194 @@ const DocumentAppDetailComponent = () => {
                     </div>
                 }
             />
-            <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
-            <form>
-                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
-                    <thead>
-                        <tr>
-                            {selectedApprovers.map((approver) => (
-                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
-                                    {approver.empName} {approver.jobName}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            {selectedApprovers.map((approver) => (
-                                <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                    {approver.edclStatus === 'S' ? (
-                                        <img
-                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
-                                            alt='싸인'
-                                            style={{
-                                                width: '80px',
-                                                height: 'auto',
-                                                objectFit: 'contain',
-                                                minHeight: '50px',
-                                                maxHeight: '50px'
-                                            }}
-                                        />
-                                    ) : (
-                                        <div style={{ width: '80px', height: '50px' }} />
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    </tbody>
-                </table>
+            {
+                docType == 'V' && (
+                    <>
+                        <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
+                        <form>
+                            <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
+                                <thead>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                                {approver.empName} {approver.jobName}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                                {approver.edclStatus === 'S' ? (
+                                                    <img
+                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        alt='싸인'
+                                                        style={{
+                                                            width: '80px',
+                                                            height: 'auto',
+                                                            objectFit: 'contain',
+                                                            minHeight: '50px',
+                                                            maxHeight: '50px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '80px', height: '50px' }} />
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                <table className={styles.vacationDocTable}>
-                    <tbody>
-                        <tr>
-                            <th>문서 제목</th>
-                            <td>
-                                <span>{docTitle}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>기간</th>
-                            <td colSpan="3">
-                                <span>{startDate ? startDate.toLocaleDateString() : ''} ~ {endDate ? endDate.toLocaleDateString() : ''}</span>
-                                <p>사용일수: {weekdayCount}일</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>사유</th>
-                            <td colSpan="3">
-                                <span>{reason}</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </form>
+                            <table className={styles.vacationDocTable}>
+                                <tbody>
+                                    <tr>
+                                        <th>문서 제목</th>
+                                        <td>
+                                            <span>{docTitle}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>기간</th>
+                                        <td colSpan="3">
+                                            <span>{startDate ? startDate.toLocaleDateString() : ''} ~ {endDate ? endDate.toLocaleDateString() : ''}</span>
+                                            <p>사용일수: {weekdayCount}일</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사유</th>
+                                        <td colSpan="3">
+                                            <span>{reason}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
 
-            <div className={styles.vacationDocSignatureSection}>
-                <p className={styles.vacationDocSignature}>위와 같이 휴가를 신청하오니 허락하여 주시기 바랍니다.</p>
+                        <div className={styles.vacationDocSignatureSection}>
+                            <p className={styles.vacationDocSignature}>위와 같이 휴가를 신청하오니 허락하여 주시기 바랍니다.</p>
 
-                <div className={styles.vacationDocDate}>
-                    <p className={styles.signature}>{currentDate}</p>
-                </div>
+                            <div className={styles.vacationDocDate}>
+                                <p className={styles.signature}>{currentDate}</p>
+                            </div>
 
-                <p className={styles.vacationDocSignature}>부서: {empInfo.deptName}</p>
-                <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
-            </div>
+                            <p className={styles.vacationDocSignature}>부서: {empInfo.deptName}</p>
+                            <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
+                            <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
+                        </div>
+                    </>
+                )}
+            {
+                docType == 'E' && (
+                    <>
+                        <h1 className={styles.vacationDocHeader}>지출결의서</h1>
+                        <form>
+                            <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
+                                <thead>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                                {approver.empName} {approver.jobName}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                                {approver.edclStatus === 'S' ? (
+                                                    <img
+                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        alt='싸인'
+                                                        style={{
+                                                            width: '80px',
+                                                            height: 'auto',
+                                                            objectFit: 'contain',
+                                                            minHeight: '50px',
+                                                            maxHeight: '50px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '80px', height: '50px' }} />
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
 
+                            <table className={styles.vacationDocTable}>
+                                <tbody>
+                                    <tr>
+                                        <th>문서 제목</th>
+                                        <td>
+                                            <span>{docTitle}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사용처</th>
+                                        <td>
+                                            <span>{storeInfo}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>결제 금액</th>
+                                        <td>
+                                            <span>{totalPrice}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>세부 결제 내역</th>
+                                        <td>
+                                            <table>
+                                                <tbody>
+                                                    {items.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td><span>{item.name}</span></td>
+                                                            <td><span>{item.price}원</span></td>
+                                                            <td><span>{item.count}개</span></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사유</th>
+                                        <td colSpan="3">
+                                            <span>{reason}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>영수증</th>
+                                        <td>
+                                            <img src={receiptImage} />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <div className={styles.vacationDocSignatureSection}>
+                            <p className={styles.vacationDocSignature}>위와 같이 지출을 신청하오니 허락하여 주시기 바랍니다.</p>
+
+                            <div className={styles.vacationDocDate}>
+                                <p className={styles.signature}>{currentDate}</p>
+                            </div>
+
+                            <p className={styles.vacationDocSignature}>부서: {empInfo.deptName}</p>
+                            <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
+                            <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
+                        </div>
+                    </>
+                )}
             {
                 status == 'A' && (
                     <div
                         className={styles.buttonContainer}
                         style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }} >
-                    
-                        {/* 반려 버튼 */}
+
                         <input
                             type='button'
                             value="반려"
@@ -274,7 +397,6 @@ const DocumentAppDetailComponent = () => {
                             }}
                         />
 
-                        {/* 승인 버튼 */}
                         <input
                             type='button'
                             value="승인"

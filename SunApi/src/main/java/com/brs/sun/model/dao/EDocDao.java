@@ -32,11 +32,15 @@ public interface EDocDao {
 	
 	boolean updateEDoc(EDocVo vo);
 	
+	boolean updateEDocFile(int edocCode, String efileName);
+	
 	boolean deleteAppList(EDocVo vo);
 	
 	EDocVo selectTempDocDetail(int edocCode);
 	
 	EDocVo selectDocDetail(int edocCode);
+	
+	EDocFileVo selectDocFile(int edocCode);
 	
 	List<EDocLineResponseDTO> selectEDocLine(int edocCode);
 	
