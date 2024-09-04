@@ -51,6 +51,24 @@ public class BTripController {
 			List<Event> holidays = holidayService.getAllHolidaysFromRedisAsEvents();
 			return new ResponseEntity<>(holidays, HttpStatus.OK);
 	    }
+	 
+	 @PostMapping("/insertholiday")
+	 public void insertHoliday(@RequestBody Map<String, Object> holidayData){
+	     String name = (String) holidayData.get("name");
+	     Map<String, String> startDateMap = (Map<String, String>) holidayData.get("startDate");
+	     Map<String, String> endDateMap = (Map<String, String>) holidayData.get("endDate");
+
+	     String startDate = startDateMap.get("date");
+	     String endDate = endDateMap.get("date");
+
+	     log.info("입력 공휴일 이름 : {}", name);
+	     log.info("입력 공휴일 시작 날짜 : {}", startDate);
+	     log.info("입력 공휴일 종료 날짜 : {}", endDate);
+
+	     holidayService.insertHoliday(name, startDate, endDate);
+	 }
+
+
 
 	@GetMapping("/btripDetail/{btripCode}")
 	public BTripVo getOneBTrip(@PathVariable("btripCode") String bTripCode, @RequestParam String empCode) {

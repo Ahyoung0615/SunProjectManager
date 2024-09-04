@@ -59,21 +59,27 @@ const holidayEvents = holidays.map((holiday, index) => {
     }
 
     function renderEventContent(eventInfo) {
-        const isTripEvent = eventInfo.event.backgroundColor === '#007bff';
         const eventStyle = {
-            color: isTripEvent ? 'white' : 'black',
+            color: 'black', // 텍스트 색상
             textAlign: 'center',
             width: '100%',
-            display: 'block'
+            height: '100%', // 높이를 전체 셀로 확장
+            display: 'flex', // 플렉스 박스를 사용하여 가운데 정렬
+            justifyContent: 'center', // 가로 방향 중앙 정렬
+            alignItems: 'center', // 세로 방향 중앙 정렬
+            backgroundColor: eventInfo.backgroundColor || '#007bff', // 배경색 지정
+            borderRadius: '4px', // 테두리 반경을 설정하여 모서리를 둥글게
+            padding: '2px' // 텍스트 주위에 여백 추가
         };
-
+    
         return (
             <div style={eventStyle}>
                 <i>{eventInfo.event.title}</i>
             </div>
         );
     }
-
+    
+    
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', backgroundColor: '#C3EFFF' }}>
             <div style={{ width: 1200, marginTop: 8, marginBottom: 8, backgroundColor: 'white' }}>
