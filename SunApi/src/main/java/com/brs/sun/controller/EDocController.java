@@ -419,4 +419,9 @@ public class EDocController {
 		Map<Integer, String> map = docService.selectEmployeeSignatures(empCodes);
 		return map;
 	}
+	
+	@GetMapping("/getDocFile")
+	public String selectDocFile(@RequestParam int edocCode) {
+		return docService.selectDocFile(edocCode);
+	}
 }

@@ -155,7 +155,7 @@ public class EDocServiceImpl implements EDocService {
 
                     String base64Encoded = Base64.getEncoder().encodeToString(empSigBytes);
                     
-                    String empSigBase64 = "data:image/" + (employeeVo.getEmpSig().substring(employeeVo.getEmpSig().lastIndexOf(".") + 1)) +";base64," + base64Encoded;
+                    String empSigBase64 = "data:image/" + (employeeVo.getEmpSig().substring(employeeVo.getEmpSig().lastIndexOf(".") + 1)) + ";base64," + base64Encoded;
                     map.put(employeeVo.getEmpCode(), empSigBase64);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -166,6 +166,30 @@ public class EDocServiceImpl implements EDocService {
         }
         System.out.println("map "+map);
         return map;
+	}
+	
+	@Override
+	public String selectDocFile(int edocCode) {
+		EDocFileVo fileVo = dao.selectDocFile(edocCode);
+		
+		if(fileVo.getEfileName() != null) {
+			File docFile = new File(eodcFilePath + "/" + fileVo.getEfileName()); 
+			try(FileInputStream fileInputStream = new FileInputStream(docFile)) {
+				byte[] docFileByte = new byte[(int) docFile.length()];
+				fileInputStream.read(docFileByte);
+				
+				String base64Encoded = Base64.getEncoder().encodeToString(docFileByte);
+				
+				String docFileToBase64 = "data:image/" + (fileVo.getEfileName().substring(fileVo.getEfileName().lastIndexOf(".") + 1)) + ";base64," + base64Encoded;
+				
+				return docFileToBase64;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			return null;
+		}
+		return null;
 	}
 	
 	@Override

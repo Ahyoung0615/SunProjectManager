@@ -30,6 +30,8 @@ public interface EDocService {
 	
 	boolean updateEDoc(EDocVo vo, List<EDocLineVo> edocLineList);
 	
+//	boolean updateEDocFile(int edocCode, MultipartFile efileName, List<EDocLineVo> edocLineList);
+	
 	boolean updateMyAppStatus(EDocVo vo);
 
 	TempEDocDetailResponseDTO selectTempDocDetail(int edocCode);
@@ -37,6 +39,8 @@ public interface EDocService {
 	EDocDetailResponseDTO selectDocDetail(int edocCode);
 	
 	List<EDocLineResponseDTO> selectEDocLine(int edocCode);
+	
+	String selectDocFile(int edocCode);
 	
 	boolean appSuccess(Map<String, Object> map);
 	

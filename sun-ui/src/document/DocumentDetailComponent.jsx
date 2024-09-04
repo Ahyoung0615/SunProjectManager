@@ -30,6 +30,11 @@ const DocumentTempDetailComponent = () => {
     const [edocStatus, setEdocStatus] = useState('');
     const [docReply, setDocReply] = useState(null);
     const [docEmpCode, setDocEmpCode] = useState();
+    const [docType, setDocType] = useState();
+    const [items, setItems] = useState([]);
+    const [totalPrice, setTotalPrice] = useState();
+    const [storeInfo, setStoreInfo] = useState();
+    const [receiptImage, setReceiptImage] = useState();
 
     useEffect(() => {
         const today = new Date();
@@ -76,7 +81,8 @@ const DocumentTempDetailComponent = () => {
                 .then((res) => {
                     const tempJsonData = JSON.parse(res.data.edocContent);
                     const reply = JSON.parse(res.data.edocReply);
-                    console.log(reply);
+                    console.log(res.data);
+                    console.log(tempJsonData)
                     setDocReply(reply);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
@@ -84,33 +90,43 @@ const DocumentTempDetailComponent = () => {
                     setDocTitle(res.data.edocTitle);
                     setEdocStatus(res.data.edocStatus);
                     setDocEmpCode(res.data.empCode);
+                    setDocType(res.data.edocType);
+                    setItems(tempJsonData.items);
+                    setTotalPrice(tempJsonData.totalPrice);
+                    setStoreInfo(tempJsonData.storeInfo);
                     const serverDocDate = new Date(res.data.edocDate);
                     const formattedDate = `${serverDocDate.getFullYear()}년 ${String(serverDocDate.getMonth() + 1).padStart(2, '0')}월 ${String(serverDocDate.getDate()).padStart(2, '0')}일`;
                     setCurrentDate(formattedDate);
+                    if (res.data.edocType == 'E') {
+                        axios.get("http://localhost:8787/api/edoc/getDocFile", { params: { edocCode } })
+                            .then((res) => {
+                                setReceiptImage(res.data);
+                            }).catch((error) => console.error(error))
+                    }
                 })
                 .catch((error) => console.log(error));
 
-                axios.get("http://localhost:8787/api/edoc/getEDocAppList", { params: { edocCode } })
-                    .then((res) => {
-                        const approvers = res.data;
-                        if (sessionEmpCode) {
-                            const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
-                            const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
+            axios.get("http://localhost:8787/api/edoc/getEDocAppList", { params: { edocCode } })
+                .then((res) => {
+                    const approvers = res.data;
+                    if (sessionEmpCode) {
+                        const sessionApprover = approvers.find(a => a.empCode === sessionEmpCode);
+                        const filteredApprovers = approvers.filter(a => a.empCode !== sessionEmpCode);
 
-                            axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
-                                setSignatureImage(res.data);
+                        axios.get("http://localhost:8787/api/edoc/getEmpSignatures?empCodes=" + filteredApprovers.map(approvers => approvers.empCode)).then((res) => {
+                            setSignatureImage(res.data);
 
-                                setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
-                            });
+                            setSelectedApprovers(sessionApprover ? [sessionApprover, ...filteredApprovers] : filteredApprovers);
+                        });
 
-                            
-                        } else {
-                            setSelectedApprovers(approvers);
-                        }
-                    })
-                    .catch((error) => console.log(error));
-                setDocCode(edocCode);
-            }
+
+                    } else {
+                        setSelectedApprovers(approvers);
+                    }
+                })
+                .catch((error) => console.log(error));
+            setDocCode(edocCode);
+        }
     }, [edocCode, sessionEmpCode]);
 
     const employeeInfo = async (empCode) => {
@@ -274,138 +290,221 @@ const DocumentTempDetailComponent = () => {
                     disabled={!isEditMode}
                 />
             )}
-            <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
+            {
+                docType == 'V' && (
+                    <>
+                        <h1 className={styles.vacationDocHeader}>휴가 신청서</h1>
+                        <form>
+                            <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
+                                <thead>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                                {approver.empName} {approver.jobName}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                                {approver.edclStatus === 'S' ? (
+                                                    <img
+                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        alt='싸인'
+                                                        style={{
+                                                            width: '80px',
+                                                            height: 'auto',
+                                                            objectFit: 'contain',
+                                                            minHeight: '50px',
+                                                            maxHeight: '50px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '80px', height: '50px' }} />
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
 
-            <form>
-                <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px' }}>
-                    <thead>
-                        <tr>
-                            {selectedApprovers.map((approver) => (
-                                <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px', textAlign: 'center'}}>
-                                    {approver.empName} {approver.jobName}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            {selectedApprovers.map((approver) => (
-                                <td key={approver.empCode} empNo={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                    {approver.edclStatus === 'S' || approver.empCode == sessionEmpCode ? (
-                                        <img
-                                            src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
-                                            alt='싸인'
-                                            style={{
-                                                width: '80px',
-                                                height: 'auto',
-                                                objectFit: 'contain',
-                                                minHeight: '50px',
-                                                maxHeight: '50px'
-                                            }}
-                                        />
-                                    ) : (
-                                        <div style={{ width: '80px', height: '50px' }} />
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    </tbody>
-                </table>
+                            <table className={styles.vacationDocTable}>
+                                <tbody>
+                                    <tr>
+                                        <th>문서 제목</th>
+                                        <td>
+                                            {isEditMode ? (
+                                                <input type='text' value={docTitle} onChange={(e) => setDocTitle(e.target.value)} />
+                                            ) : (
+                                                <span>{docTitle}</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>기간</th>
+                                        <td colSpan="3">
+                                            {isEditMode ? (
+                                                <div className={styles.dateRangeContainer}>
+                                                    <DatePicker
+                                                        selected={startDate}
+                                                        onChange={(date) => setStartDate(date)}
+                                                        dateFormat="yyyy-MM-dd"
+                                                        className={styles.dateInput}
+                                                        placeholderText="시작일"
+                                                        dayClassName={getDayClassName}
+                                                    />
+                                                    <span className={styles.dateSeparator}>~</span>
+                                                    <DatePicker
+                                                        selected={endDate}
+                                                        onChange={(date) => setEndDate(date)}
+                                                        dateFormat="yyyy-MM-dd"
+                                                        className={styles.dateInput}
+                                                        placeholderText="종료일"
+                                                        dayClassName={getDayClassName}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span>{startDate ? startDate.toLocaleDateString() : ''} ~ {endDate ? endDate.toLocaleDateString() : ''}</span>
+                                            )}
+                                            {dateError && <p className={styles.dateError}>{dateError}</p>}
+                                            {weekdayCount !== null && !dateError && <p>사용일수: {weekdayCount}일</p>}
+                                            {remainingDays !== null && edocStatus != 'S' && edocStatus != 'A' && (
+                                                <p className={remainingDays < 0 ? styles.balanceError : ''}>
+                                                    잔여 연차: {remainingDays}일
+                                                </p>
+                                            )}
+                                            {balanceError && <p className={styles.balanceError}>{balanceError}</p>}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사유</th>
+                                        <td colSpan="3">
+                                            <span>{reason}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
 
-                <table className={styles.vacationDocTable}>
-                    <tbody>
-                        <tr>
-                            <th>문서 제목</th>
-                            <td>
-                                {isEditMode ? (
-                                    <input type='text' value={docTitle} onChange={(e) => setDocTitle(e.target.value)} />
-                                ) : (
-                                    <span>{docTitle}</span>
-                                )}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>잔여 연차</th>
-                            <td>{dayOffLeft}</td>
-                        </tr>
-                        <tr>
-                            <th>기간</th>
-                            <td colSpan="3">
-                                {isEditMode ? (
-                                    <div className={styles.dateRangeContainer}>
-                                        <DatePicker
-                                            selected={startDate}
-                                            onChange={(date) => setStartDate(date)}
-                                            dateFormat="yyyy-MM-dd"
-                                            className={styles.dateInput}
-                                            placeholderText="시작일"
-                                            dayClassName={getDayClassName}
-                                        />
-                                        <span className={styles.dateSeparator}>~</span>
-                                        <DatePicker
-                                            selected={endDate}
-                                            onChange={(date) => setEndDate(date)}
-                                            dateFormat="yyyy-MM-dd"
-                                            className={styles.dateInput}
-                                            placeholderText="종료일"
-                                            dayClassName={getDayClassName}
-                                        />
-                                    </div>
-                                ) : (
-                                    <span>{startDate ? startDate.toLocaleDateString() : ''} ~ {endDate ? endDate.toLocaleDateString() : ''}</span>
-                                )}
-                                {dateError && <p className={styles.dateError}>{dateError}</p>}
-                                {weekdayCount !== null && !dateError && <p>사용일수: {weekdayCount}일</p>}
-                                {remainingDays !== null && edocStatus != 'S' && edocStatus != 'A' && (
-                                    <p className={remainingDays < 0 ? styles.balanceError : ''}>
-                                        잔여 연차: {remainingDays}일
-                                    </p>
-                                )}
-                                {balanceError && edocStatus != 'S' && <p className={styles.balanceError}>{balanceError}</p>}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>사유</th>
-                            <td colSpan="3">
-                                {isEditMode ? (
-                                    <input type='text' value={reason} onChange={(e) => setReason(e.target.value)} />
-                                ) : (
-                                    <span>{reason}</span>
-                                )}
-                            </td>
-                        </tr>
-                    </tbody>
-                    <br></br>
-                    {docReply != null && edocStatus == 'R' && (
-                        <tfoot>
-                            <tr>
-                                <th>반려자</th>
-                                <td>{docReply.deptName} {docReply.empName} {docReply.jobName}</td>
-                            </tr>
-                            <tr>
-                                <th>반려 사유</th>
-                                <td>{docReply.reason}</td>
-                            </tr>
-                            <tr>
-                                <th>반려 날짜</th>
-                                <td>{docReply.rejectDate}</td>
-                            </tr>
-                        </tfoot>
-                    )}
-                </table>
-            </form>
+                        <div className={styles.vacationDocSignatureSection}>
+                            <p className={styles.vacationDocSignature}>위와 같이 휴가를 신청하오니 허락하여 주시기 바랍니다.</p>
 
-            <div className={styles.vacationDocSignatureSection}>
-                <p className={styles.vacationDocSignature}>위와 같이 휴가를 신청하오니 허락하여 주시기 바랍니다.</p>
+                            <div className={styles.vacationDocDate}>
+                                <p className={styles.signature}>{currentDate}</p>
+                            </div>
 
-                <div className={styles.vacationDocDate}>
-                    <p className={styles.signature}>{currentDate}</p>
-                </div>
+                            <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
+                            <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
+                            <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
+                        </div>
+                    </>
+                )}
+            {
+                docType == 'E' && (
+                    <>
+                        <h1 className={styles.vacationDocHeader}>지출결의서</h1>
+                        <form>
+                            <table className={styles.vacationDocTable} style={{ width: '40%', marginLeft: 'auto', marginBottom: '10px', textAlign: 'center' }}>
+                                <thead>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <th key={approver.empCode} style={{ fontSize: '12px', padding: '5px' }}>
+                                                {approver.empName} {approver.jobName}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {selectedApprovers.map((approver) => (
+                                            <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
+                                                {approver.edclStatus === 'S' ? (
+                                                    <img
+                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        alt='싸인'
+                                                        style={{
+                                                            width: '80px',
+                                                            height: 'auto',
+                                                            objectFit: 'contain',
+                                                            minHeight: '50px',
+                                                            maxHeight: '50px'
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '80px', height: '50px' }} />
+                                                )}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
-                <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
-                <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
-            </div>
+                            <table className={styles.vacationDocTable}>
+                                <tbody>
+                                    <tr>
+                                        <th>문서 제목</th>
+                                        <td>
+                                            <span>{docTitle}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사용처</th>
+                                        <td>
+                                            <span>{storeInfo}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>결제 금액</th>
+                                        <td>
+                                            <span>{totalPrice}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>세부 결제 내역</th>
+                                        <td>
+                                            <table>
+                                                <tbody>
+                                                    {items.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td><span>{item.name}</span></td>
+                                                            <td><span>{item.price}원</span></td>
+                                                            <td><span>{item.count}개</span></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>사유</th>
+                                        <td colSpan="3">
+                                            <span>{reason}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>영수증</th>
+                                        <td>
+                                            <img src={receiptImage} />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <div className={styles.vacationDocSignatureSection}>
+                            <p className={styles.vacationDocSignature}>위와 같이 지출을 신청하오니 허락하여 주시기 바랍니다.</p>
+
+                            <div className={styles.vacationDocDate}>
+                                <p className={styles.signature}>{currentDate}</p>
+                            </div>
+
+                            <p className={styles.vacationDocSignature}>부서: {empDeptCodeToText}</p>
+                            <p className={styles.vacationDocSignature}>성명: {empInfo.empName}</p>
+                            <h1 className={styles.companyName}>주식회사 썬 컴퍼니&nbsp;&nbsp;&nbsp;직인</h1>
+                        </div>
+                    </>
+                )}
 
             <div
                 className={styles.buttonContainer}

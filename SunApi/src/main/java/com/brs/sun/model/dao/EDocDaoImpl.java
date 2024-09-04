@@ -65,6 +65,14 @@ public class EDocDaoImpl implements EDocDao {
 	}
 	
 	@Override
+	public boolean updateEDocFile(int edocCode, String efileName) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("edocCode", edocCode);
+		map.put("efileName", efileName);
+		return (template.update(NS + "updateEDocFile", map) > 0) ? true : false;
+	}
+	
+	@Override
 	public boolean deleteAppList(EDocVo vo) {
 		return (template.delete(NS + "deleteAppList", vo) > 0) ? true : false;
 	}
@@ -87,6 +95,11 @@ public class EDocDaoImpl implements EDocDao {
 	@Override
 	public EDocVo selectDocDetail(int edocCode) {
 		return template.selectOne(NS + "selectDocDetail", edocCode);
+	}
+	
+	@Override
+	public EDocFileVo selectDocFile(int edocCode) {
+		return template.selectOne(NS + "selectDocFile", edocCode);
 	}
 	
 	@Override
