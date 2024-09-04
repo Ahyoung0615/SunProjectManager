@@ -1,16 +1,19 @@
-import FullCalendar from '@fullcalendar/react';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import googleCalendarPlugin from '@fullcalendar/google-calendar';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import  googleCalendarPlugin  from '@fullcalendar/google-calendar';
 
 const VacationListComponent = () => {
     const [holidays, setHolidays] = useState([]);
-    const navigator = useNavigate();
+    const [newHoliday, setNewHoliday] = useState({ summary: '', startDate: '' });
+    const [insertNewDay, setInsertNewDay] = useState(false);
 
-    const apiKey = 'AIzaSyAMJA5opuUkb9_PAOeE2qaGiPPoWz-ryJE';
+    const navigate = useNavigate();
+
+    const apiKey = 'YOUR_GOOGLE_CALENDAR_API_KEY_HERE'; // 여기에 Google Calendar API 키를 입력하세요.
 
     useEffect(() => {
         const fetchHolidays = async () => {
@@ -24,15 +27,32 @@ const VacationListComponent = () => {
         };
 
         fetchHolidays();
-    }, []);
+    }, [insertNewDay]);
 
-    const handleHoliday = () => {
+    const handleHolidaySubmit = async () => {
+        console.log(typeof newHoliday.startDate);
+        const startDateString = new Date(newHoliday.startDate).toISOString().split('T')[0];
+        const newHolidayEvent = {
+            name: newHoliday.summary,
+            startDate: { date: startDateString },
+            endDate: { date: startDateString }
+        };
+        // 새 공휴일 이벤트 추가
+        setHolidays([...holidays, newHolidayEvent]);
 
-        
-    }
+        try {
+            const response = await axios.post('http://localhost:8787/api/insertholiday', newHolidayEvent);
+            if (response.status === 200) {
+                console.log('공휴일 입력 완료');
+                setInsertNewDay(!insertNewDay);
+            }
+        } catch (error) {
+            console.error('공휴일 입력 실패', error);
+        }
 
+        setNewHoliday({ summary: '', startDate: '' });
+    };
 
-    // 공휴일 데이터를 FullCalendar 이벤트로 변환
     const holidayEvents = holidays.map((holiday, index) => {
         const event = {
             id: holiday.id || `holiday-${index}`,
@@ -45,25 +65,24 @@ const VacationListComponent = () => {
             textColor: 'red',
         };
 
-        // start가 null인 경우 해당 이벤트를 건너뜁니다.
         if (!event.start) {
             console.warn(`Skipping holiday event due to missing start date: ${holiday.summary}`);
-            return null; // null을 반환하여 이 이벤트를 무시합니다.
+            return null;
         }
 
-        // 이벤트 데이터 콘솔에 출력
         console.log('Holiday Event:', event);
-
         return event;
-    }).filter(event => event !== null); // null 값을 필터링하여 제외합니다.
+    }).filter(event => event !== null);
 
     function renderEventContent(eventInfo) {
-        const isTripEvent = eventInfo.event.backgroundColor === '#007bff';
         const eventStyle = {
-            color: isTripEvent ? 'white' : 'black',
+            color: eventInfo.event.textColor || 'black',
             textAlign: 'center',
             width: '100%',
-            display: 'block'
+            display: 'block',
+            position: 'relative',
+            top: '60%',
+            transform: 'translateY(-50%)'
         };
 
         return (
@@ -72,35 +91,58 @@ const VacationListComponent = () => {
             </div>
         );
     }
+
     return (
-        <div className="container" style={{ marginTop: 30, maxWidth: '80%' }}>
-        <br></br>
-        <h4>공휴일 관리</h4>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', backgroundColor: '#C3EFFF' }}>
-            <div style={{ width: 1200, marginTop: 8, marginBottom: 8, backgroundColor: 'white' }}>
-                <FullCalendar
-                    plugins={[dayGridPlugin, interactionPlugin, googleCalendarPlugin]}
-                    initialView={"dayGridMonth"}
-                    googleCalendarApiKey={apiKey}
-                    headerToolbar={{
-                        start: "prev,next",
-                        center: "title",
-                        end: "today"
-                    }}
-                     eventSources={[
-                         {
-                             events: holidayEvents
-                         }
-                     ]}
-                    height={"70vh"}
-                    locale="ko"
-                    eventContent={renderEventContent}
-                />
+        <div className="container" style={{ marginTop: 30, maxWidth: '90%', display: 'flex' }}>
+            <div style={{ flex: 2, maxWidth: '70%', marginRight: 20 }}>
+                <h4>공휴일 관리</h4>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', backgroundColor: '#C3EFFF' }}>
+                    <div style={{ width: '100%', marginTop: 8, marginBottom: 8, backgroundColor: 'white' }}>
+                        <FullCalendar
+                            plugins={[dayGridPlugin, interactionPlugin, googleCalendarPlugin]}
+                            initialView="dayGridMonth"
+                            googleCalendarApiKey={apiKey}
+                            headerToolbar={{
+                                start: "prev,next",
+                                center: "title",
+                                end: "today"
+                            }}
+                            events={holidayEvents}
+                            height="70vh"
+                            locale="ko"
+                            eventContent={renderEventContent}
+                        />
+                    </div>
+                </div>
             </div>
-            <div><button className="btn btn-secondary" onClick={handleHoliday}>일정 입력</button></div>
-        </div>
-       
+
+            {/* 공휴일 입력 폼 */}
+            <div style={{ flex: 1, marginTop: 130 }}>
+                <h5>공휴일 일정 입력</h5>
+                <div style={{ padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+                    <div className="form-group">
+                        <label>공휴일 이름</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={newHoliday.summary}
+                            onChange={(e) => setNewHoliday({ ...newHoliday, summary: e.target.value })}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>날짜 선택</label>
+                        <input
+                            type="date"
+                            className="form-control"
+                            value={newHoliday.startDate}
+                            onChange={(e) => setNewHoliday({ ...newHoliday, startDate: e.target.value })}
+                        />
+                    </div>
+                    <button className="btn btn-primary mt-3" onClick={handleHolidaySubmit}>추가</button>
+                </div>
+            </div>
         </div>
     );
 };
+
 export default VacationListComponent;
