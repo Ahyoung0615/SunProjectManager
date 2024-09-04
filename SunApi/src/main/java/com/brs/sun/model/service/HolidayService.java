@@ -78,6 +78,20 @@ public class HolidayService {
             System.out.println("====데이터 캐싱 완료====");
         }
     }
+    
+    
+    //공휴일 입력 메서드
+    public void insertHoliday(String name, String startDate, String endDate) {
+        // 입력된 날짜가 유효한지 확인
+        if (!startDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: YYYY-MM-DD");
+        }
+        
+        String dateKey = "holiday:" + startDate;
+        redisTemplate.opsForValue().set(dateKey, name);
+        System.out.println("공휴일 입력 완료: " + name + " (" + startDate + ")");
+    }
+    
 
     // Redis에서 특정 날짜의 공휴일 정보를 조회하는 메서드
     public String getHoliday(String date) {
@@ -98,4 +112,6 @@ public class HolidayService {
                    })
                    .collect(Collectors.toList());
     }
+    
+    
 }
