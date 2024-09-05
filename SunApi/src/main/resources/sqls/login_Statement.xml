@@ -55,11 +55,11 @@
        WHERE EMP_CODE = #{empCode}
    </update>
 
-   <select id="getMemberImage" resultType="EmployeeVo">
-      SELECT *
-      FROM EMPLOYEE e 
-      WHERE EMP_CODE = #{empCode}
-   </select>
+	<select id="getMemberImage" resultType="EmployeeVo">
+		SELECT *
+		FROM EMPLOYEE e 
+		WHERE EMP_CODE = #{empCode}
+	</select>
 
     <!-- 사원 정보 삽입 쿼리 -->
     <insert id="insertEmployee" parameterType="EmployeeVo">

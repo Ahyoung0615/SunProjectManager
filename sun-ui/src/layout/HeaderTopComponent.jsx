@@ -55,7 +55,6 @@ const HeaderTopComponent = () => {
   }, []);
   // WebSocket 설정 및 메시지 처리
   useEffect(() => {
-
     const socket = new SockJS('http://localhost:8787/ws');
     const client = new Client({
         webSocketFactory: () => socket,
@@ -102,8 +101,12 @@ const HeaderTopComponent = () => {
         }
     };
 
-}, [chat, isChatModalOpen]);
-
+}, [chat, isChatModalOpen, userName]);
+useEffect(() => {
+  if (userName) {
+    handleChatRoomCreated();
+  }
+}, [userName]); 
 
   const handleChatRoomCreated = async () => {
     try {
@@ -184,7 +187,7 @@ const HeaderTopComponent = () => {
       <HeaderSearchComponent style={{ marginRight: 80 }} />
       <button 
         onClick={openChatModal} 
-        style={{ color: 'white', background: 'none', border: 'none', marginRight: 20, cursor: 'pointer', position: 'relative' }}
+        style={{ color: 'white', background: 'none', border: 'none', marginRight: 0, cursor: 'pointer', position: 'relative' }}
       >
         <i className="bi bi-chat-dots-fill"></i> 채팅
         {newMessageCount > 0 && (

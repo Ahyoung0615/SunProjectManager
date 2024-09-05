@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
 
 import org.springframework.http.MediaType;
 import org.springframework.core.io.PathResource;
@@ -160,27 +161,19 @@ public class BoardController {
 	//게시글 이미지 업로드
 	@PostMapping("/uploadImageBoard")
     public ResponseEntity<?> uploadImage(@RequestParam("upload") MultipartFile file) {
-        try {
-            // 고유한 파일 이름 생성
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir2 + File.separator + fileName);
+		try {
+	        // 파일의 바이트 데이터를 Base64로 인코딩
+	        String base64Image = Base64.getEncoder().encodeToString(file.getBytes());
 
-            // 파일 저장
-            Files.write(filePath, file.getBytes());
+	        // Base64 인코딩된 이미지 데이터를 CKEditor가 이해할 수 있는 응답으로 반환
+	        String base64ImageUrl = "data:" + file.getContentType() + ";base64," + base64Image;
 
-            // 파일 접근 가능한 URL 생성
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/memberImage/")
-                    .path(fileName)
-                    .toUriString();
-            System.out.println("File path: " + filePath.toString());
-            System.out.println("File URL: " + fileDownloadUri);
-            // CKEditor5에 필요한 JSON 응답 반환
-            return ResponseEntity.ok().body(new ImageUploadResponse(true, fileDownloadUri));
+	        // CKEditor에 필요한 JSON 응답 반환
+	        return ResponseEntity.ok().body(new ImageUploadResponse(true, base64ImageUrl));
 
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
-        }
+	    } catch (IOException e) {
+	        return ResponseEntity.status(500).body("파일 업로드 중 오류가 발생했습니다.");
+	    }
     }
 
     // 이미지 업로드 응답 클래스

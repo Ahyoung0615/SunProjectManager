@@ -118,7 +118,6 @@ const LoginComponent = () => {
                     </div>
                     <button type="submit" className="login-button">로그인</button>
                 </form>
-                <Link to={'/register'}><button className="signup-button">회원가입</button></Link>
             </div>
         </div>
     );
