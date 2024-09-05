@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import MemberUpdateModal from './MemberUpdateComponent';
+import axios from 'axios';
 
 const MemberDetailComponent = () => {
     const { empCode } = useParams();
     const [employee, setEmployee] = useState({});
     const [file, setFile] = useState(null);
-    const [empImg, setEmpImg] = useState(null); // 초기값을 null로 설정
+    const [empImg, setEmpImg] = useState(); // 초기값을 null로 설정
     const [previewImage, setPreviewImage] = useState(null); // 미리보기 이미지 상태
     const [showModal, setShowModal] = useState(false);
 
@@ -25,56 +26,66 @@ const MemberDetailComponent = () => {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
+                
+                axios.get(`http://localhost:8787/getMemberImage?empCode=${empCode}`)
+                .then((res) => setEmpImg(res.data))
                 setEmployee(data);
-                setEmpImg(data.empImg ? `http://localhost:8787/memberImage/${data.empImg}` : '/img/noimages.png'); // 이미지 URL 업데이트
+                
             } catch (error) {
                 console.error('Error fetching employee data:', error);
                 setEmpImg('/img/noimages.png'); // 에러 발생 시 기본 이미지
             }
         };
-
+        
         fetchEmployeeData();
     }, [empCode]); // empCode가 변경될 때만 실행
 
     // 파일 업로드 핸들러
-    const handleUpload = async () => {
+    const handleUpload = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("empCode", empCode);
 
-        try {
-            const response = await fetch('http://localhost:8787/uploadImage', {
-                method: 'POST',
-                body: formData
+        fetch('http://localhost:8787/uploadImage', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Network response was not ok: ${text}`);
+                    });
+                }
+                return response.text();
+            })
+            .then(text => {
+                try {
+                    const data = text ? JSON.parse(text) : {};
+                    console.log(data);
+                    alert(data.message || '파일 업로드 성공');
+                    
+                } catch (error) {
+                    throw new Error('Invalid JSON format');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('파일 업로드 중 오류가 발생했습니다.');
             });
-
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Network response was not ok: ${text}`);
-            }
-
-            const text = await response.text();
-            const data = text ? JSON.parse(text) : {};
-            console.log(data);
-            alert(data.message || '파일 업로드 성공');
-
-            // 파일 업로드 후 사원 정보를 새로 고침
-            await fetchEmployeeData();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('파일 업로드 중 오류가 발생했습니다.');
-        }
     };
 
     const fetchEmployeeData = async () => {
+        console.log(empCode);
         try {
             const response = await fetch(`http://localhost:8787/memberDetail/${empCode}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+            console.log("aaa",empCode);
             const data = await response.json();
+            axios.get(`http://localhost:8787/getMemberImage?empCode=${empCode}`)
+            .then((res) => setEmpImg(res.data))
             setEmployee(data);
-            setEmpImg(data.empImg ? `http://localhost:8787/memberImage/${data.empImg}` : '/img/noimages.png'); // 이미지 URL 업데이트
         } catch (error) {
             console.error('Error fetching employee data:', error);
             setEmpImg('/img/noimages.png'); // 에러 발생 시 기본 이미지
@@ -192,11 +203,13 @@ const MemberDetailComponent = () => {
             <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
                 <div style={{ marginRight: 20, textAlign: "center" }}>
                     <div style={{ width: "300px", height: "300px", backgroundColor: "#fff", marginBottom: 10 }}>
-                        <img
-                            src={previewImage || empImg || '/img/noimages.png'}
-                            alt="사원 이미지"
-                            style={{ width: "100%", height: "100%" }}
-                        />
+                        {previewImage ? (
+                            <img src={previewImage} alt="미리보기 이미지" style={{ width: "100%", height: "100%" }} />
+                        ) : empImg ? (
+                            <img src={empImg} alt="사원 이미지" style={{ width: "100%", height: "100%" }} />
+                        ) : (
+                            <img src="/img/noimages.png" alt="기본 이미지" style={{ width: "100%", height: "100%" }} />
+                        )}
                     </div>
                     <label>파일 업로드:</label>
                     <input type="file" accept="image/*" onChange={handleFileChange} />

@@ -58,7 +58,7 @@
 	<select id="getMemberImage" resultType="EmployeeVo">
 		SELECT *
 		FROM EMPLOYEE e 
-		WHERE EMP_CODE = 20030101
+		WHERE EMP_CODE = #{empCode}
 	</select>
 
     <!-- 사원 정보 삽입 쿼리 -->
