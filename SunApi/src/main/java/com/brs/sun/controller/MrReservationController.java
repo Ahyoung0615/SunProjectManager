@@ -22,9 +22,16 @@ import com.brs.sun.model.service.MrReservationService;
 import com.brs.sun.vo.MeetRoomVo;
 import com.brs.sun.vo.MrReservationVo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "시설 예약 Controller", description = "시설 예약 CRUD Controller")
 @Slf4j
 @RestController
 @RequestMapping("/api/mrReservation")
@@ -33,6 +40,8 @@ public class MrReservationController {
 
 	private final MrReservationService service;
 	
+	@Operation(summary = "예약 리스트", description = "전체 예약 리스트 반환")
+	@ApiResponse(responseCode = "200", description = "예약 현황 전체 리스트 반환", content = @Content(schema = @Schema(implementation = MrReservationFullCalendarDTO.class)))
 	@GetMapping("/getReservationList")
 	public List<MrReservationFullCalendarDTO> selectMrReservation(){
 		List<MrReservationFullCalendarDTO> fullCalendarList = new ArrayList<MrReservationFullCalendarDTO>();
@@ -45,6 +54,9 @@ public class MrReservationController {
 		return fullCalendarList;
 	}
 	
+	@Operation(summary = "예약 상세", description = "예약 내용 상세보기")
+	@Parameter(name = "mrrCode", description = "시설 예약 코드")
+	@ApiResponse(responseCode = "200", description = "예약 코드에 해당하는 예약 상세 내용 반환", content = @Content(schema = @Schema(implementation = MrReservationDetailFullCalendarDTO.class)))
 	@GetMapping("/getReservationDetail")
 	public MrReservationDetailFullCalendarDTO selectReservationDetail(@RequestParam int mrrCode) {
 		MrReservationVo reservationDetail = service.selectReservationDetail(mrrCode);
@@ -62,6 +74,8 @@ public class MrReservationController {
 		return fullCalendarDetail;
 	}
 	
+	@Operation(summary = "예약 중복 확인", description = "시설 예약시 중복 검사")
+	@ApiResponse(responseCode = "200", description = "mrrStarttime, mrrEndtime 로 중복 검사 후 결과 반환 0 (중복 없음) / 1 (중복) ")
 	@GetMapping("/getReservationOverlap")
 	public int selectOverlap(@ModelAttribute MrReservationOverlapRequestDTO requestData) {
 	    log.info("data: {}", requestData);
@@ -74,12 +88,16 @@ public class MrReservationController {
 	    return overlap;
 	}
 
+	@Operation(summary = "회의실 정보", description = "회의실 정보 리스트 반환")
+	@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = MeetRoomVo.class)))
 	@GetMapping("/getMeetRoom")
 	public List<MeetRoomVo> selectMeetRoom(){
 		List<MeetRoomVo> meetRoomList = service.selectMeetRoom();
 		return meetRoomList;
 	}
 
+	@Operation(summary = "시설 예약", description = "중복 검사 후 중복 없는 예약 데이터베이스 저장")
+	@ApiResponse(responseCode = "200", description = "예약 정보 데이터베이스 저장 성공")
 	@PostMapping("/insertReservation")
 	public ResponseEntity<String> insertReservation(@RequestBody MrReservationVo vo) {
 		// 유효성 검사 로직 추가
@@ -101,6 +119,8 @@ public class MrReservationController {
 		}
 	}
 	
+	@Operation(summary = "시설 예약 삭제", description = "해당 예약 코드 예약 삭제")
+	@ApiResponse(responseCode = "200", description = "해당 예약 코드 예약 내용 데이터베이스 삭제 성공")
 	@DeleteMapping("/deleteReservation/{mrrCode}")
     public ResponseEntity<String> deleteReservation(@PathVariable int mrrCode) {
         try {
