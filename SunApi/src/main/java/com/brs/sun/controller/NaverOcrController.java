@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.brs.sun.api.NaverOcrApi;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "Naver OCR 연동 테스트 Controller", description = "문서 스캔 API Naver OCR 연동 테스트 Controller")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class NaverOcrController {
 	@Value("${clova.ocr.secretkey}")
 	private String secretKey;
 	
+	@Operation(summary = "문서 스캔 Naver OCR", description = "문서 스캔용 Naver OCR 연동 Test Method")
 	@GetMapping("/naverOCR")
 	public ResponseEntity<List<String>> ocr() throws FileNotFoundException {
 	    String fileName = "nong.png"; // 파일명
@@ -41,12 +45,4 @@ public class NaverOcrController {
 
 	    return ResponseEntity.ok(result);
 	}
-	
-	public ResponseEntity<String> fileUpload(){
-		
-		
-		
-		return ResponseEntity.ok("ok");
-	}
-
 }
