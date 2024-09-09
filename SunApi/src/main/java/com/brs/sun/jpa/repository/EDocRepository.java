@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.brs.sun.dto.response.AppEDocListResponseDTO;
 import com.brs.sun.dto.response.EDocDetailResponseDTO;
+import com.brs.sun.dto.response.EDocListRespopnseDTO;
 import com.brs.sun.dto.response.EmployeeInfoResponseDTO;
 import com.brs.sun.jpa.entity.EDocEntity;
 
@@ -28,7 +29,7 @@ public interface EDocRepository extends JpaRepository<EDocEntity, Long> {
 	@Query(" select new com.brs.sun.dto.response.EDocListRespopnseDTO(e.eDocCode, e.eDocTitle, e.eDocDate, e.eDocStatus) "
 			+ " from EDocEntity e "
 			+ " where e.eDocStatus = :status and e.employee.empCode = :empCode order by e.eDocDate desc ")
-	Page<EDocEntity> eDocSelectByStatus(String status, Integer empCode, Pageable pageable);
+	Page<EDocListRespopnseDTO> eDocSelectByStatus(String status, Integer empCode, Pageable pageable);
 
 	/**
 	 * session storage 에서 받은 id로 전자결재 임시저장 리스트 페이징 처리 반환

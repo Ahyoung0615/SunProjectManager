@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brs.sun.dto.response.AppEDocListResponseDTO;
-import com.brs.sun.dto.response.EDocDetailResponseDTO;
+import com.brs.sun.dto.response.EDocListRespopnseDTO;
 import com.brs.sun.dto.response.EmployeeInfoResponseDTO;
 import com.brs.sun.jpa.entity.EDocEntity;
 import com.brs.sun.jpa.service.EDocJpaService;
@@ -53,7 +53,7 @@ public class EDocJPAController {
 	})
 	@ApiResponse(responseCode = "200", description = "상태 코드에 알맞는 리스트 10개씩 반환", content = @Content(schema = @Schema(implementation = Page.class)))
 	@GetMapping("/eDocList")
-	public Page<EDocEntity> selectEdocByStatus(@RequestParam String status, 
+	public Page<EDocListRespopnseDTO> selectEdocByStatus(@RequestParam String status, 
 	                                           @RequestParam Integer empCode,
 	                                           @RequestParam(defaultValue = "0") int page, 
 	                                           @RequestParam(defaultValue = "10") int size){
