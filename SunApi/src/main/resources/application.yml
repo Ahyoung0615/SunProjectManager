@@ -4,6 +4,7 @@ spring:
   datasource:
     driver-class-name: oracle.jdbc.driver.OracleDriver
     url: jdbc:oracle:thin:@localhost:1521:xe
+#    url: jdbc:oracle:thin:@localhost:1521:orclpdb1
     username: SUNPJ
     password: SUNPJ
   jpa:
@@ -12,6 +13,7 @@ spring:
     show-sql: true
     properties:
       dialect: org.hibernate.dialect.Oracle12cDialect
+#      dialect: org.hibernate.dialect.Oracle19cDialect
       hibernate:
         format_sql: true
   web:
@@ -20,6 +22,7 @@ spring:
   data:
     redis:
       host: localhost
+#      host: 172.16.2.7
       port: 6379
       password: 1004
 
