@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.brs.sun.dto.response.AppEDocListResponseDTO;
-import com.brs.sun.dto.response.EDocDetailResponseDTO;
+import com.brs.sun.dto.response.EDocListRespopnseDTO;
 import com.brs.sun.dto.response.EmployeeInfoResponseDTO;
 import com.brs.sun.jpa.entity.EDocEntity;
 
@@ -16,9 +16,9 @@ public interface EDocJpaService {
 	 * @param eDocStatus
 	 * @param page
 	 * @param size
-	 * @return Page<EDocEntity>
+	 * @return Page<EDocListRespopnseDTO>
 	 */
-	Page<EDocEntity> docSelect(String eDocStatus, Integer empCode, int page, int size);
+	Page<EDocListRespopnseDTO> docSelect(String eDocStatus, Integer empCode, int page, int size);
 	
 	/**
 	 * 임시저장 리스트 Page 객체로 반환

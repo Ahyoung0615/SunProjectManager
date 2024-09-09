@@ -34,7 +34,7 @@ public class JsTreeController {
 	
 	/***
 	 * JsTree Controller
-	 * @return 부서 리스트 > 사원 구조로 JSON 형태
+	 * @return 부서 리스트 > 사원 리스트 구조로 JSON 형태 구현
 	 */
 	@Operation(summary = "트리 구조 형태로 반환", description = "부서 > 사원 형태로 parent Mapping")
 	@ApiResponse(responseCode = "200", description = "트리 구조 반환 성공", content = @Content(mediaType = "application", schema = @Schema(implementation = JsTreeResponseDTO.class)))
@@ -46,6 +46,7 @@ public class JsTreeController {
 		List<DepartmentVo> deptList = service.getDept();
 		for (DepartmentVo departmentVo : deptList) {
 			if(departmentVo.getDeptCode() == 1) {
+				// int id, String text, String parent, String icon
 				jsList.add(new JsTreeResponseDTO(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/masterBall.png"));
 			} else {
 				jsList.add(new JsTreeResponseDTO(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/deptImg.png"));

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.brs.sun.dto.response.AppEDocListResponseDTO;
-import com.brs.sun.dto.response.EDocDetailResponseDTO;
+import com.brs.sun.dto.response.EDocListRespopnseDTO;
 import com.brs.sun.dto.response.EmployeeInfoResponseDTO;
 import com.brs.sun.jpa.entity.EDocEntity;
 import com.brs.sun.jpa.repository.EDocRepository;
@@ -30,7 +30,7 @@ public class EDocJpaServiceImpl implements EDocJpaService {
 	 * Page 객체로 전달
 	 */
 	@Override
-	public Page<EDocEntity> docSelect(String status, Integer empCode, int page, int size) {
+	public Page<EDocListRespopnseDTO> docSelect(String status, Integer empCode, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		return repository.eDocSelectByStatus(status, empCode, pageable);
 	}
