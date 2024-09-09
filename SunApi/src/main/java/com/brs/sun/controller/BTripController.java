@@ -25,6 +25,11 @@ import com.brs.sun.vo.PagingVo;
 import com.brs.sun.vo.VehicleReservationVo;
 import com.google.api.services.calendar.model.Event;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,171 +39,278 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 public class BTripController {
 
-	private final BTripService service;
-	private final HolidayService holidayService;
+    private final BTripService service;
+    private final HolidayService holidayService;
 
-	@GetMapping("/btrip/{empCode}")
-	public List<BTripVo> getMyBTrip(@PathVariable String empCode) {
+    @Tag(name = "출장관리 Controller", description = "출장 관리 API")
+    @Operation(summary = "출장 정보 조회", description = "특정 사원의 출장 목록을 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 출장 목록을 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/btrip/{empCode}")
+    public List<BTripVo> getMyBTrip(
+        @Parameter(description = "사원 코드", example = "1001") @PathVariable String empCode) {
+        log.info("getMyBTrip 요청 사원번호 : {}", empCode);
+        return service.getMyBTrip(empCode);
+    }
 
-		log.info("getMyBTrip 요청 사원번호 : {}", empCode);
-		return service.getMyBTrip(empCode);
-	}
+    @Tag(name = "공휴일관리 Controller", description = "공휴일 관리 API")
+    @Operation(summary = "공휴일 조회", description = "구글 캘린더에서 공휴일을 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 공휴일 정보를 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/holidays")
+    public ResponseEntity<List<Event>> getHolidays() throws GeneralSecurityException, IOException {
+        log.info("holidays 구글 공휴일 호출");
+        List<Event> holidays = holidayService.getAllHolidaysFromRedisAsEvents();
+        return new ResponseEntity<>(holidays, HttpStatus.OK);
+    }
 
-	 @GetMapping("/holidays")
-	    public ResponseEntity<List<Event>> getHolidays() throws GeneralSecurityException, IOException {
-	        log.info("holidays 구글 공휴일 호출");
-	        // Redis에서 모든 공휴일 정보를 가져옵니다.
-			List<Event> holidays = holidayService.getAllHolidaysFromRedisAsEvents();
-			return new ResponseEntity<>(holidays, HttpStatus.OK);
-	    }
-	 
-	 @PostMapping("/insertholiday")
-	 public void insertHoliday(@RequestBody Map<String, Object> holidayData){
-	     String name = (String) holidayData.get("name");
-	     Map<String, String> startDateMap = (Map<String, String>) holidayData.get("startDate");
-	     Map<String, String> endDateMap = (Map<String, String>) holidayData.get("endDate");
+    @Tag(name = "공휴일관리 Controller", description = "공휴일 관리 API")
+    @Operation(summary = "공휴일 추가", description = "새로운 공휴일을 추가합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "공휴일이 성공적으로 추가됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/insertholiday")
+    public void insertHoliday(@RequestBody Map<String, Object> holidayData) {
+        String name = (String) holidayData.get("name");
+        Map<String, String> startDateMap = (Map<String, String>) holidayData.get("startDate");
+        Map<String, String> endDateMap = (Map<String, String>) holidayData.get("endDate");
 
-	     String startDate = startDateMap.get("date");
-	     String endDate = endDateMap.get("date");
+        String startDate = startDateMap.get("date");
+        String endDate = endDateMap.get("date");
 
-	     log.info("입력 공휴일 이름 : {}", name);
-	     log.info("입력 공휴일 시작 날짜 : {}", startDate);
-	     log.info("입력 공휴일 종료 날짜 : {}", endDate);
+        log.info("입력 공휴일 이름 : {}", name);
+        log.info("입력 공휴일 시작 날짜 : {}", startDate);
+        log.info("입력 공휴일 종료 날짜 : {}", endDate);
 
-	     holidayService.insertHoliday(name, startDate, endDate);
-	 }
+        holidayService.insertHoliday(name, startDate, endDate);
+    }
 
+    @Tag(name = "출장관리 Controller", description = "출장 관리 API")
+    @Operation(summary = "출장 상세 조회", description = "특정 출장의 상세 정보를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 출장 상세 정보를 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/btripDetail/{btripCode}")
+    public BTripVo getOneBTrip(
+        @Parameter(description = "출장 코드", example = "1234") @PathVariable String bTripCode,
+        @Parameter(description = "사원 코드") @RequestParam String empCode) {
+        log.info("getOneBTrip 요청 empCode : {}", empCode);
+        log.info("getOneBTrip 요청 bTripCode : {}", bTripCode);
+        return service.getOneBTrip(bTripCode, empCode);
+    }
 
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "배차 상세 조회", description = "특정 출장의 배차 예약 목록을 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약 정보를 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/vrsvDetail/{btripCode}")
+    public List<VehicleReservationVo> getMyVehicleRsv(
+        @Parameter(description = "출장 코드", example = "1234") @PathVariable String bTripCode,
+        @Parameter(description = "사원 코드") @RequestParam String empCode) {
+        log.info("getMyVehicleRsv 요청 empCode : {}", empCode);
+        log.info("getMyVehicleRsv 요청 bTripCode : {}", bTripCode);
+        return service.getMyVehicleRsv(bTripCode, empCode);
+    }
 
-	@GetMapping("/btripDetail/{btripCode}")
-	public BTripVo getOneBTrip(@PathVariable("btripCode") String bTripCode, @RequestParam String empCode) {
-		log.info("getOneBTrip 요청 empCode : {}", empCode);
-		log.info("getOneBTrip 요청 bTripCode : {}", bTripCode);
-		return service.getOneBTrip(bTripCode, empCode);
-	}
+    @Tag(name = "협력사관리 Controller", description = "협력사 관리 API")
+    @Operation(summary = "협력사 목록 조회", description = "협력사의 목록을 페이징 처리하여 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 협력사 목록을 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/cowork")
+    public PagingVo<CoWorkVo> searchCoWork(
+        @Parameter(description = "페이지 번호", example = "1") @RequestParam(defaultValue = "1") int page,
+        @Parameter(description = "페이지당 항목 수", example = "5") @RequestParam(defaultValue = "5") int countList,
+        @Parameter(description = "협력사 이름") @RequestParam(required = false) String cowName,
+        @Parameter(description = "협력사 주소") @RequestParam(required = false) String cowAddress) {
 
-	@GetMapping("/vrsvDetail/{btripCode}")
-	public List<VehicleReservationVo> getMyVehicleRsv(@PathVariable("btripCode") String bTripCode,
-			@RequestParam String empCode) {
-		log.info("getMyVehicleRsv 요청 empCode : {}", empCode);
-		log.info("getMyVehicleRsv 요청 bTripCode : {}", bTripCode);
-		return service.getMyVehicleRsv(bTripCode, empCode);
-	}
+        int totalCount = service.countCoWork(cowName, cowAddress);
 
-	@GetMapping("/cowork")
-	public PagingVo<CoWorkVo> searchCoWork(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "5") int countList, @RequestParam(required = false) String cowName,
-			@RequestParam(required = false) String cowAddress) {
+        PagingVo<CoWorkVo> paging = new PagingVo<>(page, countList, totalCount, 10);
+        List<CoWorkVo> results = service.searchCoWork((page - 1) * countList + 1, page * countList, cowName, cowAddress);
+        paging.setContent(results);
 
-		// 전체 게시글 수 조회
-		int totalCount = service.countCoWork(cowName, cowAddress);
+        return paging;
+    }
 
-		// 페이징 정보 생성
-		PagingVo<CoWorkVo> paging = new PagingVo<>(page, countList, totalCount, 10);
+    @Tag(name = "협력사관리 Controller", description = "협력사 관리 API")
+    @Operation(summary = "협력사 상세 조회", description = "특정 협력사의 상세 정보를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 협력사 정보를 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/coWorkDetail/{cowCode}")
+    public CoWorkVo getOneCowork(
+        @Parameter(description = "협력사 코드", example = "C001") @PathVariable String cowCode) {
+        log.info("상세조회 협력사 코드 : {}", cowCode);
+        return service.getOneCowork(cowCode);
+    }
 
-		// 게시글 목록 조회
-		List<CoWorkVo> results = service.searchCoWork((page - 1) * countList + 1, page * countList, cowName,
-				cowAddress);
+    @Tag(name = "협력사관리 Controller", description = "협력사 관리 API")
+    @Operation(summary = "협력사 삭제", description = "협력사를 삭제합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 협력사가 삭제됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/deleteCoWork")
+    public int deleteCoWork(
+        @Parameter(description = "협력사 코드") @RequestParam String cowCode) {
+        log.info("삭제할 협력사 번호 : {}", cowCode);
+        return service.deleteCoWork(cowCode);
+    }
 
-		// 게시글 목록을 PagingVo 객체에 설정
-		paging.setContent(results);
+    @Tag(name = "협력사관리 Controller", description = "협력사 관리 API")
+    @Operation(summary = "협력사 추가", description = "협력사를 추가합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 협력사가 추가됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/insertCoWork")
+    public int insertCoWork(
+        @Parameter(description = "협력사 정보") @RequestBody CoWorkVo vo) {
+        log.info("입력할 신규 협력사 정보 : {}", vo);
+        return service.insertCoWork(vo);
+    }
 
-		// 결과 반환
-		return paging;
-	}
+    @Tag(name = "협력사관리 Controller", description = "협력사 관리 API")
+    @Operation(summary = "협력사 정보 수정", description = "협력사의 정보를 수정합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 협력사 정보가 수정됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/updateCoWork")
+    public int updateCoWork(
+        @Parameter(description = "수정할 협력사 정보") @RequestBody CoWorkVo vo) {
+        log.info("수정할 협력사 정보 : {}", vo);
+        return service.updateCoWork(vo);
+    }
 
-	@GetMapping("/coWorkDetail/{cowCode}")
-	public CoWorkVo getOneCowork(@PathVariable String cowCode) {
-		log.info("상세조회 협력사 코드 : {}", cowCode);
-		return service.getOneCowork(cowCode);
-	}
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "모든 배차 예약 조회", description = "모든 배차 예약 목록을 페이징 처리하여 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약 목록을 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/getAllVehicleRsv")
+    public PagingVo<VehicleRentDTO> getAllVehicleRsv(
+        @Parameter(description = "페이지 번호", example = "1") @RequestParam(defaultValue = "1") int page,
+        @Parameter(description = "페이지당 항목 수", example = "50") @RequestParam(defaultValue = "50") int countList,
+        @Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
+        @Parameter(description = "종료 날짜") @RequestParam(required = false) String endDate) {
 
-	@PostMapping("/deleteCoWork")
-	public int deleteCoWork(@RequestParam String cowCode) {
-		log.info("삭제할 협력사 번호 : {}", cowCode);
-		return service.deleteCoWork(cowCode);
-	}
+        log.info("startDate : {}", startDate);
+        log.info("endDate : {}", endDate);
 
-	@PostMapping("/insertCoWork")
-	public int insertCoWork(@RequestBody CoWorkVo vo) {
-		log.info("입력할 신규 협력사 정보 : {}", vo);
-		return service.insertCoWork(vo);
-	}
+        if (startDate != null && startDate.trim().isEmpty()) {
+            startDate = null;
+        }
+        if (endDate != null && endDate.trim().isEmpty()) {
+            endDate = null;
+        }
 
-	@PostMapping("/updateCoWork")
-	public int updateCoWork(@RequestBody CoWorkVo vo) {
-		log.info("수정할 협력사 정보 : {}", vo);
-		return service.updateCoWork(vo);
-	}
+        int totalCount = service.countVehicleRsv(startDate, endDate);
+        PagingVo<VehicleRentDTO> paging = new PagingVo<>(page, countList, totalCount, 10);
+        List<VehicleRentDTO> results = service.getAllVehicleRsv((page - 1) * countList + 1, page * countList, startDate, endDate);
+        paging.setContent(results);
 
-	@GetMapping("/getAllVehicleRsv")
-	public PagingVo<VehicleRentDTO> getAllVehicleRsv(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "50") int countList, @RequestParam(required = false) String startDate,
-			@RequestParam(required = false) String endDate) {
+        return paging;
+    }
 
-		log.info("startDate : {}", startDate);
-		log.info("endDate : {}", endDate);
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "가용 차량 조회", description = "특정 날짜 범위 내에서 사용 가능한 차량을 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 가용 차량을 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/availableVehicle")
+    public List<Map<String, Object>> getAvailableVehicles(
+        @Parameter(description = "시작 날짜") @RequestParam(required = false) String startDate,
+        @Parameter(description = "종료 날짜") @RequestParam(required = false) String endDate) {
+        log.info("startDate : {}", startDate);
+        log.info("endDate : {}", endDate);
+        return service.getAvailableVehicles(startDate, endDate);
+    }
 
-		// startDate나 endDate가 null 또는 빈 문자열일 경우 null로 처리
-		if (startDate != null && startDate.trim().isEmpty()) {
-			startDate = null;
-		}
-		if (endDate != null && endDate.trim().isEmpty()) {
-			endDate = null;
-		}
+    @Tag(name = "출장관리 Controller", description = "출장 관리 API")
+    @Operation(summary = "출장 및 배차 예약 추가", description = "새로운 출장 및 배차 예약을 추가합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 출장 및 배차 예약이 추가됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/insertBTrip")
+    public int insertBTripVRsv(
+        @Parameter(description = "출장 및 배차 예약 정보") @RequestBody BTripRequestDTO requestDto) {
+        log.info("requestDto:{}", requestDto);
+        return service.insertBTripVRsv(requestDto);
+    }
 
-		int totalCount = service.countVehicleRsv(startDate, endDate);
-		PagingVo<VehicleRentDTO> paging = new PagingVo<>(page, countList, totalCount, 10);
-		List<VehicleRentDTO> results = service.getAllVehicleRsv((page - 1) * countList + 1, page * countList, startDate,
-				endDate);
-		paging.setContent(results);
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "배차 예약 승인", description = "특정 배차 예약을 승인합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약이 승인됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/approveVRent")
+    public int updateVehicleRsrvYes(
+        @Parameter(description = "배차 예약 코드") @RequestParam String vrsvCode) {
+        log.info("승인한 배차신청서 코드 : {}", vrsvCode);
+        return service.updateVehicleRsrvYes(vrsvCode);
+    }
 
-		return paging;
-	}
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "배차 예약 반려", description = "특정 배차 예약을 반려합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약이 반려됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/rejectVRent")
+    public int updateVehicleRsrvNo(
+        @Parameter(description = "배차 예약 코드") @RequestParam String vrsvCode,
+        @Parameter(description = "반려 사유") @RequestParam String vrsvReply) {
+        log.info("반려한 배차신청서 코드 : {}", vrsvCode);
+        log.info("반려한 배차신청서 반려사유 : {}", vrsvReply);
+        return service.updateVehicleRsrvNo(vrsvCode, vrsvReply);
+    }
 
-	@GetMapping("/availableVehicle")
-	public List<Map<String, Object>> getAvailableVehicles(@RequestParam(required = false) String startDate,
-			@RequestParam(required = false) String endDate) {
-		log.info("startDate : {}", startDate);
-		log.info("endDate : {}", endDate);
-		return service.getAvailableVehicles(startDate, endDate);
-	}
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "배차 예약 상세 조회", description = "특정 배차 예약의 상세 정보를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약 상세 정보를 가져옴"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @GetMapping("/vrentDetail/{vrsvCode}")
+    public VehicleRentDTO getOneVehicleRsv(
+        @Parameter(description = "배차 예약 코드") @PathVariable String vrsvCode) {
+        log.info("getOneVehicleRsv 요청 vrsvCode : {}", vrsvCode);
+        return service.getOneVehicleRsv(vrsvCode);
+    }
 
-	@PostMapping("/insertBTrip")
-	public int insertBTripVRsv(@RequestBody BTripRequestDTO requestDto) {
-		log.info("requestDto:{}", requestDto);
-		return service.insertBTripVRsv(requestDto);
-	}
+    @Tag(name = "배차관리 Controller", description = "배차 관리 API")
+    @Operation(summary = "배차 예약 수정", description = "기존 배차 예약을 수정합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "성공적으로 배차 예약이 수정됨"),
+        @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
+    @PostMapping("/reVehicleRsv")
+    public void insertReVehicleRsc(
+        @Parameter(description = "수정할 배차 예약 정보") @RequestBody Map<String, Object> requestDto) {
+        log.info("재입력한 배차 신청서 정보 : {}", requestDto);
+        VehicleRentDTO vehicleRentDTO = VehicleRentDTO.builder()
+                .bTripCode(Integer.parseInt((String) requestDto.get("btripCode")))
+                .vehicleCode(Integer.parseInt((String) requestDto.get("vehicleCode")))
+                .vrsvDetail((String) requestDto.get("vrsvDetail"))
+                .vrsvDate((String) requestDto.get("vrsvDate"))
+                .build();
 
-	@PostMapping("/approveVRent")
-	public int updateVehicleRsrvYes(@RequestParam String vrsvCode) {
-		log.info("승인한 배차신청서 코드 : {}", vrsvCode);
-		return service.updateVehicleRsrvYes(vrsvCode);
-	}
-
-	@PostMapping("/rejectVRent")
-	public int updateVehicleRsrvNo(@RequestParam String vrsvCode, @RequestParam String vrsvReply) {
-		log.info("반려한 배차신청서 코드 : {}", vrsvCode);
-		log.info("반려한 배차신청서 반려사유 : {}", vrsvReply);
-		return service.updateVehicleRsrvNo(vrsvCode, vrsvReply);
-	}
-
-	@GetMapping("/vrentDetail/{vrsvCode}")
-	public VehicleRentDTO getOneVehicleRsv(@PathVariable("vrsvCode") String vrsvCode) {
-		log.info("getOneVehicleRsv 요청 vrsvCode : {}", vrsvCode);
-		return service.getOneVehicleRsv(vrsvCode);
-	}
-
-	@PostMapping("/reVehicleRsv")
-	public void insertReVehicleRsc(@RequestBody Map<String, Object> requestDto) {
-		log.info("재입력한 배차 신청서 정보 : {}", requestDto);
-		VehicleRentDTO vehicleRentDTO = VehicleRentDTO.builder()
-				.bTripCode(Integer.parseInt((String) requestDto.get("btripCode")))
-				.vehicleCode(Integer.parseInt((String) requestDto.get("vehicleCode")))
-				.vrsvDetail((String) requestDto.get("vrsvDetail")).vrsvDate((String) requestDto.get("vrsvDate"))
-				.build();
-
-		service.insertReVehicleRsc(vehicleRentDTO);
-	}
-
+        service.insertReVehicleRsc(vehicleRentDTO);
+    }
 }
