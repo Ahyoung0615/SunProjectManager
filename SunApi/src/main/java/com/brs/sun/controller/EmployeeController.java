@@ -20,6 +20,10 @@ import com.brs.sun.model.dao.EmployeeDao;
 import com.brs.sun.model.service.EmployeeService;
 import com.brs.sun.vo.EmployeeVo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,11 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000/")
+@Tag(name = "사원관리 Controller", description = "사원 관리 관련 API")
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
 
 	// 사원리스트 불러오기1
+	@Operation(summary = "사원 목록 조회", description = "모든 사원의 상세 정보를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "사원 목록이 성공적으로 반환되었습니다.")
 	@GetMapping(value = "/memberDetail")
 	public List<EmployeeVo> getAllEmployees() {
 		return employeeService.empList();
@@ -50,6 +57,11 @@ public class EmployeeController {
 	}
 
 	// 사원 상세보기
+	@Operation(summary = "사원 상세 정보 조회", description = "특정 사원의 코드를 통해 상세 정보를 조회합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "사원 정보가 성공적으로 반환되었습니다."),
+		@ApiResponse(responseCode = "404", description = "해당 사원을 찾을 수 없습니다.")
+	})
 	@GetMapping(value = "/memberDetail/{empCode}")
 	public EmployeeVo getOneEmployee(@PathVariable String empCode) {
 		return employeeService.getOneMember(empCode);
@@ -73,6 +85,8 @@ public class EmployeeController {
 		}
 	}
 	
+	@Operation(summary = "사원 이미지 조회", description = "사원의 이미지를 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "이미지가 성공적으로 반환되었습니다.")
 	@GetMapping("/getMemberImage")
 	public String getMemberImage(@RequestParam String empCode) {
 		return employeeService.getMemberImage(empCode);
@@ -117,6 +131,11 @@ public class EmployeeController {
 	}
 
 	// 새로운 사원 추가
+	@Operation(summary = "사원 추가", description = "새로운 사원을 추가합니다.")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "사원이 성공적으로 등록되었습니다."),
+		@ApiResponse(responseCode = "400", description = "사원 등록 실패.")
+	})
 	@PostMapping("/NewEmp")
 	public ResponseEntity<String> registerEmployee(@RequestParam("EmpName") String empName,
 			@RequestParam("EmpJob") String empJob, @RequestParam("EmpDept") String empDept,

@@ -33,10 +33,16 @@ import com.brs.sun.model.service.EmployeeService;
 import com.brs.sun.vo.NoticeFileVo;
 import com.brs.sun.vo.NoticeVo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name= "게시판 Controller", description = "공지사항 Mybatis CRUD Controller")
 @Slf4j
 @RestController
 @RequestMapping("")
@@ -51,11 +57,15 @@ public class BoardController {
 	String uploadDir2 = "src/main/resources/static/memberImage";
 	
 	//게시글 입력
+	@Operation(summary = "게시글 작성", description = "공지사항 게시글과 파일을 작성 및 업로드합니다.")
+	@ApiResponse(responseCode = "200", description = "게시글 작성 성공")
 	@PostMapping("/insertBoard")
-	public ResponseEntity<String> insertBoard(@RequestParam("notiTitle") String notiTitle,
-			@RequestParam("notiContent") String notiContent, @RequestParam("empCode") String empCode,
-			@RequestParam("notiStatus") String notiStatus,
-			@RequestParam(value = "files", required = false) List<MultipartFile> files) {
+	public ResponseEntity<String> insertBoard(@RequestParam("notiTitle")@Parameter(description = "게시글 제목") String notiTitle,
+			@Parameter(description = "게시글 내용") @RequestParam("notiContent") String notiContent, @RequestParam("empCode") String empCode,
+			@Parameter(description = "게시글 상태") @RequestParam("notiStatus") String notiStatus,
+			@Parameter(description = "첨부 파일 목록") @RequestParam(value = "files", required = false) List<MultipartFile> files) {
+		
+	
 		if (files == null) {
 		    files = new ArrayList<>();
 		}
@@ -81,6 +91,8 @@ public class BoardController {
 		}
 	}
 	//파일 다운로드
+	@Operation(summary = "파일 다운로드", description = "게시글에 첨부된 파일을 다운로드합니다.")
+	@ApiResponse(responseCode = "200", description = "파일 다운로드 성공")
 	@GetMapping("/files/download/{nfileFakename}")
 	public ResponseEntity<PathResource> downloadFile(@PathVariable String nfileFakename) {
 		try {
@@ -106,21 +118,26 @@ public class BoardController {
 		}
 	}
 	//게시글 리스트 불러오기
+	@Operation(summary ="공지사항 불러오기" , description = "공지사항 글 불러오기")
+	@ApiResponse(responseCode = "200", description = "불러오기 성공")
 	@GetMapping("/boardList")
 	public List<NoticeVo> boardList() {
 		return service.boardList();
 	}
 	//게시글 파일 불러오기
+	@Operation(summary = "게시글 파일 조회", description = "공지사항 게시글에 첨부된 파일 목록을 불러옵니다.")
+	@ApiResponse(responseCode = "200", description = "파일 불러오기 성공")
 	@GetMapping("/files/{notiCode}")
 	public List<NoticeFileVo> getFile(@PathVariable String notiCode) {
 		int notiCodeStr = Integer.parseInt(notiCode);
 		return service.getFile(notiCodeStr);
 	}
 	//게시글 수정
-	@PostMapping("updateBoard/{notiCode}")
+	@Operation(summary = "게시글 수정", description = "공지사항 게시글을 수정합니다.")
+	@ApiResponse(responseCode = "200", description = "불러오기 성공")
 	public ResponseEntity<String> updateBoard(@PathVariable String notiCode,
 			@RequestParam("notiTitle") String notiTitle, @RequestParam("notiContent") String notiContent,
-			@RequestParam("notiStatus") String notiStatus,
+			@RequestParam("notiStatus") String notiStatus, 
 			@RequestParam(value = "files", required = false) List<MultipartFile> files) throws IOException {
 		
 		if (files == null) {
@@ -154,6 +171,8 @@ public class BoardController {
 		return ResponseEntity.ok("게시글이 삭제되었습니다");
 	}
 	//게시글 상세보기
+	@Operation(summary = "게시글 상세보기", description = "공지사항 게시글의 상세 내용을 조회합니다.")
+	@ApiResponse(responseCode = "200", description = "게시글 상세보기 성공")
 	@GetMapping("/boardDetail/{notiCode}")
 	public NoticeVo boardDetail(@PathVariable String notiCode) {
 		return service.boardDetail(notiCode);

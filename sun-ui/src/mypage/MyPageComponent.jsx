@@ -279,7 +279,7 @@ const MyPageComponent = () => {
             <h1>마이페이지</h1>
             <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
                 <div style={{ marginRight: 20, textAlign: "center" }}>
-                    <div style={{ width: "300px", height: "300px", backgroundColor: "#ccc", marginBottom: 10 }}>
+                    <div style={{ width: "300px", height: "300px", backgroundColor: "#fff", marginBottom: 10 }}>
                         {previewImage ? (
                             <img src={previewImage} alt="미리보기 이미지" style={{ width: "100%", height: "100%" }} />
                         ) : emp.empImg ? (
