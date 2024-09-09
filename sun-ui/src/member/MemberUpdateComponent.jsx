@@ -16,7 +16,7 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         EmpStatus: '',
     });
     const [phoneError, setPhoneError] = useState('');
-    
+    const [emailError, setEmailError] = useState('');
     useEffect(() => {
         // API 호출
         fetch(`http://localhost:8787/memberDetail/${empCode}`)
@@ -49,9 +49,24 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         return phoneRegex.test(phoneNumber);
     };
 
+    const validateEmail = (empEmail) => {
+        const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/;  
+        return emailRegEx.test(empEmail);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        //이메일 유효성 검사
+        if(emp.EmpEmail === ''){
+            setEmailError('이에밀은 필수 입력 항목입니다.')
+            return;
+        }
 
+        if(!validateEmail(emp.EmpEmail)){
+            setEmailError('유효한 이메일을 입력해주세요. 형식: XXX@XXX.XXX');
+            return;
+        }
+    
         // 전화번호 유효성 검사
         if (emp.EmpTel === '') {
             setPhoneError('전화번호는 필수 입력 항목입니다.');
@@ -64,7 +79,7 @@ const MemberUpdateModal = ({ show, handleClose }) => {
         }
 
         setPhoneError(''); // 전화번호 오류를 제거합니다.
-
+        setEmailError('');
         const formData = new FormData();
         formData.append('EmpCode', emp.EmpCode);
         formData.append('EmpJob', emp.EmpJob);
@@ -206,7 +221,11 @@ const MemberUpdateModal = ({ show, handleClose }) => {
                             name="EmpEmail"
                             value={emp.EmpEmail}
                             onChange={handleChange}
+                            isInvalid={emailError !== ''}
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {emailError}
+                        </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="formEmpAddress">
                         <Form.Label>주소</Form.Label>
