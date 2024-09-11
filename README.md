@@ -158,14 +158,15 @@
 
 
 ### 4.6 전자결재
-#### [RUBI GIT 보러가기](https://github.com/Ahyoung0615/SunProjectManager) 
+##### ☀️ 담당기능
+[![화면제어 영상](https://youtu.be/uRXPvZnI9bA?si=umHOllulY9iWeteB)
 
 
 -----------------------------
 
 
 ### 4.7 시설예약
-#### [RUBI GIT 보러가기](https://github.com/Ahyoung0615/SunProjectManager)
+##### ☀️ 담당기능
 
 
 -----------------------------
@@ -188,6 +189,8 @@
 
 ### 4.13 화면제어
 ##### [BLUE GIT 보러가기](https://github.com/bluewt129/SunProjectDeploy)
+
+-----------------------------
 
 
 ## 5. 성능 개선
