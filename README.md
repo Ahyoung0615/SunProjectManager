@@ -159,7 +159,8 @@
 
 ### 4.6 전자결재
 ##### ☀️ 담당기능
-[![화면제어 영상](https://youtu.be/uRXPvZnI9bA?si=umHOllulY9iWeteB)
+[![화면제어 영상](https://img.youtube.com/vi/6ZrtvNUDXRQ/0.jpg)](https://youtu.be/6ZrtvNUDXRQ)
+
 
 
 -----------------------------
@@ -167,6 +168,7 @@
 
 ### 4.7 시설예약
 ##### ☀️ 담당기능
+[![화면제어 영상](https://img.youtube.com/vi/uRXPvZnI9bA/0.jpg)](https://youtu.be/uRXPvZnI9bA)
 
 
 -----------------------------
