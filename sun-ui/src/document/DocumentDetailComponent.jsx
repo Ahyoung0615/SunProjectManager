@@ -82,7 +82,7 @@ const DocumentTempDetailComponent = () => {
                     const tempJsonData = JSON.parse(res.data.edocContent);
                     const reply = JSON.parse(res.data.edocReply);
                     console.log(res.data);
-                    console.log(tempJsonData)
+                    console.log(reply);
                     setDocReply(reply);
                     setStartDate(new Date(tempJsonData.startDate));
                     setEndDate(new Date(tempJsonData.endDate));
@@ -309,7 +309,7 @@ const DocumentTempDetailComponent = () => {
                                     <tr>
                                         {selectedApprovers.map((approver) => (
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                                {approver.edclStatus === 'S' ? (
+                                                {approver.edclStatus == 'S' ? (
                                                     <img
                                                         src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                                         alt='싸인'
@@ -384,6 +384,28 @@ const DocumentTempDetailComponent = () => {
                                             <span>{reason}</span>
                                         </td>
                                     </tr>
+                                    {
+                                        edocStatus == 'R' && (
+                                            <>
+                                                <tr>
+                                                    <th>반려자</th>
+                                                    <td>
+                                                        {docReply.deptName} {docReply.empName}{docReply.jobName}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>반려 일자</th>
+                                                    <td>
+                                                        {docReply.rejectDate}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>반려 사유</th>
+                                                    <td>{docReply.reason}</td>
+                                                </tr>
+                                            </>
+                                        )
+                                    }
                                 </tbody>
                             </table>
                         </form>
@@ -420,7 +442,7 @@ const DocumentTempDetailComponent = () => {
                                     <tr>
                                         {selectedApprovers.map((approver) => (
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
-                                                {approver.edclStatus === 'S' ? (
+                                                {approver.edclStatus == 'S' ? (
                                                     <img
                                                         src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
                                                         alt='싸인'
@@ -489,6 +511,28 @@ const DocumentTempDetailComponent = () => {
                                             <img src={receiptImage} />
                                         </td>
                                     </tr>
+                                    {
+                                        edocStatus == 'R' && (
+                                            <>
+                                                <tr>
+                                                    <th>반려자</th>
+                                                    <td>
+                                                        {docReply.deptName} {docReply.empName}{docReply.jobName}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>반려 일자</th>
+                                                    <td>
+                                                        {docReply.rejectDate}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>반려 사유</th>
+                                                    <td>{docReply.reason}</td>
+                                                </tr>
+                                            </>
+                                        )
+                                    }
                                 </tbody>
                             </table>
                         </form>
