@@ -98,6 +98,7 @@ const OrgChartComponent = ({ buttonName, maxSelection, mappingUrl, onSelectionCh
 
         if (finalDataArr.length > 0) {
             try {
+                console.log("e", finalDataArr)
                 const res = await axios.post(`${serverUrl}${mappingUrl}`, finalDataArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });
@@ -133,7 +134,7 @@ const OrgChartComponent = ({ buttonName, maxSelection, mappingUrl, onSelectionCh
                 body={
                     <>
                         <input type="text" id="schName" placeholder="검색" />
-                        <button onClick={handleSearch}>검색</button>
+                        <button className={styles.searchButton} onClick={handleSearch}>검색</button>
                         <div className={styles.treeBox}>
                             <div className={styles['tree-container']} ref={treeRef}></div>
                             <div className={styles.child}>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import ModalComponent from '../commodule/ModalComponent';
 import styles from '../css/VacationDocComponent.module.css';
+import defaultImg from './defaultImg.png';
 
 const DocumentAppDetailComponent = () => {
     const navigate = useNavigate();
@@ -192,7 +193,7 @@ const DocumentAppDetailComponent = () => {
                             onChange={(e) => setRejectReason(e.target.value)}
                         />
                         <div style={{ marginTop: '10px', textAlign: 'right' }}>
-                            <button onClick={handleRejectSubmit} style={{ marginRight: '10px' }}>확인</button>
+                            <button onClick={handleRejectSubmit} style={{ marginRight: '10px' ,backgroundColor: "#007bff", color: "white", border:"none"}}>확인</button>
                         </div>
                     </div>
                 }
@@ -218,7 +219,7 @@ const DocumentAppDetailComponent = () => {
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                                 {approver.edclStatus === 'S' ? (
                                                     <img
-                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        src={signatureImage[approver.empCode] || defaultImg}
                                                         alt='싸인'
                                                         style={{
                                                             width: '80px',
@@ -296,7 +297,7 @@ const DocumentAppDetailComponent = () => {
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                                 {approver.edclStatus === 'S' ? (
                                                     <img
-                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        src={signatureImage[approver.empCode] || defaultImg}
                                                         alt='싸인'
                                                         style={{
                                                             width: '80px',

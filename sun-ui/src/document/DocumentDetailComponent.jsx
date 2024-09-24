@@ -5,6 +5,7 @@ import styles from '../css/VacationDocComponent.module.css';
 import axios from 'axios';
 import OrgChartComponent from '../commodule/OrgChartComponent';
 import { useNavigate, useParams } from 'react-router-dom';
+import defaultImg from './defaultImg.png';
 
 const DocumentTempDetailComponent = () => {
     const navigate = useNavigate();
@@ -311,7 +312,7 @@ const DocumentTempDetailComponent = () => {
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                                 {approver.edclStatus == 'S' ? (
                                                     <img
-                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        src={signatureImage[approver.empCode] || defaultImg}
                                                         alt='싸인'
                                                         style={{
                                                             width: '80px',
@@ -444,7 +445,7 @@ const DocumentTempDetailComponent = () => {
                                             <td key={approver.empCode} style={{ textAlign: 'center', padding: '5px' }}>
                                                 {approver.edclStatus == 'S' ? (
                                                     <img
-                                                        src={signatureImage[approver.empCode] || "https://data1.pokemonkorea.co.kr/newdata/pokedex/full/005401.png"}
+                                                        src={signatureImage[approver.empCode] || defaultImg}
                                                         alt='싸인'
                                                         style={{
                                                             width: '80px',
