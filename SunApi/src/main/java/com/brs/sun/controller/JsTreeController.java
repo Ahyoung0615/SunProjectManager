@@ -45,21 +45,12 @@ public class JsTreeController {
 		
 		List<DepartmentVo> deptList = service.getDept();
 		for (DepartmentVo departmentVo : deptList) {
-			if(departmentVo.getDeptCode() == 1) {
-				// int id, String text, String parent, String icon
-				jsList.add(new JsTreeResponseDTO(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/masterBall.png"));
-			} else {
-				jsList.add(new JsTreeResponseDTO(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/deptImg.png"));
-			}
+			jsList.add(new JsTreeResponseDTO(departmentVo.getDeptCode(), departmentVo.getDeptName(), "#", "./img/deptImg.png"));
 		}
 		
 		List<EmployeeVo> empList = service.getEmp();
 		for (EmployeeVo employeeVo : empList) {
-			if(employeeVo.getDeptCode() == 1) {
-				jsList.add(new JsTreeResponseDTO(employeeVo.getEmpCode(), employeeVo.getEmpName(), String.valueOf(employeeVo.getDeptCode()), "./img/pikachu.png"));
-			}else {
-				jsList.add(new JsTreeResponseDTO(employeeVo.getEmpCode(), employeeVo.getEmpName(), String.valueOf(employeeVo.getDeptCode()), "./img/zamanbo.png"));
-			}
+			jsList.add(new JsTreeResponseDTO(employeeVo.getEmpCode(), employeeVo.getEmpName(), String.valueOf(employeeVo.getDeptCode()), "./img/person.png"));
 		}
 		
 		return jsList;
@@ -72,7 +63,7 @@ public class JsTreeController {
 	 */
 	@Operation(summary = "선택된 사원 리스트", description = "JsTree 에서 선택된 Node 의 ID(사원 코드)로 사원 정보 조회")
 	@Parameter(name = "choiceList", description = "선택된 Node ID List")
-	@ApiResponse(responseCode = "200", description = "전달받은 사원 코드들로 사원 정보 조회", content = @Content(schema = @Schema(implementation = EmployeeVo.class)))
+	@ApiResponse(responseCode = "200", description = "전달받은 사원 코드들로 사원 정보 조회 및 직급 코드로 정렬 후 반환", content = @Content(schema = @Schema(implementation = EmployeeVo.class)))
 	@PostMapping("/empList")
 	public List<EmployeeVo> getApprovers(@RequestBody List<String> choiceList) {
 	    log.info("choiceArr: {}", choiceList);
