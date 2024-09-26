@@ -2,6 +2,7 @@ package com.brs.sun.model.service;
 
 import java.util.List;
 
+import com.brs.sun.dto.response.ApproverEmployeeResponse;
 import com.brs.sun.vo.DepartmentVo;
 import com.brs.sun.vo.EmployeeVo;
 
@@ -19,5 +20,5 @@ public interface JsTreeService {
 	 */
 	List<EmployeeVo> getEmp();
 	
-	List<EmployeeVo> getApprovers(List<String> empCodes);
+	List<ApproverEmployeeResponse> getApprovers(List<String> empCodes);
 }

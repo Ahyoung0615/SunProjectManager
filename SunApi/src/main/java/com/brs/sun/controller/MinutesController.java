@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.dto.response.ApproverEmployeeResponse;
 import com.brs.sun.jpa.entity.MinutesEntity;
 import com.brs.sun.jpa.service.MinutesJpaService;
 import com.brs.sun.model.service.JsTreeService;
@@ -84,10 +85,10 @@ public class MinutesController {
 	        @ApiResponse(responseCode = "500", description = "서버 에러입니다.")
 	    })
 	@PostMapping("/mintesAttendense")
-	public List<EmployeeVo> getApprovers(@RequestBody List<String> choiceList) {
+	public List<ApproverEmployeeResponse> getApprovers(@RequestBody List<String> choiceList) {
 	    log.info("choiceArr: {}", choiceList);
 	    
-		List<EmployeeVo> approverList = jsService.getApprovers(choiceList);
+		List<ApproverEmployeeResponse> approverList = jsService.getApprovers(choiceList);
 
 		return approverList;
 	}

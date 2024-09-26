@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.brs.sun.dto.response.ApproverEmployeeResponse;
 import com.brs.sun.model.dao.JsTreeDao;
 import com.brs.sun.vo.DepartmentVo;
 import com.brs.sun.vo.EmployeeVo;
@@ -27,7 +28,7 @@ public class JsTreeServiceImpl implements JsTreeService {
 	}
 
 	@Override
-	public List<EmployeeVo> getApprovers(List<String> empCodes) {
-		return dao.getApprovers(empCodes);
+	public List<ApproverEmployeeResponse> getApprovers(List<String> empCodes) {
+		return ApproverEmployeeResponse.of(dao.getApprovers(empCodes));
 	}
 }
