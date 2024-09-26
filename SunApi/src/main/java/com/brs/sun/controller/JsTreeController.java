@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.brs.sun.dto.response.ApproverEmployeeResponse;
 import com.brs.sun.dto.response.JsTreeResponseDTO;
 import com.brs.sun.model.service.JsTreeService;
 import com.brs.sun.vo.DepartmentVo;
@@ -65,11 +66,11 @@ public class JsTreeController {
 	@Parameter(name = "choiceList", description = "선택된 Node ID List")
 	@ApiResponse(responseCode = "200", description = "전달받은 사원 코드들로 사원 정보 조회 및 직급 코드로 정렬 후 반환", content = @Content(schema = @Schema(implementation = EmployeeVo.class)))
 	@PostMapping("/empList")
-	public List<EmployeeVo> getApprovers(@RequestBody List<String> choiceList) {
+	public List<ApproverEmployeeResponse> getApprovers(@RequestBody List<String> choiceList) {
 	    log.info("choiceArr: {}", choiceList);
 	    
 	    // Approver 리스트를 가져옵니다.
-	    List<EmployeeVo> approverList = service.getApprovers(choiceList);
+	    List<ApproverEmployeeResponse> approverList = service.getApprovers(choiceList);
 	    
 	    // jobCode에 따라 내림차순으로 정렬합니다.
 	    approverList.sort((e1, e2) -> Integer.compare(e2.getJobCode(), e1.getJobCode()));
