@@ -98,7 +98,7 @@ const OrgChartComponent = ({ buttonName, maxSelection, mappingUrl, onSelectionCh
 
         if (finalDataArr.length > 0) {
             try {
-                console.log("e", finalDataArr)
+                console.log("finalData", finalDataArr)
                 const res = await axios.post(`${serverUrl}${mappingUrl}`, finalDataArr, {
                     headers: { 'Content-Type': 'application/json' },
                 });

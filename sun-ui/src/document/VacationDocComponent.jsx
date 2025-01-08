@@ -179,7 +179,6 @@ const VacationDocComponent = () => {
     };
 
     const handleApproverSelection = (approvers) => {
-        console.log("data",approvers);
         const sortedApprovers = approvers.sort((a, b) => {
             if (a.empCode == sessionEmpCode) return -1;
             if (b.empCode == sessionEmpCode) return 1;

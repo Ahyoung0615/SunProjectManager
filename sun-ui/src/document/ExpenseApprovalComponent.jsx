@@ -148,8 +148,8 @@ const ExpenseApprovalComponent = () => {
 
     const handleApproverSelection = (approvers) => {
         const sortedApprovers = approvers.sort((a, b) => {
-            if (a.empCode === sessionEmpCode) return -1;
-            if (b.empCode === sessionEmpCode) return 1;
+            if (a.empCode == sessionEmpCode) return -1;
+            if (b.empCode == sessionEmpCode) return 1;
             return 0;
         });
         setSelectedApprovers(sortedApprovers);
@@ -179,6 +179,7 @@ const ExpenseApprovalComponent = () => {
         }
         const formData = new FormData();
         formData.append('receipt', receiptImage);
+        console.log("formdata",formData)
         try {
             await axios.post('http://localhost:8787/api/clova/setReceipt', formData, {
                 headers: {
